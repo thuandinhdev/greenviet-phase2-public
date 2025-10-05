@@ -1,0 +1,11 @@
+{
+    "name": "KnowledgeBaseArticle",
+    "alias": "knowledgebasearticle",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\KnowledgeBaseArticle\\Providers\\KnowledgeBaseArticleServiceProvider"
+    ],
+    "files": []
+}

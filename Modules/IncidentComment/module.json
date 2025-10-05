@@ -1,0 +1,11 @@
+{
+    "name": "IncidentComment",
+    "alias": "incidentcomment",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\IncidentComment\\Providers\\IncidentCommentServiceProvider"
+    ],
+    "files": []
+}

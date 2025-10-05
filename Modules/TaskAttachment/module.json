@@ -1,0 +1,11 @@
+{
+    "name": "TaskAttachment",
+    "alias": "taskattachment",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\TaskAttachment\\Providers\\TaskAttachmentServiceProvider"
+    ],
+    "files": []
+}

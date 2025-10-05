@@ -1,0 +1,11 @@
+{
+    "name": "ProjectAttachment",
+    "alias": "projectattachment",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\ProjectAttachment\\Providers\\ProjectAttachmentServiceProvider"
+    ],
+    "files": []
+}

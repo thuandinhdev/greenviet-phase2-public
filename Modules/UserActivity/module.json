@@ -1,0 +1,11 @@
+{
+    "name": "UserActivity",
+    "alias": "useractivity",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\UserActivity\\Providers\\UserActivityServiceProvider"
+    ],
+    "files": []
+}

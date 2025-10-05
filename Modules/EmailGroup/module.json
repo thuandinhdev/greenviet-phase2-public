@@ -1,0 +1,11 @@
+{
+    "name": "EmailGroup",
+    "alias": "emailgroup",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\EmailGroup\\Providers\\EmailGroupServiceProvider"
+    ],
+    "files": []
+}

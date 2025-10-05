@@ -1,0 +1,11 @@
+{
+    "name": "IncidentAttachment",
+    "alias": "incidentattachment",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\IncidentAttachment\\Providers\\IncidentAttachmentServiceProvider"
+    ],
+    "files": []
+}

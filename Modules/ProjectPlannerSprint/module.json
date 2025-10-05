@@ -1,0 +1,11 @@
+{
+    "name": "ProjectPlannerSprint",
+    "alias": "projectplannersprint",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\ProjectPlannerSprint\\Providers\\ProjectPlannerSprintServiceProvider"
+    ],
+    "files": []
+}

@@ -1,0 +1,11 @@
+{
+    "name": "DefectComment",
+    "alias": "defectcomment",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\DefectComment\\Providers\\DefectCommentServiceProvider"
+    ],
+    "files": []
+}

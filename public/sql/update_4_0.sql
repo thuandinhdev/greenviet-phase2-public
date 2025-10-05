@@ -1,0 +1,1 @@
+ALTER TABLE `vipspm_user_settings` ADD `is_team_notification` TINYINT(1) NOT NULL DEFAULT '0' COMMENT 'For Project, Task, Defect and Incident notification.' AFTER `is_announcement_notification`;
