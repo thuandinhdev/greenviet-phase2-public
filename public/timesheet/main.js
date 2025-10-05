@@ -10145,7 +10145,7 @@ __webpack_require__.r(__webpack_exports__);
 var environment;
 environment = {
     production: false,
-    apiUrl: 'http://greenvietdev.cuortech.com'
+    apiUrl: 'https://greenvietdev.cuortech.com'
     // apiUrl: 'https://greenviet.cuortech.com'
     // apiUrl: 'https://greenviet.azurewebsites.net'
     // apiUrl: 'http://chetsapp.de:8899'
