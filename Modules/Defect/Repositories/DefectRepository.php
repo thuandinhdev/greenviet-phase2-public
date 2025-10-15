@@ -950,10 +950,10 @@ class DefectRepository
     public function getDefectForReport($request)
     {
         $input = $request->all();
-        $userList = User::where('is_active', 1)->get();
+        $userList = User::where('is_active', 1)->orderBy('firstname')->get();
         $setting = Setting::select([ 'dependent', 'personal'])->first();
-        $startOfMonth = Carbon::createFromFormat('Y/m', $input['month'])->startOfMonth();
-        $endOfMonth   = Carbon::createFromFormat('Y/m', $input['month'])->endOfMonth();
+        $startOfMonth = Carbon::createFromFormat('Y-m', $input['month'])->startOfMonth();
+        $endOfMonth   = Carbon::createFromFormat('Y-m', $input['month'])->endOfMonth();
 
         $holidays = DB::table('gv_holidays')->whereBetween('date', [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')])->get();
         $leaves = DB::table('gv_leaves')->whereBetween('leave_date', [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')])
@@ -1017,8 +1017,14 @@ class DefectRepository
             $value->dependents_amount = $value->dependents * $setting->dependent;
             $value->personal_amount = $setting->personal;
         }
+
+        $settings = DB::table('gv_user_settings')->select(
+            [
+            'login_background', 'company_logo', 'theme_layout', 'default_language', 'allowed_for_registration', 'is_demo', 'working_hours', 'ot_rate', 'holiday_rate', 'sunday_rate', 'dependent', 'personal'
+            ]
+        )->first();
         
-        return ['data'=>$userList, 'holidays'=>$holidays, 'leaves'=>$leaves];
+        return ['data'=>$userList, 'holidays'=>$holidays, 'leaves'=>$leaves, 'settings'=>$settings];
         // return ['data'=>$userList];
 
 

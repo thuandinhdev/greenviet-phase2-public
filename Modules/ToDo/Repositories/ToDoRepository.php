@@ -194,7 +194,7 @@ class ToDoRepository
             ->leftjoin($incidents_table, $incidents_table . '.id', '=', $todo_table . '.module_related_id')
             ->where($todo_table . '.status', 2);
 
-        if ($request->has('module_id') && $request->has('module_related_id')) {
+        if ($request->has('module_id')!= 'all' && $request->has('module_id') && $request->has('module_related_id')) {
             $module_id = $request->get('module_id');
             $module_related_id = $request->get('module_related_id');
 

@@ -113,6 +113,11 @@ class LeaveController extends Controller
         return $this->leaveRepo->getAllLeave($request);
     }
 
+    public function leavesReport(Request $request)
+    {
+        return $this->leaveRepo->leavesReport($request);
+    }
+
     /**
      * Store a newly created resource in storage.
      *

@@ -3,6 +3,7 @@
 namespace Modules\Leave\Repositories;
 
 use Auth;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Modules\Helper\Helpers\CommonHelper;
 use Modules\Helper\Helpers\EmailsHelper;
@@ -174,6 +175,94 @@ class LeaveRepository
      *
      * @return Object
      */
+
+     
+    public function leavesReport($request){
+        $leaves_table = config('core.acl.leaves_table');
+        $leave_types_table = config('core.acl.leave_types_table');
+        $user_table = config('core.acl.users_table');
+        $user = Auth::user();
+        $input = $request->all();
+        $startOfMonth = Carbon::createFromFormat('Y-m', $input['month'])->startOfMonth();
+        $endOfMonth   = Carbon::createFromFormat('Y-m', $input['month'])->endOfMonth();
+
+        $leaves = Leave::with(['attachments'])->select(
+            $leaves_table . '.*',
+            $leave_types_table . '.leave_type',
+            $user_table . '.firstname',
+            $user_table . '.lastname',
+            $user_table . '.avatar',
+            'approved1.firstname as approved1_firstname',
+            'approved1.lastname as approved1_lastname',
+            'approved1.avatar as approved1_avatar',
+            'approved2.firstname as approved2_firstname',
+            'approved2.lastname as approved2_lastname',
+            'approved2.avatar as approved2_avatar',
+            'reject.firstname as reject_firstname',
+            'reject.lastname as reject_lastname',
+            'reject.avatar as reject_avatar',
+        )
+            ->join($leave_types_table, $leave_types_table . '.id', '=', $leaves_table . '.leave_type_id')
+            ->join($user_table, $user_table . '.id', '=', $leaves_table . '.user_id')
+            ->leftJoin($user_table . ' as approved1', 'approved1.id', '=', $leaves_table . '.approved1')
+            ->leftJoin($user_table . ' as approved2', 'approved2.id', '=', $leaves_table . '.approved2')
+            ->leftJoin($user_table . ' as reject', 'reject.id', '=', $leaves_table . '.reject_id')->where($leaves_table . '.leave_type_id', 3)->where($leaves_table . '.status', 2)->whereBetween($leaves_table . '.leave_date', [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')]);
+        $checkRole = DB::table('gv_user_role_department')->where('user_id', $user->id)->first();
+
+        if (!$user->hasRole('admin') && !$user->is_super_admin && !$user->is_super_admin && $checkRole->department_id != 6) {
+            $childUser = DB::table('gv_teams')->join('gv_teams_members',  'gv_teams.id', '=', 'gv_teams_members.team_id')->where('gv_teams.team_leader', $user->id)->pluck('gv_teams_members.user_id');
+            $childUser->push($user->id);
+            if($checkRole->department_id == 3){
+                $leaves->where(
+                    function ($query) use ($leaves_table) {
+                        $query->where($leaves_table . '.status', '!=', 1)
+                            ->orWhere($leaves_table . '.leave_type_id', 3);
+                    }
+                );
+            } else {
+                $leaves->whereIn('user_id', $childUser);
+            }
+        }
+
+        
+        if (isset($input['status']) && $input['status']) {
+            $leaves = $leaves->where($leaves_table . '.status', $input['status']);
+        }
+
+        $totalData = $leaves->count();
+        $totalFiltered = $totalData;
+
+        if (!empty($request->input('search.value'))) {
+            $search = $request->input('search.value');
+
+            $leaves = $leaves->where(
+                function ($query) use ($search, $user_table, $leaves_table, $leave_types_table) {
+                    $query->where($leaves_table . '.leave_date', 'LIKE', "%{$search}%")
+                        ->orWhere($leaves_table . '.created_at', 'LIKE', "%{$search}%")
+                        ->orWhere($leave_types_table . '.leave_type', 'LIKE', "%{$search}%")
+                        ->orWhere(
+                            DB::raw('concat(' . $user_table . '.firstname," ",' . $user_table . '.lastname)'),
+                            'LIKE',
+                            "%{$search}%"
+                        );
+                }
+            );
+
+            $totalFiltered = $leaves->count();
+        }
+
+        $data = $leaves->orderBy($leaves_table . '.leave_date', 'desc')->get();
+
+        $remainingLeave = $this->commonHelper->getRemainingLeaveDays($user->id);
+
+        return array(
+            "draw" => intval($request->input('draw')),
+            "recordsTotal" => intval($totalData),
+            "recordsFiltered" => intval($totalFiltered),
+            "data" => $data,
+            'other' => ['department_id'=>$checkRole->department_id, 'remainingLeave'=>$remainingLeave]
+        );
+    }
     public function getAllLeave($request)
     {
         $leaves_table = config('core.acl.leaves_table');

@@ -21,6 +21,7 @@ Route::group(
         Route::post('leaves/report-details', 'LeaveController@leaveReportDetails');
         Route::get('leaves/calendar', 'LeaveController@getLeavesForCalendar');
         Route::get('leaves/pending', 'LeaveController@getLeavesForBox');
+        Route::post('leaves/leaves-report', 'LeaveController@leavesReport');
         Route::get('leaves/get-leaves-for-user/{id}', 'LeaveController@getLeavesForUser');
         Route::resource('leaves', 'LeaveController');
     }

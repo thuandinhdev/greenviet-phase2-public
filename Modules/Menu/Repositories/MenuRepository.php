@@ -190,6 +190,7 @@ class MenuRepository
                 ->whereIn($department_role_menu_table . '.role_id', $roles)
                 ->where($menu_table . '.status', 1)
                 ->where($menu_table . '.module', '!=', 'settings')
+                ->where($menu_table . '.module', '!=', 'filemanager')
                 ->where($menu_table . '.module', '!=', 'utilities')
                 ->orderBy($menu_table . '.order')
                 ->distinct($menu_table . '.id')
@@ -416,10 +417,10 @@ class MenuRepository
         $leaves = $leaves->where($leaves_table . '.status', 1);
 
         $leavesStatus = $leaves->count();
-        
+
         return ['timesheet'=>$hasStatusGreaterThanZero, 'leaves'=>$leavesStatus > 0 ? true : false, 'departmentName'=>$department->department_name];
 
 
     }
-    
+
 }

@@ -4430,7 +4430,7 @@ var routes = [
                     }
                 },
                 // loadChildren: () => import('./modules/calendar-pm/calendar-pm.module').then(m => m.CalendarPmModule)
-                loadChildren: function () { return Promise.all(/*! import() | modules-timesheet-timesheet-module */[__webpack_require__.e("default~modules-admin-department-department-module~modules-admin-holiday-holiday-module~modules-admi~4ff3f378"), __webpack_require__.e("default~modules-admin-holiday-holiday-module~modules-admin-role-role-module~modules-admin-team-team-~35258bbf"), __webpack_require__.e("default~modules-hrm-leaves-leaves-module~modules-pm-defects-defects-module~modules-pm-projects-proje~a6603681"), __webpack_require__.e("default~modules-home-home-module~modules-pm-defects-defects-module~modules-pm-projects-projects-modu~7c981de6"), __webpack_require__.e("default~modules-pm-defects-defects-module~modules-pm-projects-projects-module~modules-pm-tasks-tasks~28d8cd6b"), __webpack_require__.e("default~modules-pm-defects-defects-module~modules-pm-tasks-tasks-module~modules-timesheet-timesheet-module")]).then(__webpack_require__.bind(null, /*! ./modules/timesheet/timesheet.module */ "./src/app/modules/timesheet/timesheet.module.ts")).then(function (m) { return m.TimesheetModule; }); }
+                loadChildren: function () { return Promise.all(/*! import() | modules-timesheet-timesheet-module */[__webpack_require__.e("default~modules-admin-department-department-module~modules-admin-holiday-holiday-module~modules-admi~f9d0a5b5"), __webpack_require__.e("default~modules-admin-holiday-holiday-module~modules-admin-role-role-module~modules-admin-team-team-~35258bbf"), __webpack_require__.e("default~modules-hrm-leaves-leaves-module~modules-pm-defects-defects-module~modules-pm-projects-proje~a6603681"), __webpack_require__.e("default~modules-home-home-module~modules-pm-defects-defects-module~modules-pm-projects-projects-modu~7c981de6"), __webpack_require__.e("default~modules-pm-defects-defects-module~modules-pm-projects-projects-module~modules-pm-tasks-tasks~28d8cd6b"), __webpack_require__.e("default~modules-pm-defects-defects-module~modules-pm-tasks-tasks-module~modules-timesheet-timesheet-module")]).then(__webpack_require__.bind(null, /*! ./modules/timesheet/timesheet.module */ "./src/app/modules/timesheet/timesheet.module.ts")).then(function (m) { return m.TimesheetModule; }); }
             },
             // {
             // 	path: 'todos',
@@ -4461,7 +4461,7 @@ var routes = [
                         isHome: false
                     }
                 },
-                loadChildren: function () { return Promise.all(/*! import() | modules-admin-user-user-module */[__webpack_require__.e("default~modules-admin-department-department-module~modules-admin-holiday-holiday-module~modules-admi~4ff3f378"), __webpack_require__.e("default~modules-admin-holiday-holiday-module~modules-admin-role-role-module~modules-admin-team-team-~35258bbf"), __webpack_require__.e("default~modules-admin-user-user-module~modules-hrm-leaves-leaves-module~modules-pm-defects-defects-m~faa9226c"), __webpack_require__.e("common"), __webpack_require__.e("modules-admin-user-user-module")]).then(__webpack_require__.bind(null, /*! ./modules/admin/user/user.module */ "./src/app/modules/admin/user/user.module.ts")).then(function (m) { return m.UserModule; }); }
+                loadChildren: function () { return Promise.all(/*! import() | modules-admin-user-user-module */[__webpack_require__.e("default~modules-admin-department-department-module~modules-admin-holiday-holiday-module~modules-admi~f9d0a5b5"), __webpack_require__.e("default~modules-admin-holiday-holiday-module~modules-admin-role-role-module~modules-admin-team-team-~35258bbf"), __webpack_require__.e("default~modules-admin-user-user-module~modules-hrm-leaves-leaves-module~modules-pm-defects-defects-m~faa9226c"), __webpack_require__.e("common"), __webpack_require__.e("modules-admin-user-user-module")]).then(__webpack_require__.bind(null, /*! ./modules/admin/user/user.module */ "./src/app/modules/admin/user/user.module.ts")).then(function (m) { return m.UserModule; }); }
             },
             {
                 path: 'departments',
@@ -4478,7 +4478,7 @@ var routes = [
                         only: ['admin', 'super_admin']
                     }
                 },
-                loadChildren: function () { return Promise.all(/*! import() | modules-admin-department-department-module */[__webpack_require__.e("default~modules-admin-department-department-module~modules-admin-holiday-holiday-module~modules-admi~4ff3f378"), __webpack_require__.e("common"), __webpack_require__.e("modules-admin-department-department-module")]).then(__webpack_require__.bind(null, /*! ./modules/admin/department/department.module */ "./src/app/modules/admin/department/department.module.ts")).then(function (m) { return m.DepartmentModule; }); }
+                loadChildren: function () { return Promise.all(/*! import() | modules-admin-department-department-module */[__webpack_require__.e("default~modules-admin-department-department-module~modules-admin-holiday-holiday-module~modules-admi~f9d0a5b5"), __webpack_require__.e("common"), __webpack_require__.e("modules-admin-department-department-module")]).then(__webpack_require__.bind(null, /*! ./modules/admin/department/department.module */ "./src/app/modules/admin/department/department.module.ts")).then(function (m) { return m.DepartmentModule; }); }
             },
             {
                 path: 'roles',
@@ -4495,7 +4495,7 @@ var routes = [
                         only: ['admin', 'super_admin']
                     }
                 },
-                loadChildren: function () { return Promise.all(/*! import() | modules-admin-role-role-module */[__webpack_require__.e("default~modules-admin-department-department-module~modules-admin-holiday-holiday-module~modules-admi~4ff3f378"), __webpack_require__.e("default~modules-admin-holiday-holiday-module~modules-admin-role-role-module~modules-admin-team-team-~35258bbf"), __webpack_require__.e("common"), __webpack_require__.e("modules-admin-role-role-module")]).then(__webpack_require__.bind(null, /*! ./modules/admin/role/role.module */ "./src/app/modules/admin/role/role.module.ts")).then(function (m) { return m.RoleModule; }); }
+                loadChildren: function () { return Promise.all(/*! import() | modules-admin-role-role-module */[__webpack_require__.e("default~modules-admin-department-department-module~modules-admin-holiday-holiday-module~modules-admi~f9d0a5b5"), __webpack_require__.e("default~modules-admin-holiday-holiday-module~modules-admin-role-role-module~modules-admin-team-team-~35258bbf"), __webpack_require__.e("common"), __webpack_require__.e("modules-admin-role-role-module")]).then(__webpack_require__.bind(null, /*! ./modules/admin/role/role.module */ "./src/app/modules/admin/role/role.module.ts")).then(function (m) { return m.RoleModule; }); }
             },
             // {
             // 	path: 'mailbox',
@@ -4514,23 +4514,23 @@ var routes = [
             // 	},
             // 	loadChildren: () => import('./modules/mailbox/mailbox.module').then(m => m.MailboxModule)
             // },
-            // {
-            // 	path: 'file-browser',
-            // 	canLoad: [NgxPermissionsGuard],
-            // 	data: {
-            // 		title: "breadcrumbs.file_browser.title",
-            // 		breadcrumbs: {
-            // 			text: "breadcrumbs.file_browser.text",
-            // 			icon: "fa fa-folder",
-            // 			show: false,
-            // 			isHome: false
-            // 		},
-            // 		permissions: {
-            // 			only: ['admin', 'super_admin', 'filemanager_view']
-            // 		}
-            // 	},
-            // 	loadChildren: () => import('./modules/file-browser/file-browser.module').then(m => m.FileBrowserModule)
-            // },
+            {
+                path: 'file-browser',
+                canLoad: [ngx_permissions__WEBPACK_IMPORTED_MODULE_3__["NgxPermissionsGuard"]],
+                data: {
+                    title: "breadcrumbs.file_browser.title",
+                    breadcrumbs: {
+                        text: "breadcrumbs.file_browser.text",
+                        icon: "fa fa-folder",
+                        show: false,
+                        isHome: false
+                    },
+                    permissions: {
+                        only: ['admin', 'super_admin', 'filemanager_view']
+                    }
+                },
+                loadChildren: function () { return Promise.all(/*! import() | modules-file-browser-file-browser-module */[__webpack_require__.e("default~modules-admin-department-department-module~modules-admin-holiday-holiday-module~modules-admi~f9d0a5b5"), __webpack_require__.e("default~modules-file-browser-file-browser-module~modules-pm-reports-reports-module"), __webpack_require__.e("modules-file-browser-file-browser-module")]).then(__webpack_require__.bind(null, /*! ./modules/file-browser/file-browser.module */ "./src/app/modules/file-browser/file-browser.module.ts")).then(function (m) { return m.FileBrowserModule; }); }
+            },
             {
                 path: 'teams',
                 canLoad: [ngx_permissions__WEBPACK_IMPORTED_MODULE_3__["NgxPermissionsGuard"]],
@@ -4546,7 +4546,7 @@ var routes = [
                         only: ['admin', 'super_admin', 'teams_view']
                     }
                 },
-                loadChildren: function () { return Promise.all(/*! import() | modules-admin-team-team-module */[__webpack_require__.e("default~modules-admin-department-department-module~modules-admin-holiday-holiday-module~modules-admi~4ff3f378"), __webpack_require__.e("default~modules-admin-holiday-holiday-module~modules-admin-role-role-module~modules-admin-team-team-~35258bbf"), __webpack_require__.e("modules-admin-team-team-module")]).then(__webpack_require__.bind(null, /*! ./modules/admin/team/team.module */ "./src/app/modules/admin/team/team.module.ts")).then(function (m) { return m.TeamModule; }); }
+                loadChildren: function () { return Promise.all(/*! import() | modules-admin-team-team-module */[__webpack_require__.e("default~modules-admin-department-department-module~modules-admin-holiday-holiday-module~modules-admi~f9d0a5b5"), __webpack_require__.e("default~modules-admin-holiday-holiday-module~modules-admin-role-role-module~modules-admin-team-team-~35258bbf"), __webpack_require__.e("modules-admin-team-team-module")]).then(__webpack_require__.bind(null, /*! ./modules/admin/team/team.module */ "./src/app/modules/admin/team/team.module.ts")).then(function (m) { return m.TeamModule; }); }
             },
             {
                 path: 'holidays',
@@ -4563,7 +4563,7 @@ var routes = [
                         only: ['admin', 'super_admin', 'holidays_view']
                     }
                 },
-                loadChildren: function () { return Promise.all(/*! import() | modules-admin-holiday-holiday-module */[__webpack_require__.e("default~modules-admin-department-department-module~modules-admin-holiday-holiday-module~modules-admi~4ff3f378"), __webpack_require__.e("default~modules-admin-holiday-holiday-module~modules-admin-role-role-module~modules-admin-team-team-~35258bbf"), __webpack_require__.e("modules-admin-holiday-holiday-module")]).then(__webpack_require__.bind(null, /*! ./modules/admin/holiday/holiday.module */ "./src/app/modules/admin/holiday/holiday.module.ts")).then(function (m) { return m.HolidayModule; }); }
+                loadChildren: function () { return Promise.all(/*! import() | modules-admin-holiday-holiday-module */[__webpack_require__.e("default~modules-admin-department-department-module~modules-admin-holiday-holiday-module~modules-admi~f9d0a5b5"), __webpack_require__.e("default~modules-admin-holiday-holiday-module~modules-admin-role-role-module~modules-admin-team-team-~35258bbf"), __webpack_require__.e("modules-admin-holiday-holiday-module")]).then(__webpack_require__.bind(null, /*! ./modules/admin/holiday/holiday.module */ "./src/app/modules/admin/holiday/holiday.module.ts")).then(function (m) { return m.HolidayModule; }); }
             },
             // {
             // 	path: 'meetings',
@@ -4614,7 +4614,7 @@ var routes = [
                         only: ['admin', 'super_admin', 'settings_view']
                     }
                 },
-                loadChildren: function () { return Promise.all(/*! import() | modules-settings-settings-module */[__webpack_require__.e("default~modules-admin-department-department-module~modules-admin-holiday-holiday-module~modules-admi~4ff3f378"), __webpack_require__.e("default~modules-admin-holiday-holiday-module~modules-admin-role-role-module~modules-admin-team-team-~35258bbf"), __webpack_require__.e("default~modules-admin-user-user-module~modules-hrm-leaves-leaves-module~modules-pm-defects-defects-m~faa9226c"), __webpack_require__.e("common"), __webpack_require__.e("modules-settings-settings-module")]).then(__webpack_require__.bind(null, /*! ./modules/settings/settings.module */ "./src/app/modules/settings/settings.module.ts")).then(function (m) { return m.SettingsModule; }); }
+                loadChildren: function () { return Promise.all(/*! import() | modules-settings-settings-module */[__webpack_require__.e("default~modules-admin-department-department-module~modules-admin-holiday-holiday-module~modules-admi~f9d0a5b5"), __webpack_require__.e("default~modules-admin-holiday-holiday-module~modules-admin-role-role-module~modules-admin-team-team-~35258bbf"), __webpack_require__.e("default~modules-admin-user-user-module~modules-hrm-leaves-leaves-module~modules-pm-defects-defects-m~faa9226c"), __webpack_require__.e("common"), __webpack_require__.e("modules-settings-settings-module")]).then(__webpack_require__.bind(null, /*! ./modules/settings/settings.module */ "./src/app/modules/settings/settings.module.ts")).then(function (m) { return m.SettingsModule; }); }
             },
             // {
             // 	path: 'calendar',
@@ -4648,7 +4648,7 @@ var routes = [
                         only: ['admin', 'super_admin', 'projects_view']
                     }
                 },
-                loadChildren: function () { return Promise.all(/*! import() | modules-pm-projects-projects-module */[__webpack_require__.e("default~modules-admin-department-department-module~modules-admin-holiday-holiday-module~modules-admi~4ff3f378"), __webpack_require__.e("default~modules-admin-holiday-holiday-module~modules-admin-role-role-module~modules-admin-team-team-~35258bbf"), __webpack_require__.e("default~modules-hrm-leaves-leaves-module~modules-pm-defects-defects-module~modules-pm-projects-proje~a6603681"), __webpack_require__.e("default~modules-admin-user-user-module~modules-hrm-leaves-leaves-module~modules-pm-defects-defects-m~faa9226c"), __webpack_require__.e("default~modules-home-home-module~modules-pm-defects-defects-module~modules-pm-projects-projects-modu~7c981de6"), __webpack_require__.e("default~modules-pm-defects-defects-module~modules-pm-projects-projects-module~modules-pm-tasks-tasks~28d8cd6b"), __webpack_require__.e("default~modules-home-home-module~modules-pm-defects-defects-module~modules-pm-projects-projects-modu~f7668e92"), __webpack_require__.e("default~modules-hrm-leaves-leaves-module~modules-pm-defects-defects-module~modules-pm-projects-proje~27072eef"), __webpack_require__.e("default~modules-pm-defects-defects-module~modules-pm-projects-projects-module~modules-pm-tasks-tasks-module"), __webpack_require__.e("default~modules-pm-projects-projects-module~modules-pm-tasks-tasks-module"), __webpack_require__.e("default~modules-hrm-leaves-leaves-module~modules-pm-projects-projects-module"), __webpack_require__.e("common"), __webpack_require__.e("modules-pm-projects-projects-module")]).then(__webpack_require__.bind(null, /*! ./modules/pm/projects/projects.module */ "./src/app/modules/pm/projects/projects.module.ts")).then(function (m) { return m.ProjectsModule; }); }
+                loadChildren: function () { return Promise.all(/*! import() | modules-pm-projects-projects-module */[__webpack_require__.e("default~modules-admin-department-department-module~modules-admin-holiday-holiday-module~modules-admi~f9d0a5b5"), __webpack_require__.e("default~modules-admin-holiday-holiday-module~modules-admin-role-role-module~modules-admin-team-team-~35258bbf"), __webpack_require__.e("default~modules-hrm-leaves-leaves-module~modules-pm-defects-defects-module~modules-pm-projects-proje~a6603681"), __webpack_require__.e("default~modules-admin-user-user-module~modules-hrm-leaves-leaves-module~modules-pm-defects-defects-m~faa9226c"), __webpack_require__.e("default~modules-home-home-module~modules-pm-defects-defects-module~modules-pm-projects-projects-modu~7c981de6"), __webpack_require__.e("default~modules-pm-defects-defects-module~modules-pm-projects-projects-module~modules-pm-tasks-tasks~28d8cd6b"), __webpack_require__.e("default~modules-home-home-module~modules-pm-defects-defects-module~modules-pm-projects-projects-modu~f7668e92"), __webpack_require__.e("default~modules-hrm-leaves-leaves-module~modules-pm-defects-defects-module~modules-pm-projects-proje~27072eef"), __webpack_require__.e("default~modules-pm-defects-defects-module~modules-pm-projects-projects-module~modules-pm-tasks-tasks-module"), __webpack_require__.e("default~modules-pm-projects-projects-module~modules-pm-tasks-tasks-module"), __webpack_require__.e("default~modules-hrm-leaves-leaves-module~modules-pm-projects-projects-module"), __webpack_require__.e("common"), __webpack_require__.e("modules-pm-projects-projects-module")]).then(__webpack_require__.bind(null, /*! ./modules/pm/projects/projects.module */ "./src/app/modules/pm/projects/projects.module.ts")).then(function (m) { return m.ProjectsModule; }); }
             },
             {
                 path: 'tasks',
@@ -4665,7 +4665,7 @@ var routes = [
                         only: ['admin', 'super_admin', 'tasks_view']
                     }
                 },
-                loadChildren: function () { return Promise.all(/*! import() | modules-pm-tasks-tasks-module */[__webpack_require__.e("default~modules-admin-department-department-module~modules-admin-holiday-holiday-module~modules-admi~4ff3f378"), __webpack_require__.e("default~modules-admin-holiday-holiday-module~modules-admin-role-role-module~modules-admin-team-team-~35258bbf"), __webpack_require__.e("default~modules-hrm-leaves-leaves-module~modules-pm-defects-defects-module~modules-pm-projects-proje~a6603681"), __webpack_require__.e("default~modules-admin-user-user-module~modules-hrm-leaves-leaves-module~modules-pm-defects-defects-m~faa9226c"), __webpack_require__.e("default~modules-home-home-module~modules-pm-defects-defects-module~modules-pm-projects-projects-modu~7c981de6"), __webpack_require__.e("default~modules-pm-defects-defects-module~modules-pm-projects-projects-module~modules-pm-tasks-tasks~28d8cd6b"), __webpack_require__.e("default~modules-home-home-module~modules-pm-defects-defects-module~modules-pm-projects-projects-modu~f7668e92"), __webpack_require__.e("default~modules-hrm-leaves-leaves-module~modules-pm-defects-defects-module~modules-pm-projects-proje~27072eef"), __webpack_require__.e("default~modules-pm-defects-defects-module~modules-pm-tasks-tasks-module~modules-timesheet-timesheet-module"), __webpack_require__.e("default~modules-pm-defects-defects-module~modules-pm-projects-projects-module~modules-pm-tasks-tasks-module"), __webpack_require__.e("default~modules-pm-projects-projects-module~modules-pm-tasks-tasks-module"), __webpack_require__.e("modules-pm-tasks-tasks-module")]).then(__webpack_require__.bind(null, /*! ./modules/pm/tasks/tasks.module */ "./src/app/modules/pm/tasks/tasks.module.ts")).then(function (m) { return m.TasksModule; }); }
+                loadChildren: function () { return Promise.all(/*! import() | modules-pm-tasks-tasks-module */[__webpack_require__.e("default~modules-admin-department-department-module~modules-admin-holiday-holiday-module~modules-admi~f9d0a5b5"), __webpack_require__.e("default~modules-admin-holiday-holiday-module~modules-admin-role-role-module~modules-admin-team-team-~35258bbf"), __webpack_require__.e("default~modules-hrm-leaves-leaves-module~modules-pm-defects-defects-module~modules-pm-projects-proje~a6603681"), __webpack_require__.e("default~modules-admin-user-user-module~modules-hrm-leaves-leaves-module~modules-pm-defects-defects-m~faa9226c"), __webpack_require__.e("default~modules-home-home-module~modules-pm-defects-defects-module~modules-pm-projects-projects-modu~7c981de6"), __webpack_require__.e("default~modules-pm-defects-defects-module~modules-pm-projects-projects-module~modules-pm-tasks-tasks~28d8cd6b"), __webpack_require__.e("default~modules-home-home-module~modules-pm-defects-defects-module~modules-pm-projects-projects-modu~f7668e92"), __webpack_require__.e("default~modules-hrm-leaves-leaves-module~modules-pm-defects-defects-module~modules-pm-projects-proje~27072eef"), __webpack_require__.e("default~modules-pm-defects-defects-module~modules-pm-tasks-tasks-module~modules-timesheet-timesheet-module"), __webpack_require__.e("default~modules-pm-defects-defects-module~modules-pm-projects-projects-module~modules-pm-tasks-tasks-module"), __webpack_require__.e("default~modules-pm-projects-projects-module~modules-pm-tasks-tasks-module"), __webpack_require__.e("modules-pm-tasks-tasks-module")]).then(__webpack_require__.bind(null, /*! ./modules/pm/tasks/tasks.module */ "./src/app/modules/pm/tasks/tasks.module.ts")).then(function (m) { return m.TasksModule; }); }
             },
             {
                 path: 'project_bidding',
@@ -4682,7 +4682,7 @@ var routes = [
                         only: ['admin', 'super_admin', 'defects_view']
                     }
                 },
-                loadChildren: function () { return Promise.all(/*! import() | modules-pm-defects-defects-module */[__webpack_require__.e("default~modules-admin-department-department-module~modules-admin-holiday-holiday-module~modules-admi~4ff3f378"), __webpack_require__.e("default~modules-admin-holiday-holiday-module~modules-admin-role-role-module~modules-admin-team-team-~35258bbf"), __webpack_require__.e("default~modules-hrm-leaves-leaves-module~modules-pm-defects-defects-module~modules-pm-projects-proje~a6603681"), __webpack_require__.e("default~modules-admin-user-user-module~modules-hrm-leaves-leaves-module~modules-pm-defects-defects-m~faa9226c"), __webpack_require__.e("default~modules-home-home-module~modules-pm-defects-defects-module~modules-pm-projects-projects-modu~7c981de6"), __webpack_require__.e("default~modules-pm-defects-defects-module~modules-pm-projects-projects-module~modules-pm-tasks-tasks~28d8cd6b"), __webpack_require__.e("default~modules-home-home-module~modules-pm-defects-defects-module~modules-pm-projects-projects-modu~f7668e92"), __webpack_require__.e("default~modules-hrm-leaves-leaves-module~modules-pm-defects-defects-module~modules-pm-projects-proje~27072eef"), __webpack_require__.e("default~modules-pm-defects-defects-module~modules-pm-tasks-tasks-module~modules-timesheet-timesheet-module"), __webpack_require__.e("default~modules-pm-defects-defects-module~modules-pm-projects-projects-module~modules-pm-tasks-tasks-module"), __webpack_require__.e("common"), __webpack_require__.e("modules-pm-defects-defects-module")]).then(__webpack_require__.bind(null, /*! ./modules/pm/defects/defects.module */ "./src/app/modules/pm/defects/defects.module.ts")).then(function (m) { return m.DefectsModule; }); }
+                loadChildren: function () { return Promise.all(/*! import() | modules-pm-defects-defects-module */[__webpack_require__.e("default~modules-admin-department-department-module~modules-admin-holiday-holiday-module~modules-admi~f9d0a5b5"), __webpack_require__.e("default~modules-admin-holiday-holiday-module~modules-admin-role-role-module~modules-admin-team-team-~35258bbf"), __webpack_require__.e("default~modules-hrm-leaves-leaves-module~modules-pm-defects-defects-module~modules-pm-projects-proje~a6603681"), __webpack_require__.e("default~modules-admin-user-user-module~modules-hrm-leaves-leaves-module~modules-pm-defects-defects-m~faa9226c"), __webpack_require__.e("default~modules-home-home-module~modules-pm-defects-defects-module~modules-pm-projects-projects-modu~7c981de6"), __webpack_require__.e("default~modules-pm-defects-defects-module~modules-pm-projects-projects-module~modules-pm-tasks-tasks~28d8cd6b"), __webpack_require__.e("default~modules-home-home-module~modules-pm-defects-defects-module~modules-pm-projects-projects-modu~f7668e92"), __webpack_require__.e("default~modules-hrm-leaves-leaves-module~modules-pm-defects-defects-module~modules-pm-projects-proje~27072eef"), __webpack_require__.e("default~modules-pm-defects-defects-module~modules-pm-tasks-tasks-module~modules-timesheet-timesheet-module"), __webpack_require__.e("default~modules-pm-defects-defects-module~modules-pm-projects-projects-module~modules-pm-tasks-tasks-module"), __webpack_require__.e("common"), __webpack_require__.e("modules-pm-defects-defects-module")]).then(__webpack_require__.bind(null, /*! ./modules/pm/defects/defects.module */ "./src/app/modules/pm/defects/defects.module.ts")).then(function (m) { return m.DefectsModule; }); }
             },
             // {
             // 	path: 'incidents',
@@ -4784,7 +4784,7 @@ var routes = [
                         only: ['admin', 'super_admin', 'reports_view']
                     }
                 },
-                loadChildren: function () { return Promise.all(/*! import() | modules-pm-reports-reports-module */[__webpack_require__.e("default~modules-admin-holiday-holiday-module~modules-admin-role-role-module~modules-admin-team-team-~35258bbf"), __webpack_require__.e("default~modules-hrm-leaves-leaves-module~modules-pm-defects-defects-module~modules-pm-projects-proje~a6603681"), __webpack_require__.e("modules-pm-reports-reports-module")]).then(__webpack_require__.bind(null, /*! ./modules/pm/reports/reports.module */ "./src/app/modules/pm/reports/reports.module.ts")).then(function (m) { return m.ReportsModule; }); }
+                loadChildren: function () { return Promise.all(/*! import() | modules-pm-reports-reports-module */[__webpack_require__.e("default~modules-admin-department-department-module~modules-admin-holiday-holiday-module~modules-admi~f9d0a5b5"), __webpack_require__.e("default~modules-admin-holiday-holiday-module~modules-admin-role-role-module~modules-admin-team-team-~35258bbf"), __webpack_require__.e("default~modules-hrm-leaves-leaves-module~modules-pm-defects-defects-module~modules-pm-projects-proje~a6603681"), __webpack_require__.e("default~modules-file-browser-file-browser-module~modules-pm-reports-reports-module"), __webpack_require__.e("modules-pm-reports-reports-module")]).then(__webpack_require__.bind(null, /*! ./modules/pm/reports/reports.module */ "./src/app/modules/pm/reports/reports.module.ts")).then(function (m) { return m.ReportsModule; }); }
             },
             // {
             // 	path: 'appointments',
@@ -4835,7 +4835,7 @@ var routes = [
                         only: ['admin', 'super_admin', 'leaves_view']
                     }
                 },
-                loadChildren: function () { return Promise.all(/*! import() | modules-hrm-leaves-leaves-module */[__webpack_require__.e("default~modules-admin-department-department-module~modules-admin-holiday-holiday-module~modules-admi~4ff3f378"), __webpack_require__.e("default~modules-admin-holiday-holiday-module~modules-admin-role-role-module~modules-admin-team-team-~35258bbf"), __webpack_require__.e("default~modules-hrm-leaves-leaves-module~modules-pm-defects-defects-module~modules-pm-projects-proje~a6603681"), __webpack_require__.e("default~modules-admin-user-user-module~modules-hrm-leaves-leaves-module~modules-pm-defects-defects-m~faa9226c"), __webpack_require__.e("default~modules-hrm-leaves-leaves-module~modules-pm-defects-defects-module~modules-pm-projects-proje~27072eef"), __webpack_require__.e("default~modules-hrm-leaves-leaves-module~modules-pm-projects-projects-module"), __webpack_require__.e("default~modules-hrm-leave-types-leave-types-module~modules-hrm-leaves-leaves-module"), __webpack_require__.e("modules-hrm-leaves-leaves-module")]).then(__webpack_require__.bind(null, /*! ./modules/hrm/leaves/leaves.module */ "./src/app/modules/hrm/leaves/leaves.module.ts")).then(function (m) { return m.LeavesModule; }); }
+                loadChildren: function () { return Promise.all(/*! import() | modules-hrm-leaves-leaves-module */[__webpack_require__.e("default~modules-admin-department-department-module~modules-admin-holiday-holiday-module~modules-admi~f9d0a5b5"), __webpack_require__.e("default~modules-admin-holiday-holiday-module~modules-admin-role-role-module~modules-admin-team-team-~35258bbf"), __webpack_require__.e("default~modules-hrm-leaves-leaves-module~modules-pm-defects-defects-module~modules-pm-projects-proje~a6603681"), __webpack_require__.e("default~modules-admin-user-user-module~modules-hrm-leaves-leaves-module~modules-pm-defects-defects-m~faa9226c"), __webpack_require__.e("default~modules-hrm-leaves-leaves-module~modules-pm-defects-defects-module~modules-pm-projects-proje~27072eef"), __webpack_require__.e("default~modules-hrm-leaves-leaves-module~modules-pm-projects-projects-module"), __webpack_require__.e("default~modules-hrm-leave-types-leave-types-module~modules-hrm-leaves-leaves-module"), __webpack_require__.e("modules-hrm-leaves-leaves-module")]).then(__webpack_require__.bind(null, /*! ./modules/hrm/leaves/leaves.module */ "./src/app/modules/hrm/leaves/leaves.module.ts")).then(function (m) { return m.LeavesModule; }); }
             },
             {
                 path: 'leave-types',
@@ -4852,7 +4852,7 @@ var routes = [
                         only: ['admin', 'super_admin', 'leavetypes_view']
                     }
                 },
-                loadChildren: function () { return Promise.all(/*! import() | modules-hrm-leave-types-leave-types-module */[__webpack_require__.e("default~modules-admin-department-department-module~modules-admin-holiday-holiday-module~modules-admi~4ff3f378"), __webpack_require__.e("default~modules-hrm-leave-types-leave-types-module~modules-hrm-leaves-leaves-module")]).then(__webpack_require__.bind(null, /*! ./modules/hrm/leave-types/leave-types.module */ "./src/app/modules/hrm/leave-types/leave-types.module.ts")).then(function (m) { return m.LeaveTypesModule; }); }
+                loadChildren: function () { return Promise.all(/*! import() | modules-hrm-leave-types-leave-types-module */[__webpack_require__.e("default~modules-admin-department-department-module~modules-admin-holiday-holiday-module~modules-admi~f9d0a5b5"), __webpack_require__.e("default~modules-hrm-leave-types-leave-types-module~modules-hrm-leaves-leaves-module")]).then(__webpack_require__.bind(null, /*! ./modules/hrm/leave-types/leave-types.module */ "./src/app/modules/hrm/leave-types/leave-types.module.ts")).then(function (m) { return m.LeaveTypesModule; }); }
             },
         ]
     },
