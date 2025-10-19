@@ -959,72 +959,143 @@ class DefectRepository
         $leaves = DB::table('gv_leaves')->whereBetween('leave_date', [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')])
             ->where('leave_type_id', '<', 3)
             ->whereIn('status', [1, 2])->select('*', DB::raw('DATE_FORMAT(leave_date, "%Y-%m-%d") as formatted_date'))->get();
-            
-        $query = DB::table('gv_timesheets')
-                ->where(
-                function ($querys) {
-                    $querys->where('status', 2)
-                        ->orWhere('module_id', 7);
-                })
-                ->whereNotNull('project_id')
-                ->whereBetween('start_time', [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')])
-                ->select(DB::raw('DATE(start_time) as date'), DB::raw('SUM(decimal_time) as total_decimal_time'), 'ot_rate')
-                ->groupBy(DB::raw('DATE(start_time)'), 'ot_rate');
-        $allDaysData = [];
-        for ($date = $startOfMonth; $date->lte($endOfMonth); $date->addDay()) {
-            $allDaysData[$date->format('Y-m-d')] = null;
-        }
-
-        $working_days = $this->getWorkingDays($startOfMonth->format('m'), $startOfMonth->format('Y'));
-        foreach ($userList as $key => $value) {
-            $allDays = ($allDaysData);
-            $allDaysOt = ($allDaysData);
-            $queryData = clone($query);
-            $queryData_ot = clone($query);
-            $timesheets = $queryData->where('created_user_id', $value->id)->where('ot', 0)->get();
-            $timesheets_ot = $queryData_ot->where('created_user_id', $value->id)->where('ot', 1)->get();
-            $value->count_timesheets = 0;
-            $value->count_timesheets_ot = 0;
-            foreach ($timesheets as $timesheet) {
-                $allDays[$timesheet->date] = $timesheet->total_decimal_time;
-                if($timesheet->total_decimal_time&&$timesheet->total_decimal_time!=null){
-                    $value->count_timesheets++;
-                }
-            }
-            foreach ($timesheets_ot as $timesheet_ot) {
-                $allDaysOt[$timesheet_ot->date] = $timesheet_ot->total_decimal_time;
-                if($timesheet_ot->total_decimal_time&&$timesheet_ot->total_decimal_time!=null){
-                    $value->count_timesheets_ot +=($timesheet_ot->total_decimal_time*$timesheet_ot->ot_rate);
-                }
-            }
-            $value->timesheet = $allDays;
-            $value->timesheet_ot = $allDaysOt;
-            $contract = DB::table('gv_users_contract')
-            ->where('user_id', $value->id)
-            ->where('start_date', '<=', $startOfMonth->format('Y-m-d'))
-            ->where('end_date', '>=', $startOfMonth->format('Y-m-d'))
-            ->orderBy('id', 'desc')->first();
-            $value->working_days = $working_days + 2;
-            if($contract){
-                $value->contract = $contract;
-                $value->day_salary = ($contract->performance + $contract->basic)/$value->working_days;
-                $value->salary_ot = $value->count_timesheets_ot * $value->day_salary;
-            } else {
-                $value->contract = [];
-                $value->day_salary = 0;
-                $value->salary_ot = 0;
-            }
-            $value->dependents_amount = $value->dependents * $setting->dependent;
-            $value->personal_amount = $setting->personal;
-        }
-
-        $settings = DB::table('gv_user_settings')->select(
-            [
-            'login_background', 'company_logo', 'theme_layout', 'default_language', 'allowed_for_registration', 'is_demo', 'working_hours', 'ot_rate', 'holiday_rate', 'sunday_rate', 'dependent', 'personal'
-            ]
-        )->first();
         
-        return ['data'=>$userList, 'holidays'=>$holidays, 'leaves'=>$leaves, 'settings'=>$settings];
+        if(isset($input['action']) && $input['action'] == 'user'){
+            $query = DB::table('gv_timesheets')
+            ->join('gv_projects', 'gv_projects.id', '=', 'gv_timesheets.project_id')
+            ->join('gv_tasks', 'gv_tasks.id', '=', 'gv_timesheets.module_related_id')
+            ->where(
+            function ($querys) {
+                $querys->where('gv_timesheets.status', 2)
+                    ->orWhere('gv_timesheets.module_id', 7);
+            })
+            ->whereNotNull('gv_timesheets.project_id')
+            ->whereBetween('gv_timesheets.start_time', [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')])
+            ->select(
+                DB::raw('DATE(gv_timesheets.start_time) as date'),
+                'gv_timesheets.project_id',
+                'gv_projects.project_name',
+                'gv_tasks.name as task_name',
+                'gv_timesheets.module_id',
+                'gv_timesheets.note',
+                'gv_timesheets.decimal_time',
+                'gv_timesheets.module_related_id'
+            )
+            ->orderBy('gv_timesheets.start_time', 'asc');
+            $allDaysData = [];
+            for ($date = $startOfMonth; $date->lte($endOfMonth); $date->addDay()) {
+                $allDaysData[$date->format('Y-m-d')] = null;
+            }
+
+            $working_days = $this->getWorkingDays($startOfMonth->format('m'), $startOfMonth->format('Y'));
+            foreach ($userList as $value) {
+                $queryData = clone($query);
+                $queryData_ot = clone($query);
+                $timesheets = $queryData->where('created_user_id', $value->id)
+                                        ->where('ot', 0)
+                                        ->get();
+                $timesheets_ot = $queryData_ot->where('created_user_id', $value->id)
+                                              ->where('ot', 1)
+                                              ->get();
+            
+                $value->timesheet = $timesheets;
+                $value->timesheet_ot = $timesheets_ot;
+            
+                $contract = DB::table('gv_users_contract')
+                    ->where('user_id', $value->id)
+                    ->where('start_date', '<=', $startOfMonth->format('Y-m-d'))
+                    ->where('end_date', '>=', $startOfMonth->format('Y-m-d'))
+                    ->orderBy('id', 'desc')
+                    ->first();
+            
+                $value->working_days = $this->getWorkingDays($startOfMonth->format('m'), $startOfMonth->format('Y')) + 2;
+            
+                if ($contract) {
+                    $value->contract = $contract;
+                    $value->day_salary = ($contract->performance + $contract->basic) / $value->working_days;
+                } else {
+                    $value->contract = [];
+                    $value->day_salary = 0;
+                }
+            
+                $value->dependents_amount = $value->dependents * $setting->dependent;
+                $value->personal_amount = $setting->personal;
+            }
+
+            $settings = DB::table('gv_user_settings')->select(
+                [
+                'login_background', 'company_logo', 'theme_layout', 'default_language', 'allowed_for_registration', 'is_demo', 'working_hours', 'ot_rate', 'holiday_rate', 'sunday_rate', 'dependent', 'personal'
+                ]
+            )->first();
+
+            return ['data'=>$userList, 'holidays'=>$holidays, 'leaves'=>$leaves, 'settings'=>$settings];
+        } else {
+            $query = DB::table('gv_timesheets')
+            ->where(
+            function ($querys) {
+                $querys->where('status', 2)
+                    ->orWhere('module_id', 7);
+            })
+            ->whereNotNull('project_id')
+            ->whereBetween('start_time', [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')])
+            ->select(DB::raw('DATE(start_time) as date'), DB::raw('SUM(decimal_time) as total_decimal_time'), 'ot_rate')
+            ->groupBy(DB::raw('DATE(start_time)'), 'ot_rate');
+            $allDaysData = [];
+            for ($date = $startOfMonth; $date->lte($endOfMonth); $date->addDay()) {
+                $allDaysData[$date->format('Y-m-d')] = null;
+            }
+
+            $working_days = $this->getWorkingDays($startOfMonth->format('m'), $startOfMonth->format('Y'));
+            foreach ($userList as $key => $value) {
+                $allDays = ($allDaysData);
+                $allDaysOt = ($allDaysData);
+                $queryData = clone($query);
+                $queryData_ot = clone($query);
+                $timesheets = $queryData->where('created_user_id', $value->id)->where('ot', 0)->get();
+                $timesheets_ot = $queryData_ot->where('created_user_id', $value->id)->where('ot', 1)->get();
+                $value->count_timesheets = 0;
+                $value->count_timesheets_ot = 0;
+                foreach ($timesheets as $timesheet) {
+                    $allDays[$timesheet->date] = $timesheet->total_decimal_time;
+                    if($timesheet->total_decimal_time&&$timesheet->total_decimal_time!=null){
+                        $value->count_timesheets++;
+                    }
+                }
+                foreach ($timesheets_ot as $timesheet_ot) {
+                    $allDaysOt[$timesheet_ot->date] = $timesheet_ot->total_decimal_time;
+                    if($timesheet_ot->total_decimal_time&&$timesheet_ot->total_decimal_time!=null){
+                        $value->count_timesheets_ot +=($timesheet_ot->total_decimal_time*$timesheet_ot->ot_rate);
+                    }
+                }
+                $value->timesheet = $allDays;
+                $value->timesheet_ot = $allDaysOt;
+                $contract = DB::table('gv_users_contract')
+                ->where('user_id', $value->id)
+                ->where('start_date', '<=', $startOfMonth->format('Y-m-d'))
+                ->where('end_date', '>=', $startOfMonth->format('Y-m-d'))
+                ->orderBy('id', 'desc')->first();
+                $value->working_days = $working_days + 2;
+                if($contract){
+                    $value->contract = $contract;
+                    $value->day_salary = ($contract->performance + $contract->basic)/$value->working_days;
+                    $value->salary_ot = $value->count_timesheets_ot * $value->day_salary;
+                } else {
+                    $value->contract = [];
+                    $value->day_salary = 0;
+                    $value->salary_ot = 0;
+                }
+                $value->dependents_amount = $value->dependents * $setting->dependent;
+                $value->personal_amount = $setting->personal;
+            }
+
+            $settings = DB::table('gv_user_settings')->select(
+                [
+                'login_background', 'company_logo', 'theme_layout', 'default_language', 'allowed_for_registration', 'is_demo', 'working_hours', 'ot_rate', 'holiday_rate', 'sunday_rate', 'dependent', 'personal'
+                ]
+            )->first();
+
+            return ['data'=>$userList, 'holidays'=>$holidays, 'leaves'=>$leaves, 'settings'=>$settings];
+        }
         // return ['data'=>$userList];
 
 

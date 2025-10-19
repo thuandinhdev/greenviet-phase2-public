@@ -217,6 +217,47 @@ class ToDoRepository
         );
     }
 
+    public function listReport($request)
+    {
+        $todo_table = config('core.acl.todos_table');
+        $modules_table = config('core.acl.modules_table');
+        $projects_table = config('core.acl.projects_table');
+        $task_table = config('core.acl.task_table');
+        $defects_table = config('core.acl.defects_table');
+        $incidents_table = config('core.acl.incidents_table');
+
+        $user = Auth::user();
+        $open_todos = $user->toDo()
+            ->select(
+                $todo_table . '.id',
+                $todo_table . '.module_id',
+                $todo_table . '.module_related_id',
+                $todo_table . '.description',
+                $todo_table . '.price',
+                $todo_table . '.due_date',
+                $todo_table . '.payment_date',
+                $todo_table . '.status',
+                $modules_table . '.module_name',
+                $projects_table . '.project_name as project_name',
+                $projects_table . '.generated_id as project_generated_id',
+                $task_table . '.generated_id as task_generated_id',
+                $defects_table . '.generated_id as defect_generated_id',
+                $incidents_table . '.generated_id as incident_generated_id'
+            )
+            ->join($modules_table, $modules_table . '.module_id', '=', $todo_table . '.module_id')
+            ->leftjoin($projects_table, $projects_table . '.id', '=', $todo_table . '.module_related_id')
+            ->leftjoin($task_table, $task_table . '.id', '=', $todo_table . '.module_related_id')
+            ->leftjoin($defects_table, $defects_table . '.id', '=', $todo_table . '.module_related_id')
+            ->leftjoin($incidents_table, $incidents_table . '.id', '=', $todo_table . '.module_related_id')
+            ->whereIn($todo_table . '.status', [1,2]);
+
+        return collect(
+            [
+            'data' => $open_todos->orderBy($todo_table . '.order', 'asc')->get(),
+            ]
+        );
+    }
+    
     /**
      * Update the specified resource.
      *

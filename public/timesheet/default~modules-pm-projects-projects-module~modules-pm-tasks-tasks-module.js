@@ -17650,6 +17650,132 @@ __webpack_require__.r(__webpack_exports__);
 
 //# sourceMappingURL=Subscription.js.map
 
+/***/ }),
+
+/***/ "./src/app/core/services/custom-fields.service.ts":
+/*!********************************************************!*\
+  !*** ./src/app/core/services/custom-fields.service.ts ***!
+  \********************************************************/
+/*! exports provided: CustomFieldsService */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CustomFieldsService", function() { return CustomFieldsService; });
+/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
+/* harmony import */ var _angular_common_http__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @angular/common/http */ "./node_modules/@angular/common/fesm5/http.js");
+/* harmony import */ var _environments_environment__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../environments/environment */ "./src/environments/environment.ts");
+
+
+
+
+var CustomFieldsService = /** @class */ (function () {
+    function CustomFieldsService(http) {
+        this.http = http;
+        this.apiUrl = _environments_environment__WEBPACK_IMPORTED_MODULE_3__["environment"].apiUrl;
+    }
+    CustomFieldsService.prototype.getAll = function () {
+        return this.http.get(this.apiUrl + "/api/customfields");
+    };
+    CustomFieldsService.prototype.getById = function (id) {
+        return this.http.get(this.apiUrl + "/api/customfields/" + id);
+    };
+    CustomFieldsService.prototype.create = function (customField) {
+        return this.http.post(this.apiUrl + "/api/customfields", customField);
+    };
+    CustomFieldsService.prototype.update = function (customField) {
+        return this.http.put(this.apiUrl + "/api/customfields/" + customField.id, customField);
+    };
+    CustomFieldsService.prototype.delete = function (id, tabData) {
+        return this.http.delete(this.apiUrl + "/api/customfields/" + tabData + "/" + id);
+    };
+    CustomFieldsService.prototype.changeStatus = function (customField) {
+        return this.http.post(this.apiUrl + "/api/customfields/" + customField.id + "/change-status", { status: customField.status });
+    };
+    CustomFieldsService.prototype.getFormTables = function () {
+        return this.http.get(this.apiUrl + "/api/customfields/form");
+    };
+    CustomFieldsService.prototype.getCustomFieldByForm = function (formId) {
+        return this.http.get(this.apiUrl + "/api/customfields/form/" + formId);
+    };
+    CustomFieldsService.prototype.getCustomFieldDetailByForm = function (formId, isView) {
+        return this.http.get(this.apiUrl + "/api/customfields/form/" + formId + "/1");
+    };
+    CustomFieldsService.ctorParameters = function () { return [
+        { type: _angular_common_http__WEBPACK_IMPORTED_MODULE_2__["HttpClient"] }
+    ]; };
+    CustomFieldsService = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Injectable"])({
+            providedIn: 'root'
+        }),
+        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [_angular_common_http__WEBPACK_IMPORTED_MODULE_2__["HttpClient"]])
+    ], CustomFieldsService);
+    return CustomFieldsService;
+}());
+
+
+
+/***/ }),
+
+/***/ "./src/app/core/services/team.service.ts":
+/*!***********************************************!*\
+  !*** ./src/app/core/services/team.service.ts ***!
+  \***********************************************/
+/*! exports provided: TeamService */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "TeamService", function() { return TeamService; });
+/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
+/* harmony import */ var _angular_common_http__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @angular/common/http */ "./node_modules/@angular/common/fesm5/http.js");
+/* harmony import */ var _environments_environment__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../environments/environment */ "./src/environments/environment.ts");
+
+
+
+
+var TeamService = /** @class */ (function () {
+    function TeamService(http) {
+        this.http = http;
+        this.apiUrl = _environments_environment__WEBPACK_IMPORTED_MODULE_3__["environment"].apiUrl;
+    }
+    TeamService.prototype.getAll = function () {
+        return this.http.get(this.apiUrl + "/api/teams");
+    };
+    TeamService.prototype.getById = function (id) {
+        return this.http.get(this.apiUrl + "/api/teams/" + id);
+    };
+    TeamService.prototype.create = function (team) {
+        return this.http.post(this.apiUrl + "/api/teams", team);
+    };
+    TeamService.prototype.update = function (team) {
+        return this.http.put(this.apiUrl + "/api/teams/" + team.id, team);
+    };
+    TeamService.prototype.delete = function (id) {
+        return this.http.delete(this.apiUrl + "/api/teams/" + id);
+    };
+    TeamService.prototype.getTeamForTeamBoard = function () {
+        return this.http.get(this.apiUrl + "/api/teams/teamboard");
+    };
+    TeamService.prototype.import = function (importTeams) {
+        return this.http.post(this.apiUrl + "/api/teams/import", importTeams);
+    };
+    TeamService.ctorParameters = function () { return [
+        { type: _angular_common_http__WEBPACK_IMPORTED_MODULE_2__["HttpClient"] }
+    ]; };
+    TeamService = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Injectable"])({
+            providedIn: 'root'
+        }),
+        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [_angular_common_http__WEBPACK_IMPORTED_MODULE_2__["HttpClient"]])
+    ], TeamService);
+    return TeamService;
+}());
+
+
+
 /***/ })
 
 }]);

@@ -20,6 +20,7 @@ Route::group(
     function () {
         Route::post('todos/update-list', 'ToDoController@updateList');
         Route::post('todos/list', 'ToDoController@getTodos');
+        Route::post('todos/list-report', 'ToDoController@listReport');
         Route::resource('todos', 'ToDoController');
     }
 );

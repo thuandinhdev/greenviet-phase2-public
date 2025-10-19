@@ -108,6 +108,11 @@ class ToDoController extends Controller
         return $this->toDoRepo->findById($id);
     }
 
+    public function listReport(Request $request)
+    {
+        return $this->toDoRepo->listReport($request);
+    }
+    
     /**
      * Update the specified resource in storage.
      *

@@ -153,6 +153,7 @@ class ProjectRepository
         // )
         $projects = Project::select(
                 $project_table . '.*',
+                DB::raw('SUM(gv_tasks.actual_hours) as total_actual_hours'),
                 $user_table . '.firstname as client_firstname',
                 $user_table . '.lastname as client_lastname',
                 'project_created.firstname as created_firstname',
@@ -162,7 +163,8 @@ class ProjectRepository
             )
             ->leftjoin($user_table, $user_table . '.id', '=', $project_table . '.client_id')
             ->leftjoin($user_table . ' as project_created', 'project_created.id', '=', $project_table . '.user_id')
-            ->leftjoin($team_table, $team_table . '.id', '=', $project_table . '.assign_to');
+            ->leftjoin($team_table, $team_table . '.id', '=', $project_table . '.assign_to')
+            ->leftjoin('gv_tasks', 'gv_tasks.project_id', '=', $project_table . '.id')->groupBy($project_table . '.id');
         if (!AdminHelper::can_action(43, 'view') || ($request->get('isUserProfile') && $request->has('user_id'))) {
             $projects = $projects->where($project_table . '.assign_to', $user->id);
         }
@@ -1256,6 +1258,7 @@ class ProjectRepository
         // )
         $projects = Project::select(
                 $project_table . '.*',
+                DB::raw('SUM(gv_tasks.actual_hours) as total_actual_hours'),
                 'project_created.id as created_id',
                 'project_created.firstname as created_firstname',
                 'project_created.lastname as created_lastname',
@@ -1265,7 +1268,8 @@ class ProjectRepository
                 $user_table . '.avatar as client_avatar'
             )
             ->leftjoin($user_table . ' as project_created', 'project_created.id', '=', $project_table . '.user_id')
-            ->leftjoin($user_table, $user_table . '.id', '=', $project_table . '.client_id');
+            ->leftjoin($user_table, $user_table . '.id', '=', $project_table . '.client_id')
+            ->leftjoin('gv_tasks', 'gv_tasks.project_id', '=', $project_table . '.id')->groupBy($project_table . '.id');
             if (!empty($request->input('search.value'))) {
                 $search = $request->input('search.value');
                 $projects->where($project_table . '.project_name', 'LIKE', "%{$search}%");
