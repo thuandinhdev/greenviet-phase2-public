@@ -319,7 +319,16 @@ class DefectController extends Controller
     {
         return $this->defectRepo->getDefectForCalendar($request);
     }
+    public function exportSalary(Request $request)
+    {
+        return $this->defectRepo->exportSalary($request);
+    }
 
+    public function exportTimesheet(Request $request)
+    {
+        return $this->defectRepo->exportTimesheet($request);
+    }
+    
     /**
      * Get defect permission.
      *

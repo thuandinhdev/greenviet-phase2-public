@@ -17,6 +17,12 @@ use Modules\Team\Entities\Team;
 use Modules\Timesheet\Entities\Timesheet;
 use Modules\UserActivity\Entities\UserActivity;
 use Modules\User\Entities\User\User;
+use Maatwebsite\Excel\Concerns\WithEvents;
+use Maatwebsite\Excel\Events\AfterSheet;
+use Illuminate\Http\Request;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 
 /**
  * Class DefectRepository
@@ -1171,6 +1177,294 @@ class DefectRepository
         //     "data" => $data,
         // );
     }
+    
+        
+    public function exportTimesheet($request){
+        $input = $request->all();
+        $data = $input['data'];
+        
+        // 🔹 Đường dẫn file template
+        
+        if($input['action'] == 'time'){
+            $templatePath = storage_path('app/templates/timesheet_time.xlsx');
+        } else {
+            $templatePath = storage_path('app/templates/timesheet.xlsx');
+        }
+        
+        if (!file_exists($templatePath)) {
+            abort(404, 'Không tìm thấy file mẫu salary.xlsx');
+        }
+
+        // 🔹 Load template
+        $spreadsheet = IOFactory::load($templatePath);
+        $sheet = $spreadsheet->getActiveSheet();
+
+
+        $startRow = 4;
+        $startCol = 'E'; // Bắt đầu từ cột E
+        // Lặp qua danh sách ngày trong tháng
+        $colIndex = Coordinate::columnIndexFromString($startCol);
+
+        foreach ($input['daysInMonth'] as $key => $value) {
+            $col = Coordinate::stringFromColumnIndex($colIndex);
+            
+            $sheet->setCellValue("{$col}{$startRow}", $key + 1); // hoặc $value nếu muốn hiển thị ngày thực tế
+            $colIndex++; // Tăng cột kế tiếp
+        }
+
+        $templateRow = 5; // Dòng mẫu (format gốc)
+        $startRow = $templateRow;
+        $lastCol = 'AM'; // Cột cuối cùng trong file
+        foreach ($data as $i => $item) {
+            $row = $startRow + $i;
+
+            // --- Copy style ---
+            $sheet->duplicateStyle(
+                $sheet->getStyle("A{$templateRow}:{$lastCol}{$templateRow}"),
+                "A{$row}:{$lastCol}{$row}"
+            );
+
+            // --- Copy công thức có điều chỉnh dòng ---
+            $delta = $row - $templateRow;
+            for ($col = 'A'; $col !== Coordinate::stringFromColumnIndex(
+                Coordinate::columnIndexFromString($lastCol) + 1
+            ); $col = Coordinate::stringFromColumnIndex(
+                Coordinate::columnIndexFromString($col) + 1
+            )) {
+                $cell = $sheet->getCell("{$col}{$templateRow}");
+                $value = $cell->getValue();
+
+                if ($cell->isFormula()) {
+                    $sheet->setCellValue("{$col}{$row}", $this->shiftFormulaRows($value, $delta));
+                }
+            }
+
+            // --- Ghi dữ liệu mới ---
+            $sheet->setCellValue("A{$row}", $i + 1);
+            $sheet->setCellValue("C{$row}", $item['firstname'] . ' ' . $item['lastname']);
+            // 🔹 Ghi dữ liệu ngày trong tháng (ví dụ từ cột E → cột tương ứng với ngày cuối)
+            $startCol = 'E';
+            $colIndex = Coordinate::columnIndexFromString($startCol);
+
+            foreach ($input['daysInMonth'] as $dayIndex => $dayValue) {
+                $col = Coordinate::stringFromColumnIndex($colIndex);
+                $value = $this->getTimesheetByDay($item, $dayIndex, $input['month'], $input['holidays'], $input['leaves'], $input['action']);
+                $sheet->setCellValue("{$col}{$row}", $value);
+                $colIndex++;
+            }
+            $sheet->setCellValue("AJ{$row}", $item['total_day']);
+            $sheet->setCellValue("AK{$row}", $item['total_leave']);
+            $sheet->setCellValue("AL{$row}", $item['total_total']);
+            if($input['action'] == 'time'){
+                $sheet->setCellValue("AM{$row}", $input['workingInMonth']*8.5);
+            } else {
+                $sheet->setCellValue("AM{$row}", $input['workingInMonth']);
+            }
+            
+        }
+
+        // --- Lưu file ---
+        $fileName = 'salary_export_' . time() . '.xlsx';
+        $filePath = storage_path('app/' . $fileName);
+
+        $writer = new Xlsx($spreadsheet);
+        $writer->save($filePath);
+
+        return response()->download($filePath)->deleteFileAfterSend(true);
+    }
+    public function getTimesheetByDay($user, $dayIndex, $month, $holidays, $leaves, $action)
+    {
+        // Nếu $month = "2025-10"
+        $currentDate = \Carbon\Carbon::createFromFormat('Y-m-d', "{$month}-" . ($dayIndex + 1));
+        $currentDay = $currentDate->day;
+
+        // --- Check Holiday ---
+        foreach ($holidays as $holiday) {
+            $holidayDate = \Carbon\Carbon::parse($holiday['date']);
+            if ($currentDay === $holidayDate->day) {
+                if($action== 'time'){
+                    return 8.5;
+                } else {
+                    return 'L'; // Holiday
+                }
+            }
+        }
+
+        $timesheet_total = 0;
+
+        // --- Check Leave ---
+        foreach ($leaves as $leave) {
+            $leaveDate = \Carbon\Carbon::parse($leave['leave_date']);
+
+            if ($user['id'] == $leave['user_id'] && $currentDay === $leaveDate->day) {
+                if ($leave['leave_type_id'] == 2) { // Nghỉ không phép
+                    if ($leave['duration'] == 'half') {
+                        if($action== 'time'){
+                            return 8.5;
+                        } else {
+                            return '/'; // Half unpaid
+                        }
+                    } else {
+                        return ''; // Full unpaid
+                    }
+                } else { // Nghỉ có phép
+                    if ($leave['duration'] == 'half') {
+                        if($action== 'time'){
+                            if($leave['duration_type'] == 'first_half'){
+                                return 4;
+                            } else {
+                                return 4.5;
+                            }
+                        } else {
+                            return 'P'; // Full paid leave
+                        }
+                    } else {
+                        if($action== 'time'){
+                            return 8.5;
+                        } else {
+                            return 'P'; // Full paid leave
+                        }
+                    }
+                }
+            }
+        }
+
+        if ($timesheet_total > 0) {
+            return '/'; // Half paid leave
+        } else {
+            if (!empty($user['timesheet'][$dayIndex]) && $user['timesheet'][$dayIndex]['check']) {
+                if($action== 'time'){
+                    return $user['timesheet'][$dayIndex]['value'] == 8.5 ? 8.5 : '';
+                } else {
+                    return $user['timesheet'][$dayIndex]['value'] == 8.5 ? 'x' : '';
+                }
+            }
+        }
+
+        return '';
+    }
+
+
+    public function exportSalary($request)
+    {
+        $input = $request->all();
+        $data = $input['data'];
+        
+        // 🔹 Đường dẫn file template
+        $templatePath = storage_path('app/templates/salary.xlsx');
+        if (!file_exists($templatePath)) {
+            abort(404, 'Không tìm thấy file mẫu salary.xlsx');
+        }
+
+        // 🔹 Load template
+        $spreadsheet = IOFactory::load($templatePath);
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $templateRow = 5; // Dòng mẫu (format gốc)
+        $startRow = $templateRow;
+        $lastCol = 'AJ'; // Cột cuối cùng trong file
+
+        // ✅ Duyệt qua data để ghi vào, copy format từ dòng 5
+        $row = 0;
+        foreach ($data as $i => $item) {
+            $row = $startRow + $i;
+
+            // --- Copy style ---
+            $sheet->duplicateStyle(
+                $sheet->getStyle("A{$templateRow}:{$lastCol}{$templateRow}"),
+                "A{$row}:{$lastCol}{$row}"
+            );
+
+            // --- Copy công thức có điều chỉnh dòng ---
+            $delta = $row - $templateRow;
+            for ($col = 'A'; $col !== Coordinate::stringFromColumnIndex(
+                Coordinate::columnIndexFromString($lastCol) + 1
+            ); $col = Coordinate::stringFromColumnIndex(
+                Coordinate::columnIndexFromString($col) + 1
+            )) {
+                $cell = $sheet->getCell("{$col}{$templateRow}");
+                $value = $cell->getValue();
+
+                if ($cell->isFormula()) {
+                    $sheet->setCellValue("{$col}{$row}", $this->shiftFormulaRows($value, $delta));
+                }
+            }
+
+            $sheet->setCellValue("AK{$row}",  $input['workingInMonth']);
+            // --- Ghi dữ liệu mới ---
+            $sheet->setCellValue("A{$row}", $i + 1);
+            $sheet->setCellValue("C{$row}", $item['firstname'] . ' ' . $item['lastname']);
+            $sheet->setCellValue("E{$row}", $item['salary_total']);
+            $sheet->setCellValue("F{$row}", $item['salary_basic']);
+            $sheet->setCellValue("G{$row}", $item['salary_performance']);
+            $sheet->setCellValue("I{$row}", $item['salary_working_day']);
+            $sheet->setCellValue("K{$row}", $item['salary_leave_salary']);
+            $sheet->setCellValue("L{$row}", 0);
+            $sheet->setCellValue("M{$row}", 0);
+            $sheet->setCellValue("P{$row}", $item['salary_lunch']);
+            $sheet->setCellValue("Q{$row}", 0);
+            $sheet->setCellValue("R{$row}", 0);
+            $sheet->setCellValue("T{$row}", $item['dependents']);
+            $sheet->setCellValue("V{$row}", $input['settings']['personal']);
+            $sheet->setCellValue("W{$row}", $item['salary_lunch']);
+        }
+        $totalRow = $i +$templateRow+1;
+        $currentRow = $row;
+        $startColIndex = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::columnIndexFromString('E');
+        $endColIndex   = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::columnIndexFromString('AK');
+
+        for ($i = $startColIndex; $i <= $endColIndex; $i++) {
+            $col = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($i);
+            $sheet->setCellValue("{$col}{$totalRow}", "=SUM({$col}{$startRow}:{$col}{$currentRow})");
+        }
+        $styleArray = [
+            'font' => [
+                'bold' => true,
+            ],
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                    'color' => ['argb' => 'FF000000'],
+                ],
+            ],
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'startColor' => ['argb' => 'FFFFE699'], // vàng nhạt
+            ],
+        ];
+        
+        $sheet->getStyle("A{$totalRow}:AK{$totalRow}")->applyFromArray($styleArray);
+        // --- Lưu file ---
+        $fileName = 'salary_export_' . time() . '.xlsx';
+        $filePath = storage_path('app/' . $fileName);
+
+        $writer = new Xlsx($spreadsheet);
+        $writer->save($filePath);
+
+        return response()->download($filePath)->deleteFileAfterSend(true);
+    }
+
+    public function shiftFormulaRows(string $formula, int $delta): string
+    {
+        if ($delta === 0) return $formula;
+
+        return preg_replace_callback(
+            '/(\$?[A-Z]{1,3}\$?)(\d+)/i',
+            function ($matches) use ($delta) {
+                $colPart = $matches[1];
+                $rowPart = (int)$matches[2];
+
+                // Nếu absolute row (có $ trước số), thì giữ nguyên
+                if (substr($colPart, -1) === '$') {
+                    return $colPart . $rowPart;
+                }
+
+                return $colPart . ($rowPart + $delta);
+            },
+            $formula
+        );
+    }
+
     function getWorkingDays($month, $year) {
         $totalDays = 0;
         $totalWorkingDays = 0;

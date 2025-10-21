@@ -23,6 +23,8 @@ Route::group(
         Route::post('defect/{id}/change-status','DefectController@changeDefectStatus');
         Route::post('defect/{id}/change-severity','DefectController@changeDefectSeverity');
         Route::post('defect/update-kanban', 'DefectController@updateKanban');
+        Route::post('defect/export-salary', 'DefectController@exportSalary');
+        Route::post('defect/export-timesheet', 'DefectController@exportTimesheet');
         Route::put('defect/notes/{id}', 'DefectController@defectNotesUpdate');
         Route::get('defect/{id}/permission/{type}', 'DefectController@getDefectPermission');
         Route::resource('defect', 'DefectController');
