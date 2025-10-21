@@ -152,39 +152,18 @@ class ProjectRepository
         //     ]
         // )
         $projects = Project::select(
-                $project_table.".id",
-                $project_table.".user_id",
-                $project_table.".generated_id",
-                $project_table.".project_name",
-                $project_table.".project_version",
-                $project_table.".client_id",
-                $project_table.".progress",
-                $project_table.".project_hours",
-                $project_table.".start_date",
-                $project_table.".end_date",
-                $project_table.".billing_type",
-                $project_table.".price_rate",
-                $project_table.".estimated_hours",
-                $project_table.".actual_hours",
-                $project_table.".status",
-                $project_table.".demo_url",
-                $project_table.".project_logo",
-                $project_table.".assign_to",
-                $project_table.".cost",
-                $project_table.".type",
-                $project_table.".hashtag",
-                DB::raw('SUM(gv_tasks.actual_hours) as total_actual_hours'),
+                $project_table . '.*',
                 $user_table . '.firstname as client_firstname',
                 $user_table . '.lastname as client_lastname',
                 'project_created.firstname as created_firstname',
                 'project_created.lastname as created_lastname',
                 'project_created.avatar as created_avatar',
+                DB::raw('(SELECT SUM(actual_hours) FROM gv_tasks WHERE gv_tasks.project_id = gv_projects.id) as total_actual_hours'),
                 $team_table . '.team_name'
             )
             ->leftjoin($user_table, $user_table . '.id', '=', $project_table . '.client_id')
             ->leftjoin($user_table . ' as project_created', 'project_created.id', '=', $project_table . '.user_id')
-            ->leftjoin($team_table, $team_table . '.id', '=', $project_table . '.assign_to')
-            ->leftjoin('gv_tasks', 'gv_tasks.project_id', '=', $project_table . '.id')->groupBy($project_table . '.id');
+            ->leftjoin($team_table, $team_table . '.id', '=', $project_table . '.assign_to');
         if (!AdminHelper::can_action(43, 'view') || ($request->get('isUserProfile') && $request->has('user_id'))) {
             $projects = $projects->where($project_table . '.assign_to', $user->id);
         }
@@ -1277,39 +1256,18 @@ class ProjectRepository
         //     ]
         // )
         $projects = Project::select(
-                $project_table.".id",
-                $project_table.".user_id",
-                $project_table.".generated_id",
-                $project_table.".project_name",
-                $project_table.".project_version",
-                $project_table.".client_id",
-                $project_table.".progress",
-                $project_table.".project_hours",
-                $project_table.".start_date",
-                $project_table.".end_date",
-                $project_table.".billing_type",
-                $project_table.".price_rate",
-                $project_table.".estimated_hours",
-                $project_table.".actual_hours",
-                $project_table.".status",
-                $project_table.".demo_url",
-                $project_table.".project_logo",
-                $project_table.".assign_to",
-                $project_table.".cost",
-                $project_table.".type",
-                $project_table.".hashtag",
-                DB::raw('SUM(gv_tasks.actual_hours) as total_actual_hours'),
+                $project_table.".*",
                 'project_created.id as created_id',
                 'project_created.firstname as created_firstname',
                 'project_created.lastname as created_lastname',
                 'project_created.avatar as created_avatar',
                 $user_table . '.firstname as client_firstname',
                 $user_table . '.lastname as client_lastname',
+                DB::raw('(SELECT SUM(actual_hours) FROM gv_tasks WHERE gv_tasks.project_id = gv_projects.id) as total_actual_hours'),
                 $user_table . '.avatar as client_avatar'
             )
             ->leftjoin($user_table . ' as project_created', 'project_created.id', '=', $project_table . '.user_id')
-            ->leftjoin($user_table, $user_table . '.id', '=', $project_table . '.client_id')
-            ->leftjoin('gv_tasks', 'gv_tasks.project_id', '=', $project_table . '.id')->groupBy($project_table . '.id');
+            ->leftjoin($user_table, $user_table . '.id', '=', $project_table . '.client_id');
             if (!empty($request->input('search.value'))) {
                 $search = $request->input('search.value');
                 $projects->where($project_table . '.project_name', 'LIKE', "%{$search}%");
