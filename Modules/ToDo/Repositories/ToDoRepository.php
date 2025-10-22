@@ -4,6 +4,7 @@ namespace Modules\ToDo\Repositories;
 use Auth;
 use Modules\ToDo\Entities\ToDo;
 use Modules\User\Entities\User\User;
+use Carbon\Carbon;
 
 /**
  * Class ToDoRepository
@@ -250,7 +251,13 @@ class ToDoRepository
             ->leftjoin($defects_table, $defects_table . '.id', '=', $todo_table . '.module_related_id')
             ->leftjoin($incidents_table, $incidents_table . '.id', '=', $todo_table . '.module_related_id')
             ->whereIn($todo_table . '.status', [1,2]);
-
+        if ($request->has('month') && $request->has('month') != 'all') {
+            $month = $request->get('month');
+            $startOfMonth = Carbon::createFromFormat('Y-m', $month)->startOfMonth();
+            $endOfMonth   = Carbon::createFromFormat('Y-m', $month)->endOfMonth();
+            $open_todos->whereBetween($todo_table . '.due_date', [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')]);
+        }
+        
         return collect(
             [
             'data' => $open_todos->orderBy($todo_table . '.order', 'asc')->get(),

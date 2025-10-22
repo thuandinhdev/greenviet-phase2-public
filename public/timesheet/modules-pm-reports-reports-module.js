@@ -48,7 +48,7 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = ("<!-- Card header -->\n<div class=\"pl-0 pr-0 border-bottom\">\n    <div class=\"card-header pl-0 pr-0 border-bottom\">\n        <h4 class=\"main-title mt-2\"><span>Payment</span></h4>\n        <div class=\"card-buttons d-flex\" *ngIf=\"isPageLoaded\">\n            <div class=\"btn calender-day\" (click)=\"preMonth()\">\n                <i class=\"calendar-icon fa fa-chevron-left\"></i>\n            </div>\n            <div class=\"ml-2\">\n                <a class=\"btn btn-create mb-0\" id=\"calendar-filter\" (bsValueChange)=\"changeMonth($event)\" #dp1=\"bsDatepicker\" bsDatepicker [bsConfig]=\"datepickerConfig\" ><i class=\"fa fa-calendar-plus-o\"></i></a>\n            </div>\n            <div class=\"mr-2\">\n               <input type=\"text\" class=\"form-control\" [(ngModel)]=\"month\" readonly />\n            </div>\n            <div class=\"btn calender-day\" (click)=\"nextMonth()\"  *ngIf=\"month <= currentMonth\">\n                <i class=\"calendar-icon fa fa-chevron-right\"></i>\n            </div>\n        </div>\n    </div>\n</div>\n<!-- Card body -->\n<div class=\"card-body pt-3 overflow-x-scroll overflow-y-hidden\">\n    <div class=\"row\">\n        <div class=\"col-lg-12 mb-3\">\n            <div class=\"table-responsive-xs table-responsive-sm table-responsive-md table-responsive-lg table-responsive-xl\">\n                <table datatable [dtOptions]=\"dtOptions\" [dtTrigger]=\"dtTrigger\" class=\"table table-bordered table-hover b4-datatable\" width=\"100%\" >\n                    <thead>\n                        <tr>\n                            <th>#</th>\n                            <th>Project</th>\n                            <th>Amount</th>\n                            <th>Description</th>\n                            <th>Estimated date</th>\n                            <th>Payment date</th>\n                            <th>Status</th>\n                        </tr>\n                    </thead>\n                    <tbody *ngIf=\"payments?.length > 0\">\n                        <tr *ngFor=\"let item of payments; index as i\">\n                            <td class=\"text-center\">{{ i + 1 }}</td>\n                            <td>{{item.project_name}}</td>\n                            <td>{{item.price| number:'1.0-0'}}</td>\n                            <td>{{item.description}}</td>\n                            <td>{{item.due_date}}</td>\n                            <td>{{item.payment_date}}</td>\n                            <td class=\"status-dropdown\">\n                                <div class=\"budges-status\">\n                                    <span class=\"open\" *ngIf=\"item.status == 1\">Pending</span>\n                                    <span class=\"medium\" *ngIf=\"item.status == 2\">Success</span>\n                                </div>\n                            </td>\n                        </tr>\n                    </tbody>\n                </table>\n            </div>\n        </div>\n    </div>\n</div>\n");
+/* harmony default export */ __webpack_exports__["default"] = ("<!-- Card header -->\n<div class=\"pl-0 pr-0 border-bottom\">\n    <div class=\"card-header pl-0 pr-0 border-bottom\">\n        <h4 class=\"main-title mt-2\"><span>Payment</span></h4>\n        <div class=\"card-buttons d-flex\" *ngIf=\"isPageLoaded\">\n            <a class=\"btn btn-create mb-0\" style=\"background: #34a853 !important; color: #fff !important;\" (click)=\"exportFiles()\">Export</a>\n            <div class=\"btn calender-day\" (click)=\"preMonth()\">\n                <i class=\"calendar-icon fa fa-chevron-left\"></i>\n            </div>\n            <div class=\"ml-2\">\n                <a class=\"btn btn-create mb-0\" id=\"calendar-filter\" (bsValueChange)=\"changeMonth($event)\" #dp1=\"bsDatepicker\" bsDatepicker [bsConfig]=\"datepickerConfig\" ><i class=\"fa fa-calendar-plus-o\"></i></a>\n            </div>\n            <div class=\"mr-2\">\n               <input type=\"text\" class=\"form-control\" [(ngModel)]=\"month\" readonly />\n            </div>\n            <div class=\"btn calender-day\" (click)=\"nextMonth()\"  *ngIf=\"month <= currentMonth\">\n                <i class=\"calendar-icon fa fa-chevron-right\"></i>\n            </div>\n        </div>\n    </div>\n</div>\n<!-- Card body -->\n<div class=\"card-body pt-3 overflow-x-scroll overflow-y-hidden\">\n    <div class=\"row\">\n        <div class=\"col-lg-12 mb-3\">\n            <div class=\"table-responsive-xs table-responsive-sm table-responsive-md table-responsive-lg table-responsive-xl\">\n                <table datatable [dtOptions]=\"dtOptions\" [dtTrigger]=\"dtTrigger\" class=\"table table-bordered table-hover b4-datatable\" width=\"100%\" >\n                    <thead>\n                        <tr>\n                            <th>#</th>\n                            <th>Project</th>\n                            <th>Amount</th>\n                            <th>Description</th>\n                            <th>Estimated date</th>\n                            <th>Payment date</th>\n                            <th>Status</th>\n                        </tr>\n                    </thead>\n                    <tbody *ngIf=\"payments?.length > 0\">\n                        <tr *ngFor=\"let item of payments; index as i\">\n                            <td class=\"text-center\">{{ i + 1 }}</td>\n                            <td>{{item.project_name}}</td>\n                            <td>{{item.price| number:'1.0-0'}}</td>\n                            <td>{{item.description}}</td>\n                            <td>{{item.due_date}}</td>\n                            <td>{{item.payment_date}}</td>\n                            <td class=\"status-dropdown\">\n                                <div class=\"budges-status\">\n                                    <span class=\"open\" *ngIf=\"item.status == 1\">Pending</span>\n                                    <span class=\"medium\" *ngIf=\"item.status == 2\">Success</span>\n                                </div>\n                            </td>\n                        </tr>\n                    </tbody>\n                </table>\n            </div>\n        </div>\n    </div>\n</div>\n");
 
 /***/ }),
 
@@ -1351,8 +1351,16 @@ var PaymentReportsComponent = /** @class */ (function () {
         this.month = this.datePipe.transform(selectedDate, 'yyyy-MM');
         this.loadDatatable();
     };
-    PaymentReportsComponent.prototype.exportFiles = function (type) {
-        this.exportAsService.save(this.exportAsConfig, 'Timesheet').subscribe(function () {
+    PaymentReportsComponent.prototype.exportFiles = function () {
+        var _this = this;
+        this.http.post(this.apiUrl + '/api/defect/export-payment', { data: this.payments, month: this.month, action: 'payment' }, { responseType: 'blob' })
+            .subscribe(function (blob) {
+            var link = document.createElement('a');
+            var url = window.URL.createObjectURL(blob);
+            link.href = url;
+            link.download = 'payment_' + _this.month + '.xlsx';
+            link.click();
+            window.URL.revokeObjectURL(url);
         });
     };
     PaymentReportsComponent.prototype.ngOnDestroy = function () {
@@ -1849,16 +1857,20 @@ var SalaryReportsComponent = /** @class */ (function () {
                 }
             }
         });
+        console.log(user.timesheet);
         user.timesheet.forEach(function (element, index) {
-            if (element && element.check) {
+            if (element) {
                 switch (element.value) {
                     case 8.5:
+                    case "8.5":
                         timesheet_day += 1;
                         break;
                     case 4.5:
+                    case "4.5":
                         timesheet_day += 0.5;
                         break;
                     case 4:
+                    case "4":
                         timesheet_day += 0.5;
                         break;
                     default:
@@ -1990,7 +2002,7 @@ var SalaryReportsComponent = /** @class */ (function () {
                 user.salary_lunch = user.contract.lunch;
                 user.salary_total = user.contract.basic + user.contract.performance;
                 user.timesheet.forEach(function (element, index) {
-                    if (element && element.check) {
+                    if (element) {
                         switch (element.value) {
                             case 8.5:
                                 timesheet_day += 1;
@@ -2119,8 +2131,8 @@ var SalaryReportsComponent = /** @class */ (function () {
         this.changeMonth(Object(date_fns__WEBPACK_IMPORTED_MODULE_10__["subMonths"])(this.month, 1));
     };
     SalaryReportsComponent.prototype.changeMonth = function (selectedDate) {
-        // this.month = this.datePipe.transform(selectedDate, 'yyyy/MM');
-        this.month = this.datePipe.transform("2025-08", 'yyyy-MM');
+        this.month = this.datePipe.transform(selectedDate, 'yyyy-MM');
+        // this.month = this.datePipe.transform("2025-08", 'yyyy-MM');
         this.daysInMonth = this.getTotalDaysInMonth(this.month);
         this.loadDatatable();
     };

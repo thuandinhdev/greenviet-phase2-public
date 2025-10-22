@@ -333,6 +333,11 @@ class DefectController extends Controller
     {
         return $this->defectRepo->exportWorkAllowance($request);
     }
+
+    public function exportPayment(Request $request)
+    {
+        return $this->defectRepo->exportPayment($request);
+    }
     
     /**
      * Get defect permission.

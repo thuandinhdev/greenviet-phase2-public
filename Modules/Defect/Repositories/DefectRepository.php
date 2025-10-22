@@ -1177,7 +1177,13 @@ class DefectRepository
         //     "data" => $data,
         // );
     }
+
+    
         
+    public function exportPayment($request){        
+        $input = $request->all();
+        $data = $input['data'];
+    }
     public function exportWorkAllowance($request){        
         $input = $request->all();
         $data = $input['data'];
@@ -1191,7 +1197,7 @@ class DefectRepository
         }
         
         if (!file_exists($templatePath)) {
-            abort(404, 'Không tìm thấy file mẫu salary.xlsx');
+            abort(404, 'Không tìm thấy file mẫu work_allowance.xlsx');
         }
 
         // 🔹 Load template
@@ -1226,8 +1232,7 @@ class DefectRepository
             }
             $sheet->setCellValue("B{$row}", $i + 1);
             $sheet->setCellValue("D{$row}", $item['firstname'] . ' ' . $item['lastname']);
-            $sheet->setCellValue("E{$row}", $item['leave_date']);
-            $sheet->setCellValue("E{$row}", $item['leave_date']);
+            $sheet->setCellValue("E{$row}", Carbon::parse($item['leave_date'])->format('Y-m-d'));
             $sheet->setCellValue("F{$row}", preg_replace('/<br\s*\/?>/i', "\n", $item['reason']));
             $sheet->setCellValue("G{$row}", $item['total']);
             $sheet->getStyle("G{$row}")->getNumberFormat()->setFormatCode('#,##0');
