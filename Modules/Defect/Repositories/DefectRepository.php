@@ -1183,18 +1183,70 @@ class DefectRepository
     public function exportPayment($request){        
         $input = $request->all();
         $data = $input['data'];
+        // 🔹 Đường dẫn file template
+        
+        $templatePath = storage_path('app/templates/payment.xlsx');
+        
+        if (!file_exists($templatePath)) {
+            abort(404, 'Không tìm thấy file mẫu payment.xlsx');
+        }
+
+        // 🔹 Load template
+        $spreadsheet = IOFactory::load($templatePath);
+        $sheet = $spreadsheet->getActiveSheet();
+        $startRow = 4;
+        $templateRow = 4; // Dòng mẫu (format gốc)
+        $startRow = $templateRow;
+        $lastCol = 'H'; // Cột cuối cùng trong file
+        $sheet->setCellValue("E1", $input['month']);
+        
+        foreach ($data as $i => $item) {
+            $row = $startRow + $i;
+
+            // --- Copy style ---
+            $sheet->duplicateStyle(
+                $sheet->getStyle("A{$templateRow}:{$lastCol}{$templateRow}"),
+                "A{$row}:{$lastCol}{$row}"
+            );
+            $delta = $row - $templateRow;
+            for ($col = 'A'; $col !== Coordinate::stringFromColumnIndex(
+                Coordinate::columnIndexFromString($lastCol) + 1
+            ); $col = Coordinate::stringFromColumnIndex(
+                Coordinate::columnIndexFromString($col) + 1
+            )) {
+                $cell = $sheet->getCell("{$col}{$templateRow}");
+                $value = $cell->getValue();
+
+                if ($cell->isFormula()) {
+                    $sheet->setCellValue("{$col}{$row}", $this->shiftFormulaRows($value, $delta));
+                }
+            }
+            
+            $sheet->setCellValue("B{$row}", $i + 1);
+            $sheet->setCellValue("C{$row}", $item['project_name']);
+            $sheet->setCellValue("D{$row}", $item['description']);
+            $sheet->setCellValue("E{$row}", Carbon::parse($item['due_date'])->format('Y-m-d'));
+            $sheet->setCellValue("F{$row}", Carbon::parse($item['payment_date'])->format('Y-m-d'));
+            $sheet->setCellValue("G{$row}", $input['filterKey']);
+            $sheet->setCellValue("H{$row}", $item['price']);
+            $sheet->getStyle("H{$row}")->getNumberFormat()->setFormatCode('#,##0');
+        }
+        // --- Lưu file ---
+        $fileName = 'salary_export_' . time() . '.xlsx';
+        $filePath = storage_path('app/' . $fileName);
+
+        $writer = new Xlsx($spreadsheet);
+        $writer->save($filePath);
+
+        return response()->download($filePath)->deleteFileAfterSend(true);
+
     }
     public function exportWorkAllowance($request){        
         $input = $request->all();
         $data = $input['data'];
         
         // 🔹 Đường dẫn file template
-        
-        if($input['action'] == 'time'){
-            $templatePath = storage_path('app/templates/work_allowance.xlsx');
-        } else {
-            $templatePath = storage_path('app/templates/work_allowance.xlsx');
-        }
+        $templatePath = storage_path('app/templates/work_allowance.xlsx');
         
         if (!file_exists($templatePath)) {
             abort(404, 'Không tìm thấy file mẫu work_allowance.xlsx');

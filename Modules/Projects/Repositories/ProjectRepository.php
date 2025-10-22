@@ -159,8 +159,20 @@ class ProjectRepository
                 'project_created.lastname as created_lastname',
                 'project_created.avatar as created_avatar',
                 DB::raw('(SELECT SUM(actual_hours) FROM gv_tasks WHERE gv_tasks.project_id = gv_projects.id) as total_actual_hours'),
-                $team_table . '.team_name'
+                $team_table . '.team_name',
+                DB::raw('(SELECT JSON_ARRAYAGG(JSON_OBJECT(
+                    "id", gv_todos.id,
+                    "description", gv_todos.description,
+                    "due_date", gv_todos.due_date,
+                    "status", gv_todos.status,
+                    "price", gv_todos.price,
+                    "payment_date", gv_todos.payment_date
+                ))
+                FROM gv_todos 
+                WHERE gv_todos.module_related_id = gv_projects.id
+               ) as payments')
             )
+            
             ->leftjoin($user_table, $user_table . '.id', '=', $project_table . '.client_id')
             ->leftjoin($user_table . ' as project_created', 'project_created.id', '=', $project_table . '.user_id')
             ->leftjoin($team_table, $team_table . '.id', '=', $project_table . '.assign_to');
@@ -1264,7 +1276,18 @@ class ProjectRepository
                 $user_table . '.firstname as client_firstname',
                 $user_table . '.lastname as client_lastname',
                 DB::raw('(SELECT SUM(actual_hours) FROM gv_tasks WHERE gv_tasks.project_id = gv_projects.id) as total_actual_hours'),
-                $user_table . '.avatar as client_avatar'
+                $user_table . '.avatar as client_avatar',
+                DB::raw('(SELECT JSON_ARRAYAGG(JSON_OBJECT(
+                    "id", gv_todos.id,
+                    "description", gv_todos.description,
+                    "due_date", gv_todos.due_date,
+                    "status", gv_todos.status,
+                    "price", gv_todos.price,
+                    "payment_date", gv_todos.payment_date
+                ))
+                FROM gv_todos 
+                WHERE gv_todos.module_related_id = gv_projects.id
+               ) as payments')
             )
             ->leftjoin($user_table . ' as project_created', 'project_created.id', '=', $project_table . '.user_id')
             ->leftjoin($user_table, $user_table . '.id', '=', $project_table . '.client_id');
@@ -1289,7 +1312,8 @@ class ProjectRepository
             $projects = $projects->where($matchThese);
             $totalFiltered = $projects->count();
         }
-
+        $order = $project_table . '.project_name';
+        $dir = "desc";
         $data = $projects->offset($start)
             ->limit($limit)
             ->orderBy($order, $dir === 'desc' ? 'desc' : 'asc')

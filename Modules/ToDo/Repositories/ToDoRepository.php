@@ -220,8 +220,9 @@ class ToDoRepository
 
     public function listReport($request)
     {
+        $input = $request->all();
         $todo_table = config('core.acl.todos_table');
-        $modules_table = config('core.acl.modules_table');
+        // $modules_table = config('core.acl.modules_table');
         $projects_table = config('core.acl.projects_table');
         $task_table = config('core.acl.task_table');
         $defects_table = config('core.acl.defects_table');
@@ -238,24 +239,41 @@ class ToDoRepository
                 $todo_table . '.due_date',
                 $todo_table . '.payment_date',
                 $todo_table . '.status',
-                $modules_table . '.module_name',
+                // $modules_table . '.module_name',
                 $projects_table . '.project_name as project_name',
-                $projects_table . '.generated_id as project_generated_id',
-                $task_table . '.generated_id as task_generated_id',
-                $defects_table . '.generated_id as defect_generated_id',
-                $incidents_table . '.generated_id as incident_generated_id'
+                // $projects_table . '.generated_id as project_generated_id',
+                // $task_table . '.generated_id as task_generated_id',
+                // $defects_table . '.generated_id as defect_generated_id',
+                // $incidents_table . '.generated_id as incident_generated_id'
             )
-            ->join($modules_table, $modules_table . '.module_id', '=', $todo_table . '.module_id')
+            // ->join($modules_table, $modules_table . '.module_id', '=', $todo_table . '.module_id')
             ->leftjoin($projects_table, $projects_table . '.id', '=', $todo_table . '.module_related_id')
-            ->leftjoin($task_table, $task_table . '.id', '=', $todo_table . '.module_related_id')
-            ->leftjoin($defects_table, $defects_table . '.id', '=', $todo_table . '.module_related_id')
-            ->leftjoin($incidents_table, $incidents_table . '.id', '=', $todo_table . '.module_related_id')
+            // ->leftjoin($task_table, $task_table . '.id', '=', $todo_table . '.module_related_id')
+            // ->leftjoin($defects_table, $defects_table . '.id', '=', $todo_table . '.module_related_id')
+            // ->leftjoin($incidents_table, $incidents_table . '.id', '=', $todo_table . '.module_related_id')
             ->whereIn($todo_table . '.status', [1,2]);
-        if ($request->has('month') && $request->has('month') != 'all') {
-            $month = $request->get('month');
-            $startOfMonth = Carbon::createFromFormat('Y-m', $month)->startOfMonth();
-            $endOfMonth   = Carbon::createFromFormat('Y-m', $month)->endOfMonth();
-            $open_todos->whereBetween($todo_table . '.due_date', [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')]);
+        if(isset($input['filterKey'])){
+            switch ($input['filterKey']) {
+                case 'success':
+                    $open_todos->where($todo_table . '.status', 2);
+                    if ($input['month'] && $input['month'] != 'all') {
+                        $startOfMonth = Carbon::createFromFormat('Y-m', $input['month'])->startOfMonth();
+                        $endOfMonth   = Carbon::createFromFormat('Y-m', $input['month'])->endOfMonth();
+                        $open_todos->whereBetween($todo_table . '.payment_date', [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')]);
+                    }
+                    break;
+                case 'pending':
+                    $open_todos->where($todo_table . '.status', 1);
+                    if ($input['month'] && $input['month'] != 'all') {
+                        $startOfMonth = Carbon::createFromFormat('Y-m', $input['month'])->startOfMonth();
+                        $endOfMonth   = Carbon::createFromFormat('Y-m', $input['month'])->endOfMonth();
+                        $open_todos->whereBetween($todo_table . '.due_date', [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')]);
+                    }
+                    break;
+                case 'overdue':
+                    $open_todos->where($todo_table . '.status', 1)->where($todo_table . '.due_date',  '<', Carbon::now());
+                    break;
+            }
         }
         
         return collect(
