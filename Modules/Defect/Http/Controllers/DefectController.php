@@ -328,6 +328,11 @@ class DefectController extends Controller
     {
         return $this->defectRepo->exportTimesheet($request);
     }
+
+    public function exportWorkAllowance(Request $request)
+    {
+        return $this->defectRepo->exportWorkAllowance($request);
+    }
     
     /**
      * Get defect permission.

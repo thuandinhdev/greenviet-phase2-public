@@ -25,6 +25,7 @@ Route::group(
         Route::post('defect/update-kanban', 'DefectController@updateKanban');
         Route::post('defect/export-salary', 'DefectController@exportSalary');
         Route::post('defect/export-timesheet', 'DefectController@exportTimesheet');
+        Route::post('defect/export-work-allowance', 'DefectController@exportWorkAllowance');
         Route::put('defect/notes/{id}', 'DefectController@defectNotesUpdate');
         Route::get('defect/{id}/permission/{type}', 'DefectController@getDefectPermission');
         Route::resource('defect', 'DefectController');
