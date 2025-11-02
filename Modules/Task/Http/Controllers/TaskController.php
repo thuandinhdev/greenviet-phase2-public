@@ -69,6 +69,16 @@ class TaskController extends Controller
 
         return $this->taskRepo->getAllTask($request);
     }
+    public function getAllTaskReport(Request $request)
+    {
+        // --
+        // Check role/permission
+        // if (!AdminHelper::can_action(44, 'view')) {
+        //     return response()->json("Access denied", 403);
+        // }
+
+        return $this->taskRepo->getAllTaskReport($request);
+    }
 
     /**
      * Store a newly created resource in storage.

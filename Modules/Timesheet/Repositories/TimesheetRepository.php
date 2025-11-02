@@ -157,6 +157,59 @@ class TimesheetRepository
         return $totalWorkingDays;
     }
 
+    public function getUserMonthSelect($month){
+        $user = Auth::user();
+        $startOfMonth = Carbon::createFromFormat('Y-m', $month)->startOfMonth();
+        $endOfMonth   = Carbon::createFromFormat('Y-m', $month)->endOfMonth();
+
+        $department = DB::table('gv_user_role_department')->join('gv_departments', 'gv_departments.id', '=', 'gv_user_role_department.department_id')->join('gv_roles', 'gv_roles.id', '=', 'gv_user_role_department.role_id')->where('gv_user_role_department.user_id', $user->id)->select('gv_departments.name as department_name', 'gv_roles.name as role_name')->first();
+        $data = [];
+        // if($department->department_name == 'Project'){
+        if($department->department_name != 'Administration' && $department->department_name != 'HR' && $department->department_name != 'BOD'){
+            $list = DB::table('gv_projects')->join('gv_timesheets', 'gv_timesheets.project_id', '=', 'gv_projects.id')->where('gv_timesheets.status', '<', 2)->where('gv_projects.assign_to', $user->id)->groupBy('gv_timesheets.created_user_id')->pluck('gv_timesheets.created_user_id')->toArray();
+            $team = Team::join('gv_teams_members', 'gv_teams_members.team_id', '=', 'gv_teams.id')->where('gv_teams.team_leader', $user->id)->pluck('gv_teams_members.user_id')->toArray();
+
+            $data = User::with(['departments', 'roles'])
+            ->where('is_client', false)
+            ->where('is_active', 1)
+            ->whereIn('id', array_merge($list, $team))
+            ->orderBy('username')
+            ->get();
+        }
+        if($department->department_name == 'Administration' || $department->department_name == 'HR' || $department->department_name == 'BOD'){
+            $data = User::with(['departments', 'roles'])
+            ->where('is_client', false)
+            ->where('is_active', 1)
+            ->orderBy('username')
+            ->get();
+        }
+        foreach ($data as $key => $value) {
+            // $value->timesheets_status = DB::table('gv_timesheets')->where('created_user_id', $value->id)->where('module_id', 2)->where('status', 0)->orderBy('start_time')->first();
+            $value->department_role = DB::table('gv_user_role_department')->join('gv_departments', 'gv_departments.id', '=', 'gv_user_role_department.department_id')->join('gv_roles', 'gv_roles.id', '=', 'gv_user_role_department.role_id')->where('gv_user_role_department.user_id', $value->id)->select('gv_departments.name as department_name', 'gv_roles.name as role_name')->first();
+            $value->paid_leave = $this->commonHelper->getRemainingLeaveDays($value['id']);
+
+
+            $value->timesheet_billable = DB::table('gv_timesheets')->join('gv_projects', 'gv_projects.id', '=', 'gv_timesheets.project_id')->where('gv_timesheets.created_user_id', $value->id)->where('gv_projects.income_type', 1)->where('gv_timesheets.module_id', 2)->where('gv_timesheets.status', 2)->whereBetween('gv_timesheets.start_time', [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')])->sum('gv_timesheets.decimal_time');
+            $value->timesheet_non_billable = DB::table('gv_timesheets')->join('gv_projects', 'gv_projects.id', '=', 'gv_timesheets.project_id')->where('gv_timesheets.created_user_id', $value->id)->where('gv_projects.income_type', 0)->where('gv_timesheets.module_id', 2)->where('gv_timesheets.status', 2)->whereBetween('gv_timesheets.start_time', [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')])->sum('gv_timesheets.decimal_time');
+
+            
+            $value->project_billable = DB::table('gv_timesheets')->join('gv_projects', 'gv_projects.id', '=', 'gv_timesheets.project_id')->where('gv_timesheets.created_user_id', $value->id)->where('gv_projects.income_type', 1)->where('gv_timesheets.module_id', 2)->where('gv_timesheets.status', 2)->whereBetween('gv_timesheets.start_time', [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')])->distinct('gv_timesheets.project_id')->count();
+
+            $value->project_non_billable = DB::table('gv_timesheets')->join('gv_projects', 'gv_projects.id', '=', 'gv_timesheets.project_id')->where('gv_timesheets.created_user_id', $value->id)->where('gv_projects.income_type', 0)->where('gv_timesheets.module_id', 2)->where('gv_timesheets.status', 2)->whereBetween('gv_timesheets.start_time', [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')])->distinct('gv_timesheets.project_id')->count();
+            
+            // DB::table('gv_timesheets')->where('created_user_id', $value->id)->where('module_id', 2)->where('status', 2)->whereBetween('start_time', [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')])->groupBy('project_id')->count();
+            // $value->projectcount = DB::table('gv_timesheets')->where('created_user_id', $value->id)->where('module_id', 2)->where('status', 2)->whereBetween('start_time', [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')])->groupBy('project_id')->count();
+
+
+            $value->contract = DB::table('gv_users_contract')
+                ->where('user_id', $value->id)
+                ->where('start_date', '<=', $startOfMonth->format('Y-m-d'))
+                ->where('end_date', '>=', $endOfMonth->format('Y-m-d'))
+                ->orderBy('id', 'desc')->first();
+        }
+        return ['data'=>$data, 'role'=>$department];
+    }
+
     public function getUserSelect(){
         $user = Auth::user();
         $department = DB::table('gv_user_role_department')->join('gv_departments', 'gv_departments.id', '=', 'gv_user_role_department.department_id')->join('gv_roles', 'gv_roles.id', '=', 'gv_user_role_department.role_id')->where('gv_user_role_department.user_id', $user->id)->select('gv_departments.name as department_name', 'gv_roles.name as role_name')->first();
@@ -194,6 +247,7 @@ class TimesheetRepository
                 $value->timesheets_status = DB::table('gv_timesheets')->where('created_user_id', $value->id)->where('module_id', 2)->where('status', 0)->orderBy('start_time')->first();
                 $value->department_role = DB::table('gv_user_role_department')->join('gv_departments', 'gv_departments.id', '=', 'gv_user_role_department.department_id')->join('gv_roles', 'gv_roles.id', '=', 'gv_user_role_department.role_id')->where('gv_user_role_department.user_id', $value->id)->select('gv_departments.name as department_name', 'gv_roles.name as role_name')->first();
             }
+            $value->paid_leave = $this->commonHelper->getRemainingLeaveDays($value['id']);
         }
         return ['data'=>$data, 'role'=>$department];
     }

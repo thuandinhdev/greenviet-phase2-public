@@ -64,6 +64,7 @@ class Project extends Model
         'assign_members',
         'hashtag',
         'type',
+        'income_type',
         'notes',
     ];
 

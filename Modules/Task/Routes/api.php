@@ -23,6 +23,7 @@ Route::group(
         Route::post('tasks/status-list', 'TaskController@updateKanban');
         // Route::get('tasks/get-generated-id', 'TaskController@getGeneratedId');
         Route::post('all-tasks', 'TaskController@getAllTask');
+        Route::post('all-tasks-report', 'TaskController@getAllTaskReport');
         Route::post('tasks/{taskId}/change-status', 'TaskController@changeStatus');
         Route::post('tasks/{id}/change-priority', 'TaskController@changeTaskPriority');
         Route::get(

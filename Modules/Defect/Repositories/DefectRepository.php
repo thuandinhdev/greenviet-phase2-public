@@ -963,8 +963,9 @@ class DefectRepository
 
         $holidays = DB::table('gv_holidays')->whereBetween('date', [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')])->get();
         $leaves = DB::table('gv_leaves')->whereBetween('leave_date', [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')])
-            ->where('leave_type_id', '<', 3)
+            // ->where('leave_type_id', '<', 3)
             ->whereIn('status', [1, 2])->select('*', DB::raw('DATE_FORMAT(leave_date, "%Y-%m-%d") as formatted_date'))->get();
+            
         
         if(isset($input['action']) && $input['action'] == 'user'){
             $query = DB::table('gv_timesheets')

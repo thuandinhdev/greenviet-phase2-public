@@ -65,6 +65,35 @@ class TaskRepository
      *
      * @return Array
      */
+    
+    public function getAllTaskReport($request)
+    {
+        $task_table = config('core.acl.task_table');
+        $user_table = config('core.acl.users_table');
+        $project_table = config('core.acl.projects_table');
+
+        $listTaskID = DB::table('gv_timesheets')->where('created_user_id', $request->get('user_id'))->where('module_id', 2)->where('status', 2)->groupBy('module_related_id')->pluck('module_related_id');
+        $task = Task::leftjoin($user_table, $user_table . '.id', '=', $task_table . '.assign_to')
+            ->leftjoin($project_table, $project_table.'.id', '=', $task_table . '.project_id')
+            ->whereIn($task_table . '.id', $listTaskID)
+            ->select(
+                $task_table . '.*',
+                $project_table.'.project_name',
+                $user_table . '.firstname as assign_firstname',
+                $user_table . '.lastname as assign_lastname',
+                $user_table . '.avatar as assign_avatar'
+            )->orderBy('project_name')->get();
+        foreach ($task as $value) {
+            $value->timesheet = DB::table('gv_timesheets')
+            ->where('created_user_id', $request->get('user_id'))
+            ->where('module_id', 2)
+            ->where('status', 2)
+            ->where('module_related_id', $value->id)
+            ->selectRaw('SUM(decimal_time) as total_time, SUM(cost) as total_cost')
+            ->first();
+        }
+        return ['data'=>$task];
+    }
     public function getAllTask($request)
     {
         $task_table = config('core.acl.task_table');
