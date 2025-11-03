@@ -224,9 +224,16 @@ class UserRepository
             }
             $user->projects_count = DB::table('gv_timesheets')->where('created_user_id', $user->id)->where('module_id', 2)->where('status', 2)->distinct('project_id')->count();
             $user->tasks_count = DB::table('gv_timesheets')->where('created_user_id', $user->id)->where('module_id', 2)->where('status', 2)->distinct('module_related_id')->count();
-            $user->teams = DB::table('gv_teams')->join('gv_teams_members', 'gv_teams_members.team_id', '=', 'gv_teams.id')
+            $user->teams = DB::table('gv_teams')
+            ->join('gv_teams_members', 'gv_teams_members.team_id', '=', 'gv_teams.id')
             ->join('gv_users', 'gv_users.id', '=', 'gv_teams.team_leader')
-            ->where('gv_teams_members.user_id', $user->id)->orWhere('gv_teams.team_leader', $user->id)->groupBy('gv_teams_members.team_id')->select('gv_teams.*', 'gv_users.username as lead_username')->get();
+            ->where(function($q) use ($user) {
+                $q->where('gv_teams_members.user_id', $user->id)
+                ->orWhere('gv_teams.team_leader', $user->id);
+            })
+            ->groupBy('gv_teams.id')
+            ->select('gv_teams.*', 'gv_users.username as lead_username')
+            ->get();
             // if ($user->is_client) {
             //     // $user->projects_count = $user->projects()->whereNotIn('status', [4, 5])->count();
             //     $user->projects_count = Project::where('assign_to', $id)->count();
