@@ -1,5 +1,107 @@
 (window["webpackJsonp"] = window["webpackJsonp"] || []).push([["modules-admin-department-department-module"],{
 
+/***/ "./node_modules/angular-checklist/dist/directives/checklist.directive.js":
+/*!*******************************************************************************!*\
+  !*** ./node_modules/angular-checklist/dist/directives/checklist.directive.js ***!
+  \*******************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var core_1 = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
+var ChecklistDirective = /** @class */ (function () {
+    function ChecklistDirective() {
+        this.maxSelectedItems = -1;
+        this.checklistChange = new core_1.EventEmitter();
+    }
+    ////////////
+    ChecklistDirective.prototype.ngOnChanges = function () {
+        var checklist = this.checklist || [];
+        this.isChecked = checklist.indexOf(this.checklistValue) >= 0;
+    };
+    ChecklistDirective.prototype.triggerOnChange = function ($event) {
+        var target = $event.target;
+        var updatedList;
+        var checklist = this.checklist || [];
+        if (target && target.checked) {
+            if (this.maxSelectedItems === -1 || checklist.length < this.maxSelectedItems) {
+                updatedList = checklist.concat([this.checklistValue]);
+                this.checklistChange.emit(updatedList);
+            }
+            else {
+                target.checked = false;
+            }
+        }
+        else {
+            var i = checklist.indexOf(this.checklistValue);
+            updatedList = checklist.slice(0, i).concat(checklist.slice(i + 1));
+            this.checklistChange.emit(updatedList);
+        }
+    };
+    ChecklistDirective.decorators = [
+        { type: core_1.Directive, args: [{
+                    host: {
+                        '(change)': 'triggerOnChange($event)',
+                        '[checked]': 'isChecked',
+                    },
+                    selector: '[checklist]',
+                },] },
+    ];
+    /** @nocollapse */
+    ChecklistDirective.ctorParameters = function () { return []; };
+    ChecklistDirective.propDecorators = {
+        'checklist': [{ type: core_1.Input },],
+        'checklistValue': [{ type: core_1.Input },],
+        'maxSelectedItems': [{ type: core_1.Input },],
+        'checklistChange': [{ type: core_1.Output },],
+    };
+    return ChecklistDirective;
+}());
+exports.ChecklistDirective = ChecklistDirective;
+//# sourceMappingURL=checklist.directive.js.map
+
+/***/ }),
+
+/***/ "./node_modules/angular-checklist/dist/index.js":
+/*!******************************************************!*\
+  !*** ./node_modules/angular-checklist/dist/index.js ***!
+  \******************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var common_1 = __webpack_require__(/*! @angular/common */ "./node_modules/@angular/common/fesm5/common.js");
+var core_1 = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
+var checklist_directive_1 = __webpack_require__(/*! ./directives/checklist.directive */ "./node_modules/angular-checklist/dist/directives/checklist.directive.js");
+var ChecklistModule = /** @class */ (function () {
+    function ChecklistModule() {
+    }
+    ChecklistModule.decorators = [
+        { type: core_1.NgModule, args: [{
+                    declarations: [
+                        checklist_directive_1.ChecklistDirective,
+                    ],
+                    exports: [
+                        checklist_directive_1.ChecklistDirective,
+                    ],
+                    imports: [
+                        common_1.CommonModule,
+                    ],
+                },] },
+    ];
+    /** @nocollapse */
+    ChecklistModule.ctorParameters = function () { return []; };
+    return ChecklistModule;
+}());
+exports.ChecklistModule = ChecklistModule;
+//# sourceMappingURL=index.js.map
+
+/***/ }),
+
 /***/ "./node_modules/angular-datatables/index.js":
 /*!**************************************************!*\
   !*** ./node_modules/angular-datatables/index.js ***!
@@ -559,6 +661,75 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ __webpack_exports__["default"] = ("<section>\n\t<div class=\"row\">\n\t\t<div class=\"col-sm-12\">\n\t\t\t<div class=\"card pl-2 pr-2\">\n\t\t\t\t<div class=\"card-header pl-0 pr-0 border-bottom\">\n\t\t\t\t\t<h4 class=\"main-title mt-2\"><span>{{'departments.title' | translate}}</span></h4>\n\t\t\t\t\t<button class=\"btn btn-create mb-0\" *ngxPermissionsOnly=\"['admin', 'super_admin', 'departments_create']\" (click)=\"openDepartmentCreateModal()\" tooltip=\"{{'common.create' | translate}}\"><i class=\"fa fa-plus\"></i></button>\n\t\t\t\t</div>\n\t\t\t\t<div class=\"card-content pt-3 pb-3\">\n\t\t\t\t\t<div class=\"card-body\">\n\t\t\t\t\t\t<div class=\"row\">\n\t\t\t\t\t\t\t<div class=\"col-sm-6\" *ngFor=\"let department of departments; index as i\">\n\t\t\t\t\t\t\t\t<div class=\"row\">\n\t\t\t\t\t\t\t\t\t<!-- <div class=\"col-sm-12\">\n\t\t\t\t\t\t\t\t\t\t<h4  class=\"float-left sub-title\">{{department.name}}</h4>\n\t\t\t\t\t\t\t\t\t\t<div class=\"action-btn btn-group float-right\" dropdown=\"\">\n\t\t\t\t\t\t\t\t\t\t\t<button class=\"btn btn-outline-info mb-0\" type=\"button\">{{'departments.columns.actions' | translate}}</button>\n\t\t\t\t\t\t\t\t\t\t\t<button aria-expanded=\"false\" aria-haspopup=\"true\" class=\"btn btn-outline-info dropdown-toggle mb-0\" dropdownToggle=\"\" type=\"button\">\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"sr-only\">Toggle Dropdown</span>\n\t\t\t\t\t\t\t\t\t\t\t</button>\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"dropdown-menu action-dropdown animated fadeIn\" *dropdownMenu=\"\" role=\"menu\">\n\t\t\t\t\t\t\t\t\t\t\t\t<a (click)=\"openDepartmentEditModal(department)\" class=\"dropdown-item\" *ngxPermissionsOnly=\"['admin', 'super_admin', 'departments_edit']\"><i class=\"fa fa-pencil\"></i>&nbsp;Edit</a>\n\t\t\t\t\t\t\t\t\t\t\t\t<a (click)=\"deleteDepartment(department.id)\" class=\"dropdown-item\" *ngxPermissionsOnly=\"['admin', 'super_admin', 'departments_delete']\"><i class=\"fa fa-trash-o\"></i>&nbsp;Delete</a>\n\t\t\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t</div> -->\n\t\t\t\t\t\t\t\t\t<div class=\"col-sm-12\">\n\t\t\t\t\t\t\t\t\t\t<div class=\"table-responsive-xs table-responsive-sm table-responsive-md table-responsive-lg table-responsive-xl mt-1\">\n\t\t\t\t\t\t\t\t\t\t\t<table class=\"table table-bordered table-hover b4-datatable\">\n\t\t\t\t\t\t\t\t\t\t\t\t<thead>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<tr>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<th class=\"width-50\">D{{ i+1 }}</th>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<th>{{'departments.columns.designation' | translate}}</th>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<th class=\"width-50\">{{'departments.columns.actions' | translate}}</th>\n\t\t\t\t\t\t\t\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t\t\t\t\t\t\t</thead>\n\t\t\t\t\t\t\t\t\t\t\t\t<tbody *ngIf=\"department.roles?.length != 0\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t<tr *ngFor=\"let role of department.roles; index as j\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<td class=\"text-center\">{{ j+1 }}</td>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<td>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<div *ngxPermissionsOnly=\"['admin', 'super_admin', 'departments_view']; else elseBlock2; then thenBlock\"></div>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<ng-template #elseBlock2>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t{{role.name}}&nbsp;\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"badge badge-pill badge-dark\">{{role.users}}</span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</ng-template>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<ng-template #thenBlock>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<a [routerLink]=\"['detail', department.id, role.id]\" tooltip=\"{{'departments.tooltip.tooltip11' | translate}}\">{{role.name}}&nbsp;</a><span class=\"badge badge-pill badge-dark\">{{role.users}}</span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</ng-template>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t</td>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<td class=\"actions-dropdown\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<div class=\"btn-group\" dropdown>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<button dropdownToggle class=\"dropdown-toggle btn-action\" type=\"button\" id=\"button-basic-1\" aria-controls=\"dropdown-basic-1\"><i class=\"fa fa-ellipsis-v\"></i></button>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<ul id=\"dropdown-basic-1\" *dropdownMenu class=\"dropdown-menu animated fadeIn\" role=\"menu\" aria-labelledby=\"button-basic-1\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<li role=\"menuitem\" *ngxPermissionsOnly=\"['admin', 'super_admin', 'departments_view']\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<a [routerLink]=\"['detail', department.id, role.id]\" tooltip=\"{{'departments.tooltip.tooltip11' | translate}}\" class=\"dropdown-item btn btn-edit btn-raised\"><i class=\"fa fa-lock\"></i></a>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</li>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<!-- <li role=\"menuitem\" *ngxPermissionsOnly=\"['admin', 'super_admin', 'departments_delete']\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<a (click)=\"deleteDepartmentRole(department.id, role.id)\" class=\"dropdown-item btn btn-delete btn-raised\" tooltip=\"{{'common.delete' | translate}}\"><i class=\"fa fa-trash-o\"></i></a>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</li> -->\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</ul>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t</td>\n\t\t\t\t\t\t\t\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t\t\t\t\t\t\t</tbody>\n\t\t\t\t\t\t\t\t\t\t\t\t<tfoot *ngIf=\"department?.length == 0\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t<tr>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<td colspan=\"3\" class=\"text-center\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<img src=\"assets/img/norecord-img.png\" width=\"50\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<p class=\"mt-1\">{{ 'common.empty_message.departments' | translate }}</p>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t</td>\n\t\t\t\t\t\t\t\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t\t\t\t\t\t\t</tfoot>\n\t\t\t\t\t\t\t\t\t\t\t</table>\n\t\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</section>\n");
+
+/***/ }),
+
+/***/ "./src/app/core/services/department.service.ts":
+/*!*****************************************************!*\
+  !*** ./src/app/core/services/department.service.ts ***!
+  \*****************************************************/
+/*! exports provided: DepartmentService */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DepartmentService", function() { return DepartmentService; });
+/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
+/* harmony import */ var _angular_common_http__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @angular/common/http */ "./node_modules/@angular/common/fesm5/http.js");
+/* harmony import */ var _environments_environment__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../environments/environment */ "./src/environments/environment.ts");
+
+
+
+
+var DepartmentService = /** @class */ (function () {
+    function DepartmentService(http) {
+        this.http = http;
+        this.apiUrl = _environments_environment__WEBPACK_IMPORTED_MODULE_3__["environment"].apiUrl;
+    }
+    DepartmentService.prototype.getAll = function () {
+        return this.http.get(this.apiUrl + "/api/departments");
+    };
+    DepartmentService.prototype.getDepartmentRoles = function () {
+        return this.http.get(this.apiUrl + "/api/get-department-roles");
+    };
+    DepartmentService.prototype.getById = function (id) {
+        return this.http.get(this.apiUrl + "/api/departments/" + id);
+    };
+    DepartmentService.prototype.create = function (department) {
+        return this.http.post(this.apiUrl + "/api/departments", department);
+    };
+    DepartmentService.prototype.update = function (department) {
+        return this.http.put(this.apiUrl + "/api/departments/" + department.id, department);
+    };
+    DepartmentService.prototype.delete = function (id) {
+        return this.http.delete(this.apiUrl + "/api/departments/" + id);
+    };
+    DepartmentService.prototype.deleteDepartmentRole = function (id, roleId) {
+        return this.http.delete(this.apiUrl + "/api/departments/" + id + "/" + roleId);
+    };
+    DepartmentService.prototype.getDepartmentDetail = function (id, roleId) {
+        return this.http.get(this.apiUrl + "/api/departments/" + id + "/" + roleId);
+    };
+    DepartmentService.prototype.updateDepartmentDetail = function (id, roleId, menu) {
+        return this.http.put(this.apiUrl + "/api/departments/" + id + "/" + roleId, menu);
+    };
+    DepartmentService.prototype.getDepartmentsClientsRoles = function () {
+        return this.http.get(this.apiUrl + "/api/departments/clients-roles");
+    };
+    DepartmentService.ctorParameters = function () { return [
+        { type: _angular_common_http__WEBPACK_IMPORTED_MODULE_2__["HttpClient"] }
+    ]; };
+    DepartmentService = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Injectable"])({
+            providedIn: 'root'
+        }),
+        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [_angular_common_http__WEBPACK_IMPORTED_MODULE_2__["HttpClient"]])
+    ], DepartmentService);
+    return DepartmentService;
+}());
+
+
 
 /***/ }),
 

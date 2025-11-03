@@ -1,5 +1,107 @@
 (window["webpackJsonp"] = window["webpackJsonp"] || []).push([["modules-settings-settings-module"],{
 
+/***/ "./node_modules/angular-checklist/dist/directives/checklist.directive.js":
+/*!*******************************************************************************!*\
+  !*** ./node_modules/angular-checklist/dist/directives/checklist.directive.js ***!
+  \*******************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var core_1 = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
+var ChecklistDirective = /** @class */ (function () {
+    function ChecklistDirective() {
+        this.maxSelectedItems = -1;
+        this.checklistChange = new core_1.EventEmitter();
+    }
+    ////////////
+    ChecklistDirective.prototype.ngOnChanges = function () {
+        var checklist = this.checklist || [];
+        this.isChecked = checklist.indexOf(this.checklistValue) >= 0;
+    };
+    ChecklistDirective.prototype.triggerOnChange = function ($event) {
+        var target = $event.target;
+        var updatedList;
+        var checklist = this.checklist || [];
+        if (target && target.checked) {
+            if (this.maxSelectedItems === -1 || checklist.length < this.maxSelectedItems) {
+                updatedList = checklist.concat([this.checklistValue]);
+                this.checklistChange.emit(updatedList);
+            }
+            else {
+                target.checked = false;
+            }
+        }
+        else {
+            var i = checklist.indexOf(this.checklistValue);
+            updatedList = checklist.slice(0, i).concat(checklist.slice(i + 1));
+            this.checklistChange.emit(updatedList);
+        }
+    };
+    ChecklistDirective.decorators = [
+        { type: core_1.Directive, args: [{
+                    host: {
+                        '(change)': 'triggerOnChange($event)',
+                        '[checked]': 'isChecked',
+                    },
+                    selector: '[checklist]',
+                },] },
+    ];
+    /** @nocollapse */
+    ChecklistDirective.ctorParameters = function () { return []; };
+    ChecklistDirective.propDecorators = {
+        'checklist': [{ type: core_1.Input },],
+        'checklistValue': [{ type: core_1.Input },],
+        'maxSelectedItems': [{ type: core_1.Input },],
+        'checklistChange': [{ type: core_1.Output },],
+    };
+    return ChecklistDirective;
+}());
+exports.ChecklistDirective = ChecklistDirective;
+//# sourceMappingURL=checklist.directive.js.map
+
+/***/ }),
+
+/***/ "./node_modules/angular-checklist/dist/index.js":
+/*!******************************************************!*\
+  !*** ./node_modules/angular-checklist/dist/index.js ***!
+  \******************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var common_1 = __webpack_require__(/*! @angular/common */ "./node_modules/@angular/common/fesm5/common.js");
+var core_1 = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
+var checklist_directive_1 = __webpack_require__(/*! ./directives/checklist.directive */ "./node_modules/angular-checklist/dist/directives/checklist.directive.js");
+var ChecklistModule = /** @class */ (function () {
+    function ChecklistModule() {
+    }
+    ChecklistModule.decorators = [
+        { type: core_1.NgModule, args: [{
+                    declarations: [
+                        checklist_directive_1.ChecklistDirective,
+                    ],
+                    exports: [
+                        checklist_directive_1.ChecklistDirective,
+                    ],
+                    imports: [
+                        common_1.CommonModule,
+                    ],
+                },] },
+    ];
+    /** @nocollapse */
+    ChecklistModule.ctorParameters = function () { return []; };
+    return ChecklistModule;
+}());
+exports.ChecklistModule = ChecklistModule;
+//# sourceMappingURL=index.js.map
+
+/***/ }),
+
 /***/ "./node_modules/raw-loader/dist/cjs.js!./src/app/modules/settings/components/company-detail/company-detail.component.html":
 /*!********************************************************************************************************************************!*\
   !*** ./node_modules/raw-loader/dist/cjs.js!./src/app/modules/settings/components/company-detail/company-detail.component.html ***!

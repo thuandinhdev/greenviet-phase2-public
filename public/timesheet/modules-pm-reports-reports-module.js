@@ -3109,10 +3109,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _file_browser_components_create_folder_model_create_folder_model_component__WEBPACK_IMPORTED_MODULE_30__ = __webpack_require__(/*! ./../../file-browser/components/create-folder-model/create-folder-model.component */ "./src/app/modules/file-browser/components/create-folder-model/create-folder-model.component.ts");
 /* harmony import */ var _file_browser_components_edit_folder_modal_edit_folder_modal_component__WEBPACK_IMPORTED_MODULE_31__ = __webpack_require__(/*! ./../../file-browser/components/edit-folder-modal/edit-folder-modal.component */ "./src/app/modules/file-browser/components/edit-folder-modal/edit-folder-modal.component.ts");
 /* harmony import */ var _file_browser_components_edit_file_modal_edit_file_modal_component__WEBPACK_IMPORTED_MODULE_32__ = __webpack_require__(/*! ./../../file-browser/components/edit-file-modal/edit-file-modal.component */ "./src/app/modules/file-browser/components/edit-file-modal/edit-file-modal.component.ts");
-/* harmony import */ var _admin_user_pages_user_detail_user_detail_component__WEBPACK_IMPORTED_MODULE_33__ = __webpack_require__(/*! ./../../admin/user/pages/user-detail/user-detail.component */ "./src/app/modules/admin/user/pages/user-detail/user-detail.component.ts");
-/* harmony import */ var _admin_user_components_user_detail_update_user_detail_update_component__WEBPACK_IMPORTED_MODULE_34__ = __webpack_require__(/*! ./../../admin/user/components/user-detail-update/user-detail-update.component */ "./src/app/modules/admin/user/components/user-detail-update/user-detail-update.component.ts");
-/* harmony import */ var _admin_user_components_user_projects_user_projects_component__WEBPACK_IMPORTED_MODULE_35__ = __webpack_require__(/*! ./../../admin/user/components/user-projects/user-projects.component */ "./src/app/modules/admin/user/components/user-projects/user-projects.component.ts");
-/* harmony import */ var _admin_user_components_user_tasks_user_tasks_component__WEBPACK_IMPORTED_MODULE_36__ = __webpack_require__(/*! ./../../admin/user/components/user-tasks/user-tasks.component */ "./src/app/modules/admin/user/components/user-tasks/user-tasks.component.ts");
+/* harmony import */ var _admin_user_user_module__WEBPACK_IMPORTED_MODULE_33__ = __webpack_require__(/*! ./../../admin/user/user.module */ "./src/app/modules/admin/user/user.module.ts");
 
 
 
@@ -3147,9 +3144,10 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-
-
-
+// import { UserDetailComponent } from './../../admin/user/pages/user-detail/user-detail.component';
+// import { UserDetailUpdateComponent } from './../../admin/user/components/user-detail-update/user-detail-update.component';
+// import { UserProjectsComponent } from './../../admin/user/components/user-projects/user-projects.component';
+// import { UserTasksComponent } from './../../admin/user/components/user-tasks/user-tasks.component';
 
 var ReportsModule = /** @class */ (function () {
     function ReportsModule() {
@@ -3171,10 +3169,10 @@ var ReportsModule = /** @class */ (function () {
                 _file_browser_components_create_folder_model_create_folder_model_component__WEBPACK_IMPORTED_MODULE_30__["CreateFolderModelComponent"],
                 _file_browser_components_edit_folder_modal_edit_folder_modal_component__WEBPACK_IMPORTED_MODULE_31__["EditFolderModalComponent"],
                 _file_browser_components_edit_folder_modal_edit_folder_modal_component__WEBPACK_IMPORTED_MODULE_31__["EditFolderModalComponent"],
-                _admin_user_pages_user_detail_user_detail_component__WEBPACK_IMPORTED_MODULE_33__["UserDetailComponent"],
-                _admin_user_components_user_detail_update_user_detail_update_component__WEBPACK_IMPORTED_MODULE_34__["UserDetailUpdateComponent"],
-                _admin_user_components_user_projects_user_projects_component__WEBPACK_IMPORTED_MODULE_35__["UserProjectsComponent"],
-                _admin_user_components_user_tasks_user_tasks_component__WEBPACK_IMPORTED_MODULE_36__["UserTasksComponent"],
+                // UserDetailComponent,
+                // UserDetailUpdateComponent,
+                // UserProjectsComponent,
+                // UserTasksComponent,
                 _file_browser_components_edit_file_modal_edit_file_modal_component__WEBPACK_IMPORTED_MODULE_32__["EditFileModalComponent"]
             ],
             imports: [
@@ -3206,6 +3204,7 @@ var ReportsModule = /** @class */ (function () {
                 }),
                 _shared_shared_module__WEBPACK_IMPORTED_MODULE_16__["SharedModule"],
                 _admin_todo_todo_module__WEBPACK_IMPORTED_MODULE_18__["TodoModule"],
+                _admin_user_user_module__WEBPACK_IMPORTED_MODULE_33__["UserModule"],
             ],
             entryComponents: [
                 _file_browser_components_upload_files_model_upload_files_model_component__WEBPACK_IMPORTED_MODULE_29__["UploadFilesModelComponent"],
