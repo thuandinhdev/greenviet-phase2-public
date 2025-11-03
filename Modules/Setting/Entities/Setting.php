@@ -112,6 +112,10 @@ class Setting extends Model
         'contract',
         'project',
         'task',
+        'bhbb',
+        'dpcd',
+        'dnbhbb',
+        'dndpcd',
     ];
 
     /**
