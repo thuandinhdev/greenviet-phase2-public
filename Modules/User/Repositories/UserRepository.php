@@ -231,9 +231,10 @@ class UserRepository
                 $q->where('gv_teams_members.user_id', $user->id)
                 ->orWhere('gv_teams.team_leader', $user->id);
             })
-            ->groupBy('gv_teams.id')
             ->select('gv_teams.*', 'gv_users.username as lead_username')
+            ->distinct()
             ->get();
+
             // if ($user->is_client) {
             //     // $user->projects_count = $user->projects()->whereNotIn('status', [4, 5])->count();
             //     $user->projects_count = Project::where('assign_to', $id)->count();
