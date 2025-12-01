@@ -27,6 +27,9 @@ class CommonHelper
 
     function getRemainingLeaveDays($user_id) {
         $user = User::where('id', $user_id)->first();
+        if($user['type']!= 1){
+            return 0;
+        }
         $initPaidLeave = $user->init_paid_leave;
         $initPaidLeaveDate = Carbon::parse($user->init_paid_leave_date);
         $currentDate = Carbon::now();

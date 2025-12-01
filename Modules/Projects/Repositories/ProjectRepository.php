@@ -333,7 +333,7 @@ class ProjectRepository
         )
             ->where('id', $id)
             ->first();
-
+        $project['payment'] = DB::table('gv_todos')->where('module_related_id', $project['id'])->get();
         if ($project) {
             $result = $project;
             $result['current_user_id'] = $user->id;
@@ -451,6 +451,15 @@ class ProjectRepository
 
         $projects = $project->create($input);
         if ($projects) {
+            foreach ($input['payment'] as $value) {
+                $value['module_id'] = 1;
+                $value['user_id'] = $user->id;
+                $value['module_related_id'] = $projects['id'];
+                if($value['status'] == 1){
+                    unset($value['payment_date']);
+                }
+                DB::table('gv_todos')->insert($value);
+            }
             // --
             // Save custom field
             if (!empty($projects) && isset($input['custom_fields'])) {
@@ -626,6 +635,16 @@ class ProjectRepository
         $assignMembers = array_unique($assignMembers);
 
         if ($project->fill($input)->save()) {
+            DB::table('gv_todos')->where('module_related_id', $project['id'])->delete();
+            foreach ($input['payment'] as $value) {
+                $value['module_id'] = 1;
+                $value['user_id'] = $user->id;
+                $value['module_related_id'] = $project['id'];
+                if($value['status'] == 1){
+                    unset($value['payment_date']);
+                }
+                DB::table('gv_todos')->insert($value);
+            }
             // --
             // Save custom field
             if (isset($input['custom_fields'])) {

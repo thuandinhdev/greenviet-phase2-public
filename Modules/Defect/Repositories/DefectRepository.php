@@ -958,15 +958,20 @@ class DefectRepository
         $input = $request->all();
         $userList = User::where('is_active', 1)->orderBy('firstname')->get();
         $setting = Setting::select([ 'dependent', 'personal'])->first();
-        $startOfMonth = Carbon::createFromFormat('Y-m', $input['month'])->startOfMonth();
-        $endOfMonth   = Carbon::createFromFormat('Y-m', $input['month'])->endOfMonth();
+        if(isset($input['selectedRange'])){
+            $startOfMonth = Carbon::createFromFormat('Y-m-d', $input['selectedRange']['start']);
+            $endOfMonth   = Carbon::createFromFormat('Y-m-d', $input['selectedRange']['end']);
+        } else {
+            $startOfMonth = Carbon::createFromFormat('Y-m', $input['month'])->startOfMonth();
+            $endOfMonth   = Carbon::createFromFormat('Y-m', $input['month'])->endOfMonth();
+        }
 
         $holidays = DB::table('gv_holidays')->whereBetween('date', [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')])->get();
         $leaves = DB::table('gv_leaves')->whereBetween('leave_date', [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')])
             // ->where('leave_type_id', '<', 3)
             ->whereIn('status', [1, 2])->select('*', DB::raw('DATE_FORMAT(leave_date, "%Y-%m-%d") as formatted_date'))->get();
-            
-        
+
+
         if(isset($input['action']) && $input['action'] == 'user'){
             $query = DB::table('gv_timesheets')
             ->join('gv_projects', 'gv_projects.id', '=', 'gv_timesheets.project_id')
@@ -1004,19 +1009,19 @@ class DefectRepository
                 $timesheets_ot = $queryData_ot->where('created_user_id', $value->id)
                                               ->where('ot', 1)
                                               ->get();
-            
+
                 $value->timesheet = $timesheets;
                 $value->timesheet_ot = $timesheets_ot;
-            
+
                 $contract = DB::table('gv_users_contract')
                     ->where('user_id', $value->id)
                     ->where('start_date', '<=', $startOfMonth->format('Y-m-d'))
                     ->where('end_date', '>=', $startOfMonth->format('Y-m-d'))
                     ->orderBy('id', 'desc')
                     ->first();
-            
+
                 $value->working_days = $this->getWorkingDays($startOfMonth->format('m'), $startOfMonth->format('Y')) + 2;
-            
+
                 if ($contract) {
                     $value->contract = $contract;
                     $value->day_salary = ($contract->performance + $contract->basic) / $value->working_days;
@@ -1024,7 +1029,7 @@ class DefectRepository
                     $value->contract = [];
                     $value->day_salary = 0;
                 }
-            
+
                 $value->dependents_amount = $value->dependents * $setting->dependent;
                 $value->personal_amount = $setting->personal;
             }
@@ -1171,15 +1176,15 @@ class DefectRepository
         // );
     }
 
-    
-        
-    public function exportPayment($request){        
+
+
+    public function exportPayment($request){
         $input = $request->all();
         $data = $input['data'];
         // 🔹 Đường dẫn file template
-        
+
         $templatePath = storage_path('app/templates/payment.xlsx');
-        
+
         if (!file_exists($templatePath)) {
             abort(404, 'Không tìm thấy file mẫu payment.xlsx');
         }
@@ -1192,7 +1197,7 @@ class DefectRepository
         $startRow = $templateRow;
         $lastCol = 'H'; // Cột cuối cùng trong file
         $sheet->setCellValue("E1", $input['month']);
-        
+
         foreach ($data as $i => $item) {
             $row = $startRow + $i;
 
@@ -1214,7 +1219,7 @@ class DefectRepository
                     $sheet->setCellValue("{$col}{$row}", $this->shiftFormulaRows($value, $delta));
                 }
             }
-            
+
             $sheet->setCellValue("B{$row}", $i + 1);
             $sheet->setCellValue("C{$row}", $item['project_name']);
             $sheet->setCellValue("D{$row}", $item['description']);
@@ -1234,13 +1239,13 @@ class DefectRepository
         return response()->download($filePath)->deleteFileAfterSend(true);
 
     }
-    public function exportWorkAllowance($request){        
+    public function exportWorkAllowance($request){
         $input = $request->all();
         $data = $input['data'];
-        
+
         // 🔹 Đường dẫn file template
         $templatePath = storage_path('app/templates/work_allowance.xlsx');
-        
+
         if (!file_exists($templatePath)) {
             abort(404, 'Không tìm thấy file mẫu work_allowance.xlsx');
         }
@@ -1253,7 +1258,7 @@ class DefectRepository
         $startRow = $templateRow;
         $lastCol = 'H'; // Cột cuối cùng trong file
         $sheet->setCellValue("G1", $input['month']);
-        
+
         foreach ($data as $i => $item) {
             $row = $startRow + $i;
 
@@ -1299,15 +1304,15 @@ class DefectRepository
     public function exportTimesheet($request){
         $input = $request->all();
         $data = $input['data'];
-        
+
         // 🔹 Đường dẫn file template
-        
+
         if($input['action'] == 'time'){
             $templatePath = storage_path('app/templates/timesheet_time.xlsx');
         } else {
             $templatePath = storage_path('app/templates/timesheet.xlsx');
         }
-        
+
         if (!file_exists($templatePath)) {
             abort(404, 'Không tìm thấy file mẫu salary.xlsx');
         }
@@ -1317,21 +1322,29 @@ class DefectRepository
         $sheet = $spreadsheet->getActiveSheet();
 
 
-        $startRow = 4;
+        $startRow = 12;
         $startCol = 'E'; // Bắt đầu từ cột E
         // Lặp qua danh sách ngày trong tháng
         $colIndex = Coordinate::columnIndexFromString($startCol);
 
-        foreach ($input['daysInMonth'] as $key => $value) {
+        foreach ($input['daysInMonth'] as $dayIndex => $dayValue) {
             $col = Coordinate::stringFromColumnIndex($colIndex);
-            
-            $sheet->setCellValue("{$col}{$startRow}", $key + 1); // hoặc $value nếu muốn hiển thị ngày thực tế
-            $colIndex++; // Tăng cột kế tiếp
+            $sheet->setCellValue("{$col}8", $this->getThuTrongTuan( $dayValue['date']));
+            $sheet->setCellValue("{$col}11", $dayValue['day']);
+            $colIndex++;
         }
 
-        $templateRow = 5; // Dòng mẫu (format gốc)
+
+        // foreach ($input['daysInMonth'] as $key => $value) {
+        //     $col = Coordinate::stringFromColumnIndex($colIndex);
+
+        //     $sheet->setCellValue("{$col}{$startRow}", $key + 1); // hoặc $value nếu muốn hiển thị ngày thực tế
+        //     $colIndex++; // Tăng cột kế tiếp
+        // }
+
+        $templateRow = 12; // Dòng mẫu (format gốc)
         $startRow = $templateRow;
-        $lastCol = 'AM'; // Cột cuối cùng trong file
+        $lastCol = 'BS'; // Cột cuối cùng trong file
         foreach ($data as $i => $item) {
             $row = $startRow + $i;
 
@@ -1369,16 +1382,38 @@ class DefectRepository
                 $sheet->setCellValue("{$col}{$row}", $value);
                 $colIndex++;
             }
-            $sheet->setCellValue("AJ{$row}", $item['total_day']);
-            $sheet->setCellValue("AK{$row}", $item['total_leave']);
-            $sheet->setCellValue("AL{$row}", $item['total_total']);
+            $sheet->setCellValue("BP{$row}", $item['total_day']);
+            $sheet->setCellValue("BQ{$row}", $item['total_leave']);
+            $sheet->setCellValue("BR{$row}", $item['total_total']);
             if($input['action'] == 'time'){
-                $sheet->setCellValue("AM{$row}", $input['workingInMonth']*8.5);
+                $sheet->setCellValue("BS{$row}", $input['workingInMonth']*8.5);
             } else {
-                $sheet->setCellValue("AM{$row}", $input['workingInMonth']);
+                $sheet->setCellValue("BS{$row}", $input['workingInMonth']);
             }
-            
+
         }
+
+        // ================================
+        // XÓA CÁC CỘT TỪ E + count(days) TỚI TRƯỚC BS
+        // ================================
+
+        // Cột E → index số
+        $colE = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::columnIndexFromString('E');
+
+        // Cột bắt đầu xoá
+        $startColIndex = $colE + count($input['daysInMonth']);
+        $startCol = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($startColIndex);
+
+        // Cột BS → index số
+        $endColIndex = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::columnIndexFromString('BP');
+
+        // Số cột cần xoá
+        $countToDelete = $endColIndex - $startColIndex;
+        if ($countToDelete > 0) {
+            $sheet->removeColumn($startCol, $countToDelete);
+        }
+
+
 
         // --- Lưu file ---
         $fileName = 'salary_export_' . time() . '.xlsx';
@@ -1466,7 +1501,7 @@ class DefectRepository
     {
         $input = $request->all();
         $data = $input['data'];
-        
+
         // 🔹 Đường dẫn file template
         $templatePath = storage_path('app/templates/salary.xlsx');
         if (!file_exists($templatePath)) {
@@ -1475,37 +1510,13 @@ class DefectRepository
 
         // 🔹 Load template
         $spreadsheet = IOFactory::load($templatePath);
-        $sheet = $spreadsheet->getActiveSheet();
+        $sheet = $spreadsheet->getSheet(0);
 
         $templateRow = 12; // Dòng mẫu (format gốc)
         $startRow = $templateRow;
-        $lastCol = 'DM'; // Cột cuối cùng trong file
+        $lastCol = 'AL'; // Cột cuối cùng trong file
         $sheet->setCellValue("O4", $input['month']);
-        $sheet->setCellValue("BC4", $input['month']);
-        $sheet->setCellValue("CQ4", $input['month']);
-        // ✅ Duyệt qua data để ghi vào, copy format từ dòng 5
         $row = 0;
-        $colIndex = Coordinate::columnIndexFromString('AO');
-        foreach ($input['daysInMonth'] as $dayIndex => $dayValue) {
-            $col = Coordinate::stringFromColumnIndex($colIndex);
-            $sheet->setCellValue("{$col}8", $this->getThuTrongTuan($input['month'].'-'.$dayIndex+1));
-            $sheet->setCellValue("{$col}11", $dayIndex+1);
-            $colIndex++;
-        }
-        $colIndex = Coordinate::columnIndexFromString('AO');
-        foreach ($input['daysInMonth'] as $dayIndex => $dayValue) {
-            $col = Coordinate::stringFromColumnIndex($colIndex);
-            $sheet->setCellValue("{$col}8", $this->getThuTrongTuan($input['month'].'-'.$dayIndex+1));
-            $sheet->setCellValue("{$col}11", $dayIndex+1);
-            $colIndex++;
-        }
-        $colIndex = Coordinate::columnIndexFromString('CA');
-        foreach ($input['daysInMonth'] as $dayIndex => $dayValue) {
-            $col = Coordinate::stringFromColumnIndex($colIndex);
-            $sheet->setCellValue("{$col}8", $this->getThuTrongTuan($input['month'].'-'.$dayIndex+1));
-            $sheet->setCellValue("{$col}11", $dayIndex+1);
-            $colIndex++;
-        }
         foreach ($data as $i => $item) {
 
             // salary
@@ -1551,34 +1562,6 @@ class DefectRepository
             $sheet->setCellValue("W{$row}", $item['salary_lunch']);
 
             // timesheet
-
-
-            // --- Ghi dữ liệu mới ---
-            $sheet->setCellValue("AL{$row}", $i + 1);
-            // 🔹 Ghi dữ liệu ngày trong tháng (ví dụ từ cột E → cột tương ứng với ngày cuối)
-            $startCol = 'AO';
-            $colIndex = Coordinate::columnIndexFromString($startCol);
-
-            foreach ($input['daysInMonth'] as $dayIndex => $dayValue) {
-                $col = Coordinate::stringFromColumnIndex($colIndex);
-                $value = $this->getTimesheetByDay($item, $dayIndex, $input['month'], $input['holidays'], $input['leaves'], 'day');
-                $sheet->setCellValue("{$col}{$row}", $value);
-                $colIndex++;
-            }
-            $sheet->setCellValue("BT{$row}", $item['total_day']);
-            $sheet->setCellValue("BU{$row}", $item['total_leave']);
-            $sheet->setCellValue("BV{$row}", $item['total_total']);
-            $sheet->setCellValue("BW{$row}", $input['workingInMonth']);
-
-            $startCol = 'CA';
-            $colIndex = Coordinate::columnIndexFromString($startCol);
-
-            foreach ($input['daysInMonth'] as $dayIndex => $dayValue) {
-                $col = Coordinate::stringFromColumnIndex($colIndex);
-                $sheet->setCellValue("{$col}{$row}", $item['timesheet_ot'][$dayIndex]['value']);
-                $colIndex++;
-            }
-            
         }
         $totalRow = $i +$templateRow+1;
         $currentRow = $row;
@@ -1604,8 +1587,134 @@ class DefectRepository
                 'startColor' => ['argb' => 'FFFFE699'], // vàng nhạt
             ],
         ];
-        
+
         $sheet->getStyle("A{$totalRow}:AK{$totalRow}")->applyFromArray($styleArray);
+
+
+
+        //sheet 2
+        $sheet = $spreadsheet->getSheet(1);
+
+        $templateRow = 12; // Dòng mẫu (format gốc)
+        $startRow = $templateRow;
+        $lastCol = 'AM'; // Cột cuối cùng trong file
+        $sheet->setCellValue("O4", $input['month']);
+        $sheet->setCellValue("C{$row}", $item['lastname'] . ' ' . $item['firstname']);
+        $row = 0;
+        $colIndex = Coordinate::columnIndexFromString('D');
+        foreach ($input['daysInMonth'] as $dayIndex => $dayValue) {
+            $col = Coordinate::stringFromColumnIndex($colIndex);
+            $sheet->setCellValue("{$col}8", $this->getThuTrongTuan($input['month'].'-'.$dayIndex+1));
+            $sheet->setCellValue("{$col}11", $dayIndex+1);
+            $colIndex++;
+        }
+        foreach ($data as $i => $item) {
+
+            // salary
+            $row = $startRow + $i;
+
+            // --- Copy style ---
+            $sheet->duplicateStyle(
+                $sheet->getStyle("A{$templateRow}:{$lastCol}{$templateRow}"),
+                "A{$row}:{$lastCol}{$row}"
+            );
+
+            // --- Copy công thức có điều chỉnh dòng ---
+            $delta = $row - $templateRow;
+            for ($col = 'A'; $col !== Coordinate::stringFromColumnIndex(
+                Coordinate::columnIndexFromString($lastCol) + 1
+            ); $col = Coordinate::stringFromColumnIndex(
+                Coordinate::columnIndexFromString($col) + 1
+            )) {
+                $cell = $sheet->getCell("{$col}{$templateRow}");
+                $value = $cell->getValue();
+
+                if ($cell->isFormula()) {
+                    $sheet->setCellValue("{$col}{$row}", $this->shiftFormulaRows($value, $delta));
+                }
+            }
+
+
+            // --- Ghi dữ liệu mới ---
+            $sheet->setCellValue("A{$row}", $i + 1);
+            // 🔹 Ghi dữ liệu ngày trong tháng (ví dụ từ cột E → cột tương ứng với ngày cuối)
+            $startCol = 'D';
+            $colIndex = Coordinate::columnIndexFromString($startCol);
+
+            foreach ($input['daysInMonth'] as $dayIndex => $dayValue) {
+                $col = Coordinate::stringFromColumnIndex($colIndex);
+                $value = $this->getTimesheetByDay($item, $dayIndex, $input['month'], $input['holidays'], $input['leaves'], 'day');
+                $sheet->setCellValue("{$col}{$row}", $value);
+                $colIndex++;
+            }
+            $sheet->setCellValue("AI{$row}", $item['total_day']);
+            $sheet->setCellValue("AJ{$row}", $item['total_leave']);
+            $sheet->setCellValue("AK{$row}", $item['total_total']);
+            $sheet->setCellValue("AL{$row}", $input['workingInMonth']);
+
+
+        }
+
+        //sheet 2
+        $sheet = $spreadsheet->getSheet(2);
+
+        $templateRow = 12; // Dòng mẫu (format gốc)
+        $startRow = $templateRow;
+        $lastCol = 'AM'; // Cột cuối cùng trong file
+        $sheet->setCellValue("O4", $input['month']);
+        $sheet->setCellValue("C{$row}", $item['lastname'] . ' ' . $item['firstname']);
+        $row = 0;
+        $colIndex = Coordinate::columnIndexFromString('D');
+        foreach ($input['daysInMonth'] as $dayIndex => $dayValue) {
+            $col = Coordinate::stringFromColumnIndex($colIndex);
+            $sheet->setCellValue("{$col}8", $this->getThuTrongTuan($input['month'].'-'.$dayIndex+1));
+            $sheet->setCellValue("{$col}11", $dayIndex+1);
+            $colIndex++;
+        }
+        foreach ($data as $i => $item) {
+
+            // salary
+            $row = $startRow + $i;
+
+            // --- Copy style ---
+            $sheet->duplicateStyle(
+                $sheet->getStyle("A{$templateRow}:{$lastCol}{$templateRow}"),
+                "A{$row}:{$lastCol}{$row}"
+            );
+
+            // --- Copy công thức có điều chỉnh dòng ---
+            $delta = $row - $templateRow;
+            for ($col = 'A'; $col !== Coordinate::stringFromColumnIndex(
+                Coordinate::columnIndexFromString($lastCol) + 1
+            ); $col = Coordinate::stringFromColumnIndex(
+                Coordinate::columnIndexFromString($col) + 1
+            )) {
+                $cell = $sheet->getCell("{$col}{$templateRow}");
+                $value = $cell->getValue();
+
+                if ($cell->isFormula()) {
+                    $sheet->setCellValue("{$col}{$row}", $this->shiftFormulaRows($value, $delta));
+                }
+            }
+
+
+            // --- Ghi dữ liệu mới ---
+            $sheet->setCellValue("A{$row}", $i + 1);
+            // 🔹 Ghi dữ liệu ngày trong tháng (ví dụ từ cột E → cột tương ứng với ngày cuối)
+            $startCol = 'D';
+            $colIndex = Coordinate::columnIndexFromString($startCol);
+
+
+            foreach ($input['daysInMonth'] as $dayIndex => $dayValue) {
+                $col = Coordinate::stringFromColumnIndex($colIndex);
+                $sheet->setCellValue("{$col}{$row}", $item['timesheet_ot'][$dayIndex]['value']);
+                $colIndex++;
+            }
+
+        }
+
+
+
         // --- Lưu file ---
         $fileName = 'salary_export_' . time() . '.xlsx';
         $filePath = storage_path('app/' . $fileName);
@@ -1633,7 +1742,7 @@ class DefectRepository
                 default => null,
             };
         } catch (\Exception $e) {
-            return null; 
+            return null;
         }
     }
 

@@ -157,10 +157,14 @@ class TimesheetRepository
         return $totalWorkingDays;
     }
 
-    public function getUserMonthSelect($month){
+    public function getUserMonthSelect($request){
+        $input = $request->all();
+        $startOfMonth = Carbon::createFromFormat('Y-m-d', $input['selectedRange']['start']);
+        $endOfMonth   = Carbon::createFromFormat('Y-m-d', $input['selectedRange']['end']);
+        $ids = array_column($input['project'], 'id');
         $user = Auth::user();
-        $startOfMonth = Carbon::createFromFormat('Y-m', $month)->startOfMonth();
-        $endOfMonth   = Carbon::createFromFormat('Y-m', $month)->endOfMonth();
+        // $startOfMonth = Carbon::createFromFormat('Y-m', $month)->startOfMonth();
+        // $endOfMonth   = Carbon::createFromFormat('Y-m', $month)->endOfMonth();
 
         $department = DB::table('gv_user_role_department')->join('gv_departments', 'gv_departments.id', '=', 'gv_user_role_department.department_id')->join('gv_roles', 'gv_roles.id', '=', 'gv_user_role_department.role_id')->where('gv_user_role_department.user_id', $user->id)->select('gv_departments.name as department_name', 'gv_roles.name as role_name')->first();
         $data = [];
@@ -183,19 +187,31 @@ class TimesheetRepository
             ->orderBy('username')
             ->get();
         }
+        
         foreach ($data as $key => $value) {
             // $value->timesheets_status = DB::table('gv_timesheets')->where('created_user_id', $value->id)->where('module_id', 2)->where('status', 0)->orderBy('start_time')->first();
+            if($input['project']){
+
+            }
             $value->department_role = DB::table('gv_user_role_department')->join('gv_departments', 'gv_departments.id', '=', 'gv_user_role_department.department_id')->join('gv_roles', 'gv_roles.id', '=', 'gv_user_role_department.role_id')->where('gv_user_role_department.user_id', $value->id)->select('gv_departments.name as department_name', 'gv_roles.name as role_name')->first();
             $value->paid_leave = $this->commonHelper->getRemainingLeaveDays($value['id']);
 
 
-            $value->timesheet_billable = DB::table('gv_timesheets')->join('gv_projects', 'gv_projects.id', '=', 'gv_timesheets.project_id')->where('gv_timesheets.created_user_id', $value->id)->where('gv_projects.income_type', 1)->where('gv_timesheets.module_id', 2)->where('gv_timesheets.status', 2)->whereBetween('gv_timesheets.start_time', [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')])->sum('gv_timesheets.decimal_time');
-            $value->timesheet_non_billable = DB::table('gv_timesheets')->join('gv_projects', 'gv_projects.id', '=', 'gv_timesheets.project_id')->where('gv_timesheets.created_user_id', $value->id)->where('gv_projects.income_type', 0)->where('gv_timesheets.module_id', 2)->where('gv_timesheets.status', 2)->whereBetween('gv_timesheets.start_time', [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')])->sum('gv_timesheets.decimal_time');
+            $value->timesheet_billable = DB::table('gv_timesheets')->join('gv_projects', 'gv_projects.id', '=', 'gv_timesheets.project_id')->where('gv_timesheets.created_user_id', $value->id)->where('gv_projects.income_type', 1)->where('gv_timesheets.module_id', 2)->where('gv_timesheets.status', 2)->when(!empty($ids), function ($q) use ($ids) {
+                $q->whereIn('gv_projects.id', $ids);
+            })->whereBetween('gv_timesheets.start_time', [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')])->sum('gv_timesheets.decimal_time');
+            $value->timesheet_non_billable = DB::table('gv_timesheets')->join('gv_projects', 'gv_projects.id', '=', 'gv_timesheets.project_id')->where('gv_timesheets.created_user_id', $value->id)->where('gv_projects.income_type', 0)->where('gv_timesheets.module_id', 2)->when(!empty($ids), function ($q) use ($ids) {
+                $q->whereIn('gv_projects.id', $ids);
+            })->where('gv_timesheets.status', 2)->whereBetween('gv_timesheets.start_time', [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')])->sum('gv_timesheets.decimal_time');
 
             
-            $value->project_billable = DB::table('gv_timesheets')->join('gv_projects', 'gv_projects.id', '=', 'gv_timesheets.project_id')->where('gv_timesheets.created_user_id', $value->id)->where('gv_projects.income_type', 1)->where('gv_timesheets.module_id', 2)->where('gv_timesheets.status', 2)->whereBetween('gv_timesheets.start_time', [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')])->distinct('gv_timesheets.project_id')->count();
+            $value->project_billable = DB::table('gv_timesheets')->join('gv_projects', 'gv_projects.id', '=', 'gv_timesheets.project_id')->where('gv_timesheets.created_user_id', $value->id)->where('gv_projects.income_type', 1)->where('gv_timesheets.module_id', 2)->when(!empty($ids), function ($q) use ($ids) {
+                $q->whereIn('gv_projects.id', $ids);
+            })->where('gv_timesheets.status', 2)->whereBetween('gv_timesheets.start_time', [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')])->distinct('gv_timesheets.project_id')->count();
 
-            $value->project_non_billable = DB::table('gv_timesheets')->join('gv_projects', 'gv_projects.id', '=', 'gv_timesheets.project_id')->where('gv_timesheets.created_user_id', $value->id)->where('gv_projects.income_type', 0)->where('gv_timesheets.module_id', 2)->where('gv_timesheets.status', 2)->whereBetween('gv_timesheets.start_time', [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')])->distinct('gv_timesheets.project_id')->count();
+            $value->project_non_billable = DB::table('gv_timesheets')->join('gv_projects', 'gv_projects.id', '=', 'gv_timesheets.project_id')->where('gv_timesheets.created_user_id', $value->id)->where('gv_projects.income_type', 0)->where('gv_timesheets.module_id', 2)->when(!empty($ids), function ($q) use ($ids) {
+                $q->whereIn('gv_projects.id', $ids);
+            })->where('gv_timesheets.status', 2)->whereBetween('gv_timesheets.start_time', [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')])->distinct('gv_timesheets.project_id')->count();
             
             // DB::table('gv_timesheets')->where('created_user_id', $value->id)->where('module_id', 2)->where('status', 2)->whereBetween('start_time', [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')])->groupBy('project_id')->count();
             // $value->projectcount = DB::table('gv_timesheets')->where('created_user_id', $value->id)->where('module_id', 2)->where('status', 2)->whereBetween('start_time', [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')])->groupBy('project_id')->count();

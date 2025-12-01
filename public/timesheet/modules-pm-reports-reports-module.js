@@ -9,7 +9,7 @@
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = ("<!-- Card header -->\n<div class=\"pl-0 pr-0 border-bottom\">\n    <div class=\"card-header pl-0 pr-0 border-bottom\">\n        <h4 class=\"main-title mt-2\"><span>Work allowance</span></h4>\n        <div class=\"card-buttons d-flex\" *ngIf=\"isPageLoaded\">\n            <a class=\"btn btn-create mb-0\" style=\"background: #34a853 !important; color: #fff !important;\"  (click)=\"exportFiles()\">Export</a>\n            <div class=\"btn calender-day\" (click)=\"preMonth()\">\n                <i class=\"calendar-icon fa fa-chevron-left\"></i>\n            </div>\n            <div class=\"ml-2\">\n                <a class=\"btn btn-create mb-0\" id=\"calendar-filter\" (bsValueChange)=\"changeMonth($event)\" #dp1=\"bsDatepicker\" bsDatepicker [bsConfig]=\"datepickerConfig\" ><i class=\"fa fa-calendar-plus-o\"></i></a>\n            </div>\n            <div class=\"mr-2\">\n               <input type=\"text\" class=\"form-control\" [(ngModel)]=\"month\" readonly />\n            </div>\n            <div class=\"btn calender-day\" (click)=\"nextMonth()\"  *ngIf=\"month <= currentMonth\">\n                <i class=\"calendar-icon fa fa-chevron-right\"></i>\n            </div>\n        </div>\n    </div>\n</div>\n<!-- Card body -->\n<div class=\"card-body pt-3 overflow-x-scroll overflow-y-hidden\">\n    <div class=\"row\">\n        <div class=\"col-lg-12 mb-3\">\n            <div class=\"table-responsive-xs table-responsive-sm table-responsive-md table-responsive-lg table-responsive-xl\">\n                <table class=\"table table-bordered table-hover b4-datatable\" width=\"100%\" id=\"defects_table\">\n                    <thead>\n                        <tr>\n                            <th>#</th>\n                            <th>{{'leaves.create.fields.user' | translate}}</th>\n                            <th>{{'leaves.create.fields.reason' | translate}}</th>\n                            <th>{{'leaves.columns.request_date' | translate}}</th>\n                            <th>{{'leaves.columns.leave_date' | translate}}</th>\n                            <th>Value(VNĐ)</th>\n                            <th>Approve1</th>                                        \n                            <th>Approve2</th>\n                        </tr>\n                    </thead>\n                    <tbody *ngIf=\"leavesData?.length != 0\">\n                        <tr *ngFor=\"let leave of leavesData; index as i\">\n                            <td class=\"text-center\">{{ i + 1 }}</td>\n                            <td>{{leave.firstname}} {{leave.lastname}}</td>\n                            <td><div [innerHTML]=\"leave.reason\"></div></td>\n                            <td>{{ leave.created_at | dateTimeFormatFilter: loginUser.settings.date_format }}</td>\n                            <td>{{ leave.leave_date | dateTimeFormatFilter: loginUser.settings.date_format }}</td>\n                            <td>{{ leave.total | number:'1.0-0'}}</td>\n                            <td class=\"people-lists\">\n                                <a [routerLink]=\"['/users/profile', leave.approved1]\" class=\"btn btn-profile-info rounded-circle\" placement=\"top\" tooltip=\"{{leave.approved1_firstname}} {{leave.approved1_lastname}}\" *ngIf=\"leave.approved1\">\n                                    <img *ngIf=\"leave.approved1_avatar\" src=\"{{apiUrl}}/uploads/profile/{{leave.approved1_avatar}}\" class=\"img-sm rounded-circle\" alt=\"Profile\" />\n                                    <img *ngIf=\"!leave.approved1_avatar\" src=\"../assets/img/profile_small.jpg\" class=\"img-sm rounded-circle\" alt=\"Profile\" />\n                                </a>\n                            </td>\n                            <td class=\"people-lists\">\n                                <a [routerLink]=\"['/users/profile', leave.approved2]\" class=\"btn btn-profile-info rounded-circle\" placement=\"top\" tooltip=\"{{leave.approved2_firstname}} {{leave.approved2_lastname}}\" *ngIf=\"leave.approved2\">\n                                    <img *ngIf=\"leave.approved2_avatar\" src=\"{{apiUrl}}/uploads/profile/{{leave.approved2_avatar}}\" class=\"img-sm rounded-circle\" alt=\"Profile\" />\n                                    <img *ngIf=\"!leave.approved2_avatar\" src=\"../assets/img/profile_small.jpg\" class=\"img-sm rounded-circle\" alt=\"Profile\" />\n                                </a>\n                            </td>\n                        </tr>\n                        <tr style=\"background-color: rgba(160, 136, 0, 0.11);\">\n                            <td colspan=\"5\"><b>Total:</b></td>\n                            <td colspan=\"3\"><b>{{totalData | number:'1.0-0'}}</b></td>\n                        </tr>\n                    </tbody>\n                </table>\n                <!-- <table class=\"table table-bordered table-hover b4-datatable\" width=\"100%\" id=\"defects_table\">\n                    <thead>\n                        <tr class=\"display_all\">\n                            <th>Full Name</th>\n                            <th>Date</th>\n                            <th>Description</th>\n                            <th>Value(VNĐ)</th>\n                        </tr>\n                    </thead>\n                    <tbody >\n                        <tr>\n                            <td> Lê Phương Dũng </td>\n                            <td> 9/5/2025 </td>\n                            <td>Starry, Bến Lức LA,  Xe hơi bao tài xế </td>\n                            <td>250.000</td>\n                        </tr> \n                        <tr>\n                            <td> Lê Phương Dũng </td>\n                            <td> 9/5/2025 </td>\n                            <td>Starry, Bến Lức LA,  Xe hơi bao tài xế </td>\n                            <td>250.000</td>\n                        </tr> \n                        <tr>\n                            <td> Lê Phương Dũng </td>\n                            <td> 9/5/2025 </td>\n                            <td>Starry, Bến Lức LA,  Xe hơi bao tài xế </td>\n                            <td>250.000</td>\n                        </tr> \n                        <tr>\n                            <td> Lê Phương Dũng </td>\n                            <td> 9/5/2025 </td>\n                            <td>Starry, Bến Lức LA,  Xe hơi bao tài xế </td>\n                            <td>250.000</td>\n                        </tr> \n                        <tr>\n                            <td> Lê Phương Dũng </td>\n                            <td> 9/5/2025 </td>\n                            <td>Starry, Bến Lức LA,  Xe hơi bao tài xế </td>\n                            <td>250.000</td>\n                        </tr> \n                        <tr>\n                            <td> Lê Phương Dũng </td>\n                            <td> 9/5/2025 </td>\n                            <td>Starry, Bến Lức LA,  Xe hơi bao tài xế </td>\n                            <td>250.000</td>\n                        </tr> \n                        <tr>\n                            <td> Lê Phương Dũng </td>\n                            <td> 9/5/2025 </td>\n                            <td>Starry, Bến Lức LA,  Xe hơi bao tài xế </td>\n                            <td>250.000</td>\n                        </tr> \n                        <tr>\n                            <td> Lê Phương Dũng </td>\n                            <td> 9/5/2025 </td>\n                            <td>Starry, Bến Lức LA,  Xe hơi bao tài xế </td>\n                            <td>250.000</td>\n                        </tr> \n                        <tr>\n                            <td> Lê Phương Dũng </td>\n                            <td> 9/5/2025 </td>\n                            <td>Starry, Bến Lức LA,  Xe hơi bao tài xế </td>\n                            <td>250.000</td>\n                        </tr> \n                        <tr>\n                            <td colspan=\"3\"> Total </td>\n                            <td>2.250.000</td>\n                        </tr> \n                    </tbody>\n                </table> -->\n                <!-- <table class=\"table table-bordered table-hover b4-datatable\" width=\"100%\" id=\"export_table\" style=\"display: none;\">\n                    <thead>\n                        <tr class=\"display_all\">\n                            <th>Full Name</th>\n                            <th>Total</th>\n                            <th *ngFor=\"let day of daysInMonth; let i = index\">\n                                <div *ngIf=\"day.stt==0\">CN-{{day.day}}</div>\n                                <div *ngIf=\"day.stt>0\">T{{day.stt + 1}}-{{day.day}}</div>\n                            </th>\n                        </tr>\n                    </thead>\n                    <tbody *ngIf=\"exportTableData?.length != 0\">\n                        <ng-container *ngFor=\"let user of exportTableData; let i = index\">\n                            <tr>\n                                <td rowspan=\"2\">{{user.firstname}} {{user.lastname}}</td>\n                                <td>{{ getTimesheetTotal(user) }}</td>\n                                <ng-container *ngFor=\"let day of daysInMonth; let j = index\">\n                                    <td [innerHTML]=\"getTimesheetByDay(user, j)\"></td>\n                                </ng-container>\n                            </tr>\n                            <tr style=\"background-color: rgba(160, 136, 0, 0.11);text-align: center;\">\n                                <td>{{user.timesheet_ot_total}}</td>\n                                <td *ngFor=\"let day of daysInMonth; let j = index\">\n                                    <div *ngIf=\"user.timesheet_ot[j] && user.timesheet_ot[j].value && user.timesheet_ot[j].value > 0\">{{user.timesheet_ot[j].value | number:'1.0-1'}}</div>\n                                </td>\n                            </tr>\n                        </ng-container>\n                    </tbody>\n                </table> -->\n            </div>\n        </div>\n    </div>\n</div>\n");
+/* harmony default export */ __webpack_exports__["default"] = ("<!-- Card header -->\n<div class=\"pl-0 pr-0 border-bottom\">\n    <div class=\"card-header pl-0 pr-0 border-bottom\">\n        <h4 class=\"main-title mt-2\"><span>Work allowance</span></h4>\n        <div class=\"card-buttons d-flex\" *ngIf=\"isPageLoaded\">\n            <input\n                class=\"btn btn-create mb-0\"\n                bsDaterangepicker\n                [(ngModel)]=\"selectedRange\"\n                (ngModelChange)=\"onRangeChange($event)\"\n                [bsConfig]=\"datepickerConfig\"\n                style=\"cursor: pointer; padding: 6px 10px; min-width: 260px;\"\n            />\n            <ng-select [searchable]=\"true\"\n            [items]=\"projects\"\n            [selectOnTab]=\"true\"\n            [multiple]=\"true\"\n            bindLabel=\"project_name\"\n            style=\"width: 600px; \"\n            bindValue=\"id\"\n            labelForId=\"project_id\"\n            (change)=\"projectChange($event)\"\n            placeholder=\"{{'tasks.create.placeholders.placeholder6' | translate }}\">\n            <ng-template ng-option-tmp let-item=\"item\">{{item.project_name}}</ng-template>\n            </ng-select>\n            <a class=\"btn btn-create mb-0 ml-5\" style=\"background: #32bdd9 !important; color: #fff !important;\" (click)=\"submitFormFilter()\">Submit</a>\n            <a class=\"btn btn-create mb-0\" style=\"background: #34a853 !important; color: #fff !important;\"  (click)=\"exportFiles()\">Export</a>\n            <!-- <div class=\"btn calender-day\" (click)=\"preMonth()\">\n                <i class=\"calendar-icon fa fa-chevron-left\"></i>\n            </div>\n            <div class=\"ml-2\">\n                <a class=\"btn btn-create mb-0\" id=\"calendar-filter\" (bsValueChange)=\"changeMonth($event)\" #dp1=\"bsDatepicker\" bsDatepicker [bsConfig]=\"datepickerConfig\" ><i class=\"fa fa-calendar-plus-o\"></i></a>\n            </div>\n            <div class=\"mr-2\">\n               <input type=\"text\" class=\"form-control\" [(ngModel)]=\"month\" readonly />\n            </div>\n            <div class=\"btn calender-day\" (click)=\"nextMonth()\"  *ngIf=\"month <= currentMonth\">\n                <i class=\"calendar-icon fa fa-chevron-right\"></i>\n            </div> -->\n        </div>\n    </div>\n</div>\n<!-- Card body -->\n<div class=\"card-body pt-3 overflow-x-scroll overflow-y-hidden\">\n    <div class=\"row\">\n        <div class=\"col-lg-12 mb-3\">\n            <div class=\"table-responsive-xs table-responsive-sm table-responsive-md table-responsive-lg table-responsive-xl\">\n                <table class=\"table table-bordered table-hover b4-datatable\" width=\"100%\" id=\"defects_table\">\n                    <thead>\n                        <tr>\n                            <th>#</th>\n                            <th>{{'leaves.create.fields.user' | translate}}</th>\n                            <th>{{'leaves.create.fields.reason' | translate}}</th>\n                            <th>{{'leaves.columns.request_date' | translate}}</th>\n                            <th>{{'leaves.columns.leave_date' | translate}}</th>\n                            <th>Value(VNĐ)</th>\n                            <th>Approve1</th>\n                            <th>Approve2</th>\n                        </tr>\n                    </thead>\n                    <tbody *ngIf=\"leavesData?.length != 0\">\n                        <tr *ngFor=\"let leave of leavesData; index as i\">\n                            <td class=\"text-center\">{{ i + 1 }}</td>\n                            <td>{{leave.firstname}} {{leave.lastname}}</td>\n                            <td><div [innerHTML]=\"leave.reason\"></div></td>\n                            <td>{{ leave.created_at | dateTimeFormatFilter: loginUser.settings.date_format }}</td>\n                            <td>{{ leave.leave_date | dateTimeFormatFilter: loginUser.settings.date_format }}</td>\n                            <td>{{ leave.total | number:'1.0-0'}}</td>\n                            <td class=\"people-lists\">\n                                <a [routerLink]=\"['/users/profile', leave.approved1]\" class=\"btn btn-profile-info rounded-circle\" placement=\"top\" tooltip=\"{{leave.approved1_firstname}} {{leave.approved1_lastname}}\" *ngIf=\"leave.approved1\">\n                                    <img *ngIf=\"leave.approved1_avatar\" src=\"{{apiUrl}}/uploads/profile/{{leave.approved1_avatar}}\" class=\"img-sm rounded-circle\" alt=\"Profile\" />\n                                    <img *ngIf=\"!leave.approved1_avatar\" src=\"../assets/img/profile_small.jpg\" class=\"img-sm rounded-circle\" alt=\"Profile\" />\n                                </a>\n                            </td>\n                            <td class=\"people-lists\">\n                                <a [routerLink]=\"['/users/profile', leave.approved2]\" class=\"btn btn-profile-info rounded-circle\" placement=\"top\" tooltip=\"{{leave.approved2_firstname}} {{leave.approved2_lastname}}\" *ngIf=\"leave.approved2\">\n                                    <img *ngIf=\"leave.approved2_avatar\" src=\"{{apiUrl}}/uploads/profile/{{leave.approved2_avatar}}\" class=\"img-sm rounded-circle\" alt=\"Profile\" />\n                                    <img *ngIf=\"!leave.approved2_avatar\" src=\"../assets/img/profile_small.jpg\" class=\"img-sm rounded-circle\" alt=\"Profile\" />\n                                </a>\n                            </td>\n                        </tr>\n                        <tr style=\"background-color: rgba(160, 136, 0, 0.11);\">\n                            <td colspan=\"5\"><b>Total:</b></td>\n                            <td colspan=\"3\"><b>{{totalData | number:'1.0-0'}}</b></td>\n                        </tr>\n                    </tbody>\n                </table>\n                <!-- <table class=\"table table-bordered table-hover b4-datatable\" width=\"100%\" id=\"defects_table\">\n                    <thead>\n                        <tr class=\"display_all\">\n                            <th>Full Name</th>\n                            <th>Date</th>\n                            <th>Description</th>\n                            <th>Value(VNĐ)</th>\n                        </tr>\n                    </thead>\n                    <tbody >\n                        <tr>\n                            <td> Lê Phương Dũng </td>\n                            <td> 9/5/2025 </td>\n                            <td>Starry, Bến Lức LA,  Xe hơi bao tài xế </td>\n                            <td>250.000</td>\n                        </tr>\n                        <tr>\n                            <td> Lê Phương Dũng </td>\n                            <td> 9/5/2025 </td>\n                            <td>Starry, Bến Lức LA,  Xe hơi bao tài xế </td>\n                            <td>250.000</td>\n                        </tr>\n                        <tr>\n                            <td> Lê Phương Dũng </td>\n                            <td> 9/5/2025 </td>\n                            <td>Starry, Bến Lức LA,  Xe hơi bao tài xế </td>\n                            <td>250.000</td>\n                        </tr>\n                        <tr>\n                            <td> Lê Phương Dũng </td>\n                            <td> 9/5/2025 </td>\n                            <td>Starry, Bến Lức LA,  Xe hơi bao tài xế </td>\n                            <td>250.000</td>\n                        </tr>\n                        <tr>\n                            <td> Lê Phương Dũng </td>\n                            <td> 9/5/2025 </td>\n                            <td>Starry, Bến Lức LA,  Xe hơi bao tài xế </td>\n                            <td>250.000</td>\n                        </tr>\n                        <tr>\n                            <td> Lê Phương Dũng </td>\n                            <td> 9/5/2025 </td>\n                            <td>Starry, Bến Lức LA,  Xe hơi bao tài xế </td>\n                            <td>250.000</td>\n                        </tr>\n                        <tr>\n                            <td> Lê Phương Dũng </td>\n                            <td> 9/5/2025 </td>\n                            <td>Starry, Bến Lức LA,  Xe hơi bao tài xế </td>\n                            <td>250.000</td>\n                        </tr>\n                        <tr>\n                            <td> Lê Phương Dũng </td>\n                            <td> 9/5/2025 </td>\n                            <td>Starry, Bến Lức LA,  Xe hơi bao tài xế </td>\n                            <td>250.000</td>\n                        </tr>\n                        <tr>\n                            <td> Lê Phương Dũng </td>\n                            <td> 9/5/2025 </td>\n                            <td>Starry, Bến Lức LA,  Xe hơi bao tài xế </td>\n                            <td>250.000</td>\n                        </tr>\n                        <tr>\n                            <td colspan=\"3\"> Total </td>\n                            <td>2.250.000</td>\n                        </tr>\n                    </tbody>\n                </table> -->\n                <!-- <table class=\"table table-bordered table-hover b4-datatable\" width=\"100%\" id=\"export_table\" style=\"display: none;\">\n                    <thead>\n                        <tr class=\"display_all\">\n                            <th>Full Name</th>\n                            <th>Total</th>\n                            <th *ngFor=\"let day of daysInMonth; let i = index\">\n                                <div *ngIf=\"day.stt==0\">CN-{{day.day}}</div>\n                                <div *ngIf=\"day.stt>0\">T{{day.stt + 1}}-{{day.day}}</div>\n                            </th>\n                        </tr>\n                    </thead>\n                    <tbody *ngIf=\"exportTableData?.length != 0\">\n                        <ng-container *ngFor=\"let user of exportTableData; let i = index\">\n                            <tr>\n                                <td rowspan=\"2\">{{user.firstname}} {{user.lastname}}</td>\n                                <td>{{ getTimesheetTotal(user) }}</td>\n                                <ng-container *ngFor=\"let day of daysInMonth; let j = index\">\n                                    <td [innerHTML]=\"getTimesheetByDay(user, j)\"></td>\n                                </ng-container>\n                            </tr>\n                            <tr style=\"background-color: rgba(160, 136, 0, 0.11);text-align: center;\">\n                                <td>{{user.timesheet_ot_total}}</td>\n                                <td *ngFor=\"let day of daysInMonth; let j = index\">\n                                    <div *ngIf=\"user.timesheet_ot[j] && user.timesheet_ot[j].value && user.timesheet_ot[j].value > 0\">{{user.timesheet_ot[j].value | number:'1.0-1'}}</div>\n                                </td>\n                            </tr>\n                        </ng-container>\n                    </tbody>\n                </table> -->\n            </div>\n        </div>\n    </div>\n</div>\n");
 
 /***/ }),
 
@@ -22,7 +22,7 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = ("<!-- Card header -->\n<div class=\"pl-0 pr-0 border-bottom\">\n    <div class=\"card-header pl-0 pr-0 border-bottom\">\n        <h4 class=\"main-title mt-2\"><span>Standard working hours per month: {{workingInMonth * 8.5}}h</span></h4>\n        <div class=\"card-buttons d-flex\" *ngIf=\"isPageLoaded\">\n            <a class=\"btn btn-create mb-0\" style=\"background: #34a853 !important; color: #fff !important;\" (click)=\"exportFiles()\">Export</a>\n            <div class=\"btn calender-day\" (click)=\"preMonth()\">\n                <i class=\"calendar-icon fa fa-chevron-left\"></i>\n            </div>\n            <div class=\"ml-2\">\n                <a class=\"btn btn-create mb-0\" id=\"calendar-filter\" (bsValueChange)=\"changeMonth($event)\" #dp1=\"bsDatepicker\" bsDatepicker [bsConfig]=\"datepickerConfig\" ><i class=\"fa fa-calendar-plus-o\"></i></a>\n            </div>\n            <div class=\"mr-2\">\n               <input type=\"text\" class=\"form-control\" [(ngModel)]=\"month\" readonly />\n            </div>\n            <div class=\"btn calender-day\" (click)=\"nextMonth()\"  *ngIf=\"month <= currentMonth\">\n                <i class=\"calendar-icon fa fa-chevron-right\"></i>\n            </div>\n        </div>\n    </div>\n</div>\n<!-- Card body -->\n<div class=\"card-body pt-3 overflow-x-scroll overflow-y-hidden\">\n    <div class=\"row\">\n        <div class=\"col-lg-12 mb-3\">\n            <div class=\"table-responsive-xs table-responsive-sm table-responsive-md table-responsive-lg table-responsive-xl\">\n                <table class=\"table table-bordered table-hover b4-datatable\" width=\"100%\" id=\"defects_table\">\n                    <thead>\n                        <tr class=\"display_all\">\n                            <th style=\"min-width: 250px;\">Full Name</th>\n                            <th>Total</th>\n                            <th *ngFor=\"let day of daysInMonth; let i = index\">\n                                <div *ngIf=\"day.stt==0\">CN<br>{{day.day}}</div>\n                                <div *ngIf=\"day.stt>0\">T{{day.stt + 1}}<br>{{day.day}}</div>\n                            </th>\n                        </tr>\n                    </thead>\n                    <tbody *ngIf=\"exportTableData?.length != 0\">\n                        <ng-container *ngFor=\"let user of exportTableData; let i = index\">\n                            <tr>\n                                <td rowspan=\"2\">{{user.lastname}} {{user.firstname}}</td>\n\n                                <td><div class=\"cell\">{{ getTimesheetTotal(user) }}</div></td>\n                                <ng-container *ngFor=\"let day of daysInMonth; let j = index\">\n                                    <td [innerHTML]=\"getTimesheetByDay(user, j)\"></td>\n                                </ng-container>\n                            </tr>\n                            <tr style=\"background-color: rgba(160, 136, 0, 0.11);text-align: center;\">\n                                <td><div class=\"cell\">{{user.timesheet_ot_total}}</div></td>\n                                <td *ngFor=\"let day of daysInMonth; let j = index\">\n                                    <div *ngIf=\"user.timesheet_ot[j] && user.timesheet_ot[j].value && user.timesheet_ot[j].value > 0\">{{user.timesheet_ot[j].value | number:'1.0-1'}}</div>\n                                </td>\n                            </tr>\n                        </ng-container>\n                    </tbody>\n                </table>\n                <!-- <table class=\"table table-bordered table-hover b4-datatable\" width=\"100%\" id=\"export_table\" style=\"display: none;\">\n                    <thead>\n                        <tr class=\"display_all\">\n                            <th>Full Name</th>\n                            <th>Total</th>\n                            <th *ngFor=\"let day of daysInMonth; let i = index\">\n                                <div *ngIf=\"day.stt==0\">CN-{{day.day}}</div>\n                                <div *ngIf=\"day.stt>0\">T{{day.stt + 1}}-{{day.day}}</div>\n                            </th>\n                        </tr>\n                    </thead>\n                    <tbody *ngIf=\"exportTableData?.length != 0\">\n                        <ng-container *ngFor=\"let user of exportTableData; let i = index\">\n                            <tr>\n                                <td rowspan=\"2\">{{user.firstname}} {{user.lastname}}</td>\n                                <td>{{ getTimesheetTotal(user) }}</td>\n                                <ng-container *ngFor=\"let day of daysInMonth; let j = index\">\n                                    <td [innerHTML]=\"getTimesheetByDay(user, j)\"></td>\n                                </ng-container>\n                            </tr>\n                            <tr style=\"background-color: rgba(160, 136, 0, 0.11);text-align: center;\">\n                                <td>{{user.timesheet_ot_total}}</td>\n                                <td *ngFor=\"let day of daysInMonth; let j = index\">\n                                    <div *ngIf=\"user.timesheet_ot[j] && user.timesheet_ot[j].value && user.timesheet_ot[j].value > 0\">{{user.timesheet_ot[j].value | number:'1.0-1'}}</div>\n                                </td>\n                            </tr>\n                        </ng-container>\n                    </tbody>\n                </table> -->\n            </div>\n        </div>\n    </div>\n</div>\n");
+/* harmony default export */ __webpack_exports__["default"] = ("<!-- Card header -->\n<div class=\"pl-0 pr-0 border-bottom\">\n    <div class=\"card-header pl-0 pr-0 border-bottom\">\n        <h4 class=\"main-title mt-2\"><span>Standard working hours per month: {{workingInMonth * 8.5}}h</span></h4>\n        <div class=\"card-buttons d-flex\" *ngIf=\"isPageLoaded\">\n            <input\n                class=\"btn btn-create mb-0\"\n                bsDaterangepicker\n                [(ngModel)]=\"selectedRange\"\n                (ngModelChange)=\"onRangeChange($event)\"\n                [bsConfig]=\"datepickerConfig\"\n                style=\"cursor: pointer; padding: 6px 10px; min-width: 260px;\"\n            />\n            <a class=\"btn btn-create mb-0\" style=\"background: #34a853 !important; color: #fff !important;\" (click)=\"exportFiles()\">Export</a>\n            <!-- <div class=\"btn calender-day\" (click)=\"preMonth()\">\n                <i class=\"calendar-icon fa fa-chevron-left\"></i>\n            </div>\n            <div class=\"ml-2\">\n                <a class=\"btn btn-create mb-0\" id=\"calendar-filter\" (bsValueChange)=\"changeMonth($event)\" #dp1=\"bsDatepicker\" bsDatepicker [bsConfig]=\"datepickerConfig\" ><i class=\"fa fa-calendar-plus-o\"></i></a>\n            </div>\n            <div class=\"mr-2\">\n               <input type=\"text\" class=\"form-control\" [(ngModel)]=\"month\" readonly />\n            </div>\n            <div class=\"btn calender-day\" (click)=\"nextMonth()\"  *ngIf=\"month <= currentMonth\">\n                <i class=\"calendar-icon fa fa-chevron-right\"></i>\n            </div> -->\n        </div>\n    </div>\n</div>\n<!-- Card body -->\n<div class=\"card-body pt-3 overflow-x-scroll overflow-y-hidden\">\n    <div class=\"row\">\n        <div class=\"col-lg-12 mb-3\">\n            <div class=\"table-responsive-xs table-responsive-sm table-responsive-md table-responsive-lg table-responsive-xl\">\n                <table class=\"table table-bordered table-hover b4-datatable\" width=\"100%\" id=\"defects_table\">\n                    <thead>\n                        <tr class=\"display_all\">\n                            <th style=\"min-width: 250px;\">Full Name</th>\n                            <th>Total</th>\n                            <th *ngFor=\"let day of daysInMonth; let i = index\">\n                                <div *ngIf=\"day.stt==0\">CN<br>{{day.day}}</div>\n                                <div *ngIf=\"day.stt>0\">T{{day.stt + 1}}<br>{{day.day}}</div>\n                            </th>\n                        </tr>\n                    </thead>\n                    <tbody *ngIf=\"exportTableData?.length != 0\">\n                        <ng-container *ngFor=\"let user of exportTableData; let i = index\">\n                            <tr>\n                                <td rowspan=\"2\">{{user.lastname}} {{user.firstname}}</td>\n\n                                <td><div class=\"cell\">{{ getTimesheetTotal(user) }}</div></td>\n                                <ng-container *ngFor=\"let day of daysInMonth; let j = index\">\n                                    <td [innerHTML]=\"getTimesheetByDay(user, j)\"></td>\n                                </ng-container>\n                            </tr>\n                            <tr style=\"background-color: rgba(160, 136, 0, 0.11);text-align: center;\">\n                                <td><div class=\"cell\">{{user.timesheet_ot_total}}</div></td>\n                                <td *ngFor=\"let day of daysInMonth; let j = index\">\n                                    <div *ngIf=\"user.timesheet_ot[j] && user.timesheet_ot[j].value && user.timesheet_ot[j].value > 0\">{{user.timesheet_ot[j].value | number:'1.0-1'}}</div>\n                                </td>\n                            </tr>\n                        </ng-container>\n                    </tbody>\n                </table>\n                <!-- <table class=\"table table-bordered table-hover b4-datatable\" width=\"100%\" id=\"export_table\" style=\"display: none;\">\n                    <thead>\n                        <tr class=\"display_all\">\n                            <th>Full Name</th>\n                            <th>Total</th>\n                            <th *ngFor=\"let day of daysInMonth; let i = index\">\n                                <div *ngIf=\"day.stt==0\">CN-{{day.day}}</div>\n                                <div *ngIf=\"day.stt>0\">T{{day.stt + 1}}-{{day.day}}</div>\n                            </th>\n                        </tr>\n                    </thead>\n                    <tbody *ngIf=\"exportTableData?.length != 0\">\n                        <ng-container *ngFor=\"let user of exportTableData; let i = index\">\n                            <tr>\n                                <td rowspan=\"2\">{{user.firstname}} {{user.lastname}}</td>\n                                <td>{{ getTimesheetTotal(user) }}</td>\n                                <ng-container *ngFor=\"let day of daysInMonth; let j = index\">\n                                    <td [innerHTML]=\"getTimesheetByDay(user, j)\"></td>\n                                </ng-container>\n                            </tr>\n                            <tr style=\"background-color: rgba(160, 136, 0, 0.11);text-align: center;\">\n                                <td>{{user.timesheet_ot_total}}</td>\n                                <td *ngFor=\"let day of daysInMonth; let j = index\">\n                                    <div *ngIf=\"user.timesheet_ot[j] && user.timesheet_ot[j].value && user.timesheet_ot[j].value > 0\">{{user.timesheet_ot[j].value | number:'1.0-1'}}</div>\n                                </td>\n                            </tr>\n                        </ng-container>\n                    </tbody>\n                </table> -->\n            </div>\n        </div>\n    </div>\n</div>\n");
 
 /***/ }),
 
@@ -48,7 +48,7 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = ("<!-- Card header -->\n<div class=\"pl-0 pr-0 border-bottom\">\n    <div class=\"card-header pl-0 pr-0 border-bottom\">\n        <div class=\"btn-group mr-2 mb-2\">\n            <label class=\"btn btn-secondary btn-toggle m-0\" [ngClass]=\"{ 'active': FilterKey === 'success' }\" (click)=\"filterByStatus('success')\" btnRadio=\"success\" tabindex=\"0\" role=\"button\">Success</label>\n            <label class=\"btn btn-secondary btn-toggle m-0\" [ngClass]=\"{ 'active': FilterKey === 'pending' }\" (click)=\"filterByStatus('pending')\" btnRadio=\"pending\" tabindex=\"0\" role=\"button\">Pending</label>\n            <label class=\"btn btn-secondary btn-toggle m-0\" [ngClass]=\"{ 'active': FilterKey === 'overdue' }\" (click)=\"filterByStatus('overdue')\" btnRadio=\"overdue\" tabindex=\"0\" role=\"button\">Overdue</label>\n        </div>\n        <div class=\"card-buttons d-flex\" *ngIf=\"isPageLoaded\">\n            <a class=\"btn btn-create mb-0\" style=\"background: #34a853 !important; color: #fff !important;\" (click)=\"exportFiles()\">Export</a>\n            <div class=\"btn calender-day\" (click)=\"preMonth()\" *ngIf=\"FilterKey != 'overdue'\">\n                <i class=\"calendar-icon fa fa-chevron-left\"></i>\n            </div>\n            <div class=\"ml-2\" *ngIf=\"FilterKey != 'overdue'\">\n                <a class=\"btn btn-create mb-0\" id=\"calendar-filter\" (bsValueChange)=\"changeMonth($event)\" #dp1=\"bsDatepicker\" bsDatepicker [bsConfig]=\"datepickerConfig\" ><i class=\"fa fa-calendar-plus-o\"></i></a>\n            </div>\n            <div class=\"mr-2\" *ngIf=\"FilterKey != 'overdue'\">\n               <input type=\"text\" class=\"form-control\" [(ngModel)]=\"month\" readonly />\n            </div>\n            <div class=\"btn calender-day\" (click)=\"nextMonth()\"  *ngIf=\"month <= currentMonth && FilterKey != 'overdue'\">\n                <i class=\"calendar-icon fa fa-chevron-right\"></i>\n            </div>\n        </div>\n    </div>\n</div>\n<!-- Card body -->\n<div class=\"card-body pt-3 overflow-x-scroll overflow-y-hidden\">\n    <div class=\"row\">\n        <div class=\"col-lg-12 mb-3\">\n            <div class=\"table-responsive-xs table-responsive-sm table-responsive-md table-responsive-lg table-responsive-xl\">\n                <table datatable [dtOptions]=\"dtOptions\" [dtTrigger]=\"dtTrigger\" class=\"table table-bordered table-hover b4-datatable\" width=\"100%\" >\n                    <thead>\n                        <tr>\n                            <th>#</th>\n                            <th>Project</th>\n                            <th>Amount</th>\n                            <th>Description</th>\n                            <th>Estimated date</th>\n                            <th>Payment date</th>\n                            <th>Status</th>\n                        </tr>\n                    </thead>\n                    <tbody *ngIf=\"payments?.length > 0\">\n                        <tr *ngFor=\"let item of payments; index as i\">\n                            <td class=\"text-center\">{{ i + 1 }}</td>\n                            <td>{{item.project_name}}</td>\n                            <td>{{item.price| number:'1.0-0'}}</td>\n                            <td>{{item.description}}</td>\n                            <td>{{item.due_date}}</td>\n                            <td>{{item.payment_date}}</td>\n                            <td class=\"status-dropdown\">\n                                <div class=\"budges-status\">\n                                    <span class=\"open\" *ngIf=\"item.status == 1 && FilterKey != 'overdue'\">Pending</span>\n                                    <span class=\"in_progress\" *ngIf=\"item.status == 1 && FilterKey == 'overdue'\">Overdue</span>\n                                    <span class=\"medium\" *ngIf=\"item.status == 2\">Success</span>\n                                </div>\n                            </td>\n                        </tr>\n                    </tbody>\n                </table>\n            </div>\n        </div>\n    </div>\n</div>\n");
+/* harmony default export */ __webpack_exports__["default"] = ("<!-- Card header -->\n<div class=\"pl-0 pr-0 border-bottom\">\n    <div class=\"card-header pl-0 pr-0 border-bottom\">\n        <div class=\"btn-group mr-2 mb-2\">\n            <label class=\"btn btn-secondary btn-toggle m-0\" [ngClass]=\"{ 'active': FilterKey === 'success' }\" (click)=\"filterByStatus('success')\" btnRadio=\"success\" tabindex=\"0\" role=\"button\">Success</label>\n            <label class=\"btn btn-secondary btn-toggle m-0\" [ngClass]=\"{ 'active': FilterKey === 'pending' }\" (click)=\"filterByStatus('pending')\" btnRadio=\"pending\" tabindex=\"0\" role=\"button\">Pending</label>\n            <label class=\"btn btn-secondary btn-toggle m-0\" [ngClass]=\"{ 'active': FilterKey === 'overdue' }\" (click)=\"filterByStatus('overdue')\" btnRadio=\"overdue\" tabindex=\"0\" role=\"button\">Overdue</label>\n        </div>\n        <div class=\"card-buttons d-flex\" *ngIf=\"isPageLoaded\">\n            <input\n                class=\"btn btn-create mb-0\"\n                bsDaterangepicker\n                [(ngModel)]=\"selectedRange\"\n                (ngModelChange)=\"onRangeChange($event)\"\n                [bsConfig]=\"datepickerConfig\"\n                style=\"cursor: pointer; padding: 6px 10px; min-width: 260px;\"\n            />\n            <a class=\"btn btn-create mb-0\" style=\"background: #34a853 !important; color: #fff !important;\" (click)=\"exportFiles()\">Export</a>\n            <!-- <div class=\"btn calender-day\" (click)=\"preMonth()\" *ngIf=\"FilterKey != 'overdue'\">\n                <i class=\"calendar-icon fa fa-chevron-left\"></i>\n            </div>\n            <div class=\"ml-2\" *ngIf=\"FilterKey != 'overdue'\">\n                <a class=\"btn btn-create mb-0\" id=\"calendar-filter\" (bsValueChange)=\"changeMonth($event)\" #dp1=\"bsDatepicker\" bsDatepicker [bsConfig]=\"datepickerConfig\" ><i class=\"fa fa-calendar-plus-o\"></i></a>\n            </div>\n            <div class=\"mr-2\" *ngIf=\"FilterKey != 'overdue'\">\n               <input type=\"text\" class=\"form-control\" [(ngModel)]=\"month\" readonly />\n            </div>\n            <div class=\"btn calender-day\" (click)=\"nextMonth()\"  *ngIf=\"month <= currentMonth && FilterKey != 'overdue'\">\n                <i class=\"calendar-icon fa fa-chevron-right\"></i>\n            </div> -->\n        </div>\n    </div>\n</div>\n<!-- Card body -->\n<div class=\"card-body pt-3 overflow-x-scroll overflow-y-hidden\">\n    <div class=\"row\">\n        <div class=\"col-lg-12 mb-3\">\n            <div class=\"table-responsive-xs table-responsive-sm table-responsive-md table-responsive-lg table-responsive-xl\">\n                <table datatable [dtOptions]=\"dtOptions\" [dtTrigger]=\"dtTrigger\" class=\"table table-bordered table-hover b4-datatable\" width=\"100%\" >\n                    <thead>\n                        <tr>\n                            <th>#</th>\n                            <th>Project</th>\n                            <th>Amount</th>\n                            <th>Description</th>\n                            <th>Estimated date</th>\n                            <th>Payment date</th>\n                            <th>Status</th>\n                        </tr>\n                    </thead>\n                    <tbody *ngIf=\"payments?.length > 0\">\n                        <tr *ngFor=\"let item of payments; index as i\">\n                            <td class=\"text-center\">{{ i + 1 }}</td>\n                            <td>{{item.project_name}}</td>\n                            <td>{{item.price| number:'1.0-0'}}</td>\n                            <td>{{item.description}}</td>\n                            <td>{{item.due_date}}</td>\n                            <td>{{item.payment_date}}</td>\n                            <td class=\"status-dropdown\">\n                                <div class=\"budges-status\">\n                                    <span class=\"open\" *ngIf=\"item.status == 1 && FilterKey != 'overdue'\">Pending</span>\n                                    <span class=\"in_progress\" *ngIf=\"item.status == 1 && FilterKey == 'overdue'\">Overdue</span>\n                                    <span class=\"medium\" *ngIf=\"item.status == 2\">Success</span>\n                                </div>\n                            </td>\n                        </tr>\n                    </tbody>\n                </table>\n            </div>\n        </div>\n    </div>\n</div>\n");
 
 /***/ }),
 
@@ -100,7 +100,7 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = ("<!-- Card header -->\n<div class=\"pl-0 pr-0 border-bottom\">\n    <div class=\"card-header pl-0 pr-0 border-bottom\">\n        <div class=\"btn-group mr-2 mb-2\" style=\"height:42px;\">\n          <label class=\"btn btn-secondary btn-toggle m-0\" [ngClass]=\"{ 'active': FilterKey === 'user_list' }\" (click)=\"filterByStatus('user_list')\" btnRadio=\"user_list\" tabindex=\"0\" role=\"button\">All Users</label>\n            <label class=\"btn btn-secondary btn-toggle m-0\" [ngClass]=\"{ 'active': FilterKey === 'user_detail' }\" (click)=\"filterByStatus('user_detail')\" btnRadio=\"user_detail\" tabindex=\"0\" role=\"button\">User Detail</label>\n            <!-- <label class=\"btn btn-secondary btn-toggle m-0\" [ngClass]=\"{ 'active': FilterKey === 'profile' }\" (click)=\"filterByStatus('profile')\" btnRadio=\"profile\" tabindex=\"0\" role=\"button\">Profile</label> -->\n            <!-- <label class=\"btn btn-secondary btn-toggle m-0\" [ngClass]=\"{ 'active': FilterKey === 'normal' }\" (click)=\"filterByStatus('normal')\" btnRadio=\"normal\" tabindex=\"0\" role=\"button\">Normal</label>\n            <label class=\"btn btn-secondary btn-toggle m-0\" [ngClass]=\"{ 'active': FilterKey === 'ot' }\" (click)=\"filterByStatus('ot')\" btnRadio=\"ot\" tabindex=\"0\" role=\"button\">OT</label> -->\n        </div>\n        <div class=\"col-sm-3\" *ngIf=\"FilterKey === 'user_detail'\">\n            <form>\n                <div class=\"form-group\">\n                    <ng-select\n                        [searchable]=\"true\"\n                        [items]=\"users\"\n                        [selectOnTab]=\"true\"\n                        [multiple]=\"false\"\n                        [selectableGroup]=\"false\"\n                        bindLabel=\"username\"\n                        bindValue=\"id\"\n                        labelForId=\"user_id\"\n                        placeholder=\"{{'timesheet.filter.placeholders.placeholder5' | translate }}\"\n                        (change)=\"changeUser($event)\">\n                        <ng-template ng-label-tmp let-item=\"item\">\n                            {{item.username}}\n                        </ng-template>\n                    </ng-select>\n                </div>\n            </form>\n        </div>\n        <div class=\"card-buttons d-flex\" *ngIf=\"isPageLoaded && FilterKey === 'user_list'\">\n            <div class=\"btn calender-day\" (click)=\"preMonth()\">\n                <i class=\"calendar-icon fa fa-chevron-left\"></i>\n            </div>\n            <div class=\"ml-2\">\n                <a class=\"btn btn-create mb-0\" id=\"calendar-filter\" (bsValueChange)=\"changeMonth($event)\" #dp1=\"bsDatepicker\" bsDatepicker [bsConfig]=\"datepickerConfig\" ><i class=\"fa fa-calendar-plus-o\"></i></a>\n            </div>\n            <div class=\"mr-2\">\n               <input type=\"text\" class=\"form-control\" [(ngModel)]=\"month\" readonly />\n            </div>\n            <div class=\"btn calender-day\" (click)=\"nextMonth()\"  *ngIf=\"month <= currentMonth\">\n                <i class=\"calendar-icon fa fa-chevron-right\"></i>\n            </div>\n        </div>\n    </div>\n</div>\n<!-- Card body -->\n<div class=\"card-body pt-3 overflow-x-scroll overflow-y-hidden\">\n    <div class=\"row\">\n        <div class=\"col-lg-12 mb-3\">\n            <div class=\"table-responsive-xs table-responsive-sm table-responsive-md table-responsive-lg table-responsive-xl\">\n                <app-user-detail [userId]=\"users_id\" *ngIf=\"users_id && FilterKey === 'user_detail'\"></app-user-detail>\n                <span class=\"card-title text-warning\" *ngIf=\"!users_id && FilterKey === 'user_detail'\"><b> Please select a user to view details.\"</b></span>\n                <table datatable [dtOptions]=\"dtOptions\" [dtTrigger]=\"dtTrigger\" class=\"table table-bordered table-hover b4-datatable\" width=\"100%\" id=\"users_table\"  *ngIf=\"FilterKey == 'user_list'\">\n                  <thead>\n                    <tr>\n                      <th>{{'users.columns.photo' | translate}}</th>\n                      <th>{{'users.columns.first_name' | translate}}</th>\n                      <th>{{'users.columns.last_name' | translate}}</th>\n                      <th>{{'users.columns.username' | translate}}</th>\n                      <th>{{'users.columns.email' | translate}}</th>\n                      <th>Remaining leave</th>\n                      <th>{{'users.columns.status' | translate}}</th>\n                      <th>{{'users.columns.departments_roles' | translate}}</th>\n                      <th>Total hour (Standard:{{workingInMonth*8.5| number:'1.0-1'}})</th>\n                      <th>Total Cost(VNĐ)</th>\n                      <th>Projects Billable(VNĐ)</th>\n                      <th>Projects Non-Billable(VNĐ)</th>\n                    </tr>\n                  </thead>\n                  <tbody *ngIf=\"users?.length != 0\">\n                    <tr *ngFor=\"let user of users; index as i\">\n                      <td class=\"people-lists\">\n                        <a [routerLink]=\"['/users/profile', user.id]\" class=\"btn btn-profile-info rounded-circle text-dark\" placement=\"top\" tooltip=\"{{user.firstname}} {{user.lastname}}\">\n                          <img *ngIf=\"user.avatar\" src=\"{{apiUrl}}/uploads/profile/{{user.avatar}}\" class=\"img-sm rounded-circle\" alt=\"Profile\" />\n                          <img *ngIf=\"!user.avatar\" src=\"../assets/img/profile_small.jpg\" class=\"img-sm rounded-circle\" alt=\"Profile\" />\n                        </a>\n                      </td>\n                      <td>\n                        {{user.firstname}}\n                      </td>\n                      <td>\n                        {{user.lastname}}\n                      </td>\n                      <td>\n                        <a [routerLink]=\"['profile', user.id]\" tooltip=\"{{'common.view' | translate}}\">{{user.username}}</a>\n                      </td>\n                      <td>\n                        {{user.email}}\n                      </td>\n                      <td>\n                        {{user.paid_leave}}\n                      </td>\n                      <td class=\"text-center\">\n                        <div class=\"budges-status\">\n                          <span class=\"completed\" *ngIf=\"user.is_active == '1'\">{{'common.status.active' | translate}}</span>\n                          <span class=\"cancel\" *ngIf=\"user.is_active == '0'\">{{'common.status.deactive' | translate}}</span>\n                        </div>\n                      </td>\n                      <td class=\"budges-status\">\n                        <span class=\"completed\">{{user.department_role.role_name}} ({{user.department_role.department_name}})</span>\n                      </td>\n                      <td>\n                        <span class=\"completed\">{{user.timesheet_billable+user.timesheet_non_billable| number:'1.0-1'}}</span>\n                      </td>\n                      <td>\n                        <div class=\"budges-status\" style=\"display: inline-flex; align-items: center; gap: 4px;justify-content: flex-end; width: 100%;\">\n                          {{(user.timesheet_billable+user.timesheet_non_billable)*user.salarytohour| number:'1.0-0'}}\n                          <span class=\"open\">{{user.project_billable+user.project_non_billable}}</span>\n                        </div>\n                      </td>\n                      <td>\n                        <div class=\"budges-status\" style=\"display: inline-flex; align-items: center; gap: 4px;justify-content: flex-end; width: 100%;\">\n                          {{(user.timesheet_billable)*user.salarytohour| number:'1.0-0'}}\n                          <span class=\"open\">{{user.project_billable}}</span>\n                        </div>\n                      </td>\n                      <td>\n                        <div class=\"budges-status\" style=\"display: inline-flex; align-items: center; gap: 4px;justify-content: flex-end; width: 100%;\">\n                          {{(user.timesheet_non_billable)*user.salarytohour| number:'1.0-0'}}\n                          <span class=\"open\">{{user.project_non_billable}}</span>\n                        </div>\n                      </td>\n                    </tr>\n                  </tbody>\n                </table>\n                <!-- <table class=\"table table-bordered table-hover b4-datatable\" width=\"100%\" id=\"defects_table\" *ngIf=\"users_id && salaryFilterKey != 'profile'\">\n                    <thead>\n                      <tr class=\"display_all\">\n                        <th></th>\n                        <th *ngFor=\"let key of usersTimesheetTable | keyvalue\">\n                          <div class=\"fw-bold\">\n                            PROJECT: {{ key.key.split('__')[0] }}\n                          </div>\n                          <div>TASK: {{ key.key.split('__')[1] }}</div>\n                        </th>\n                        <th>Total</th>\n                      </tr>\n                    </thead>\n                    <tbody>\n                      <tr *ngFor=\"let day of daysInMonth\">\n                        <td>\n                            <b>{{(day.day < 10 ? '0' + day.day : day.day)}}</b>\n                        </td>\n                  \n                        <td *ngFor=\"let key of usersTimesheetTable | keyvalue\">\n                          <ng-container *ngIf=\"key.value[month +'-' + (day.day < 10 ? '0' + day.day : day.day)] as tasks\">\n                            <div *ngFor=\"let t of tasks\">\n                              <b>{{ t.decimal_time }}</b>\n                              <span *ngIf=\"t.note\"> - Note: {{ t.note }}</span>\n                            </div>\n                          </ng-container>\n                        </td>\n                        <td [innerHTML]=\"getTotalByDay(usersTimesheetTable, day.day)\"></td>\n                      </tr>\n                      <tr style=\"background-color: rgba(160, 136, 0, 0.11);\">\n                        <td>\n                            <b>Total</b>\n                        </td>\n                  \n                        <td *ngFor=\"let element of usersTimesheetTable | keyvalue\">\n                            <div [innerHTML]=\"getTotalByTask(element.value)\"></div>\n                        </td>\n                        <td [innerHTML]=\"getGrandTotal(usersTimesheetTable)\"></td>\n                      </tr>\n                    </tbody>\n                  </table> -->\n            </div>\n        </div>\n    </div>\n</div>\n");
+/* harmony default export */ __webpack_exports__["default"] = ("<!-- Card header -->\n<div class=\"pl-0 pr-0 border-bottom\">\n    <div class=\"card-header pl-0 pr-0 border-bottom\">\n        <div class=\"btn-group mr-2 mb-2\" style=\"height:42px;\">\n          <label class=\"btn btn-secondary btn-toggle m-0\" [ngClass]=\"{ 'active': FilterKey === 'user_list' }\" (click)=\"filterByStatus('user_list')\" btnRadio=\"user_list\" tabindex=\"0\" role=\"button\">All Users</label>\n            <label class=\"btn btn-secondary btn-toggle m-0\" [ngClass]=\"{ 'active': FilterKey === 'user_detail' }\" (click)=\"filterByStatus('user_detail')\" btnRadio=\"user_detail\" tabindex=\"0\" role=\"button\">User Detail</label>\n            <!-- <label class=\"btn btn-secondary btn-toggle m-0\" [ngClass]=\"{ 'active': FilterKey === 'profile' }\" (click)=\"filterByStatus('profile')\" btnRadio=\"profile\" tabindex=\"0\" role=\"button\">Profile</label> -->\n            <!-- <label class=\"btn btn-secondary btn-toggle m-0\" [ngClass]=\"{ 'active': FilterKey === 'normal' }\" (click)=\"filterByStatus('normal')\" btnRadio=\"normal\" tabindex=\"0\" role=\"button\">Normal</label>\n            <label class=\"btn btn-secondary btn-toggle m-0\" [ngClass]=\"{ 'active': FilterKey === 'ot' }\" (click)=\"filterByStatus('ot')\" btnRadio=\"ot\" tabindex=\"0\" role=\"button\">OT</label> -->\n        </div>\n        <div class=\"col-sm-3\" *ngIf=\"FilterKey === 'user_detail'\">\n            <form>\n                <div class=\"form-group\">\n                    <ng-select\n                        [searchable]=\"true\"\n                        [items]=\"users\"\n                        [selectOnTab]=\"true\"\n                        [multiple]=\"false\"\n                        [selectableGroup]=\"false\"\n                        bindLabel=\"username\"\n                        bindValue=\"id\"\n                        labelForId=\"user_id\"\n                        placeholder=\"{{'timesheet.filter.placeholders.placeholder5' | translate }}\"\n                        (change)=\"changeUser($event)\">\n                        <ng-template ng-label-tmp let-item=\"item\">\n                            {{item.username}}\n                        </ng-template>\n                    </ng-select>\n                </div>\n            </form>\n        </div>\n        <input\n            class=\"btn btn-create mb-0\"\n            bsDaterangepicker\n            [(ngModel)]=\"selectedRange\"\n            (ngModelChange)=\"onRangeChange($event)\"\n            [bsConfig]=\"datepickerConfig\"\n            style=\"cursor: pointer; padding: 6px 10px; min-width: 260px; \"\n        />\n        <ng-select [searchable]=\"true\"\n          [items]=\"projects\"\n          [selectOnTab]=\"true\"\n          [multiple]=\"true\"\n          bindLabel=\"project_name\"\n          style=\"width: 600px; \"\n          bindValue=\"id\"\n          labelForId=\"project_id\"\n          (change)=\"projectChange($event)\"\n          placeholder=\"{{'tasks.create.placeholders.placeholder6' | translate }}\">\n          <ng-template ng-option-tmp let-item=\"item\">{{item.project_name}}</ng-template>\n        </ng-select>\n        <a class=\"btn btn-create mb-0\" style=\"background: #32bdd9 !important; color: #fff !important;\" (click)=\"submitFormFilter()\">Submit</a>\n        <!-- <div class=\"card-buttons d-flex\" *ngIf=\"isPageLoaded && FilterKey === 'user_list'\">\n            <div class=\"btn calender-day\" (click)=\"preMonth()\">\n                <i class=\"calendar-icon fa fa-chevron-left\"></i>\n            </div>\n            <div class=\"ml-2\">\n                <a class=\"btn btn-create mb-0\" id=\"calendar-filter\" (bsValueChange)=\"changeMonth($event)\" #dp1=\"bsDatepicker\" bsDatepicker [bsConfig]=\"datepickerConfig\" ><i class=\"fa fa-calendar-plus-o\"></i></a>\n            </div>\n            <div class=\"mr-2\">\n               <input type=\"text\" class=\"form-control\" [(ngModel)]=\"month\" readonly />\n            </div>\n            <div class=\"btn calender-day\" (click)=\"nextMonth()\"  *ngIf=\"month <= currentMonth\">\n                <i class=\"calendar-icon fa fa-chevron-right\"></i>\n            </div>\n        </div> -->\n    </div>\n</div>\n<!-- Card body -->\n<div class=\"card-body pt-3 overflow-x-scroll overflow-y-hidden\">\n    <div class=\"row\">\n        <div class=\"col-lg-12 mb-3\">\n            <div class=\"table-responsive-xs table-responsive-sm table-responsive-md table-responsive-lg table-responsive-xl\">\n                <app-user-detail [userId]=\"users_id\" [dataCall]=\"dataCall\" *ngIf=\"users_id && FilterKey === 'user_detail'\"></app-user-detail>\n                <span class=\"card-title text-warning\" *ngIf=\"!users_id && FilterKey === 'user_detail'\"><b> Please select a user to view details.\"</b></span>\n                <table datatable [dtOptions]=\"dtOptions\" [dtTrigger]=\"dtTrigger\" class=\"table table-bordered table-hover b4-datatable\" width=\"100%\" id=\"users_table\"  *ngIf=\"FilterKey == 'user_list'\">\n                  <thead>\n                    <tr>\n                      <th>{{'users.columns.photo' | translate}}</th>\n                      <th>{{'users.columns.first_name' | translate}}</th>\n                      <th>{{'users.columns.last_name' | translate}}</th>\n                      <th>{{'users.columns.username' | translate}}</th>\n                      <th>{{'users.columns.email' | translate}}</th>\n                      <th>Remaining leave</th>\n                      <th>{{'users.columns.status' | translate}}</th>\n                      <th>{{'users.columns.departments_roles' | translate}}</th>\n                      <th>Total hour (Standard:{{workingInMonth*8.5| number:'1.0-1'}})</th>\n                      <th>Total Cost(VNĐ)</th>\n                      <th>Projects Billable(VNĐ)</th>\n                      <th>Projects Non-Billable(VNĐ)</th>\n                    </tr>\n                  </thead>\n                  <tbody *ngIf=\"users?.length != 0\">\n                    <tr *ngFor=\"let user of users; index as i\">\n                      <td class=\"people-lists\">\n                        <a [routerLink]=\"['/users/profile', user.id]\" class=\"btn btn-profile-info rounded-circle text-dark\" placement=\"top\" tooltip=\"{{user.firstname}} {{user.lastname}}\">\n                          <img *ngIf=\"user.avatar\" src=\"{{apiUrl}}/uploads/profile/{{user.avatar}}\" class=\"img-sm rounded-circle\" alt=\"Profile\" />\n                          <img *ngIf=\"!user.avatar\" src=\"../assets/img/profile_small.jpg\" class=\"img-sm rounded-circle\" alt=\"Profile\" />\n                        </a>\n                      </td>\n                      <td>\n                        {{user.firstname}}\n                      </td>\n                      <td>\n                        {{user.lastname}}\n                      </td>\n                      <td>\n                        <a [routerLink]=\"['profile', user.id]\" tooltip=\"{{'common.view' | translate}}\">{{user.username}}</a>\n                      </td>\n                      <td>\n                        {{user.email}}\n                      </td>\n                      <td>\n                        {{user.paid_leave}}\n                      </td>\n                      <td class=\"text-center\">\n                        <div class=\"budges-status\">\n                          <span class=\"completed\" *ngIf=\"user.is_active == '1'\">{{'common.status.active' | translate}}</span>\n                          <span class=\"cancel\" *ngIf=\"user.is_active == '0'\">{{'common.status.deactive' | translate}}</span>\n                        </div>\n                      </td>\n                      <td class=\"budges-status\">\n                        <span class=\"completed\">{{user.department_role.role_name}} ({{user.department_role.department_name}})</span>\n                      </td>\n                      <td>\n                        <span class=\"completed\">{{user.timesheet_billable+user.timesheet_non_billable| number:'1.0-1'}}</span>\n                      </td>\n                      <td>\n                        <div class=\"budges-status\" style=\"display: inline-flex; align-items: center; gap: 4px;justify-content: flex-end; width: 100%;\">\n                          {{(user.timesheet_billable+user.timesheet_non_billable)*user.salarytohour| number:'1.0-0'}}\n                          <span class=\"open\">{{user.project_billable+user.project_non_billable}}</span>\n                        </div>\n                      </td>\n                      <td>\n                        <div class=\"budges-status\" style=\"display: inline-flex; align-items: center; gap: 4px;justify-content: flex-end; width: 100%;\">\n                          {{(user.timesheet_billable)*user.salarytohour| number:'1.0-0'}}\n                          <span class=\"open\">{{user.project_billable}}</span>\n                        </div>\n                      </td>\n                      <td>\n                        <div class=\"budges-status\" style=\"display: inline-flex; align-items: center; gap: 4px;justify-content: flex-end; width: 100%;\">\n                          {{(user.timesheet_non_billable)*user.salarytohour| number:'1.0-0'}}\n                          <span class=\"open\">{{user.project_non_billable}}</span>\n                        </div>\n                      </td>\n                    </tr>\n                  </tbody>\n                </table>\n                <!-- <table class=\"table table-bordered table-hover b4-datatable\" width=\"100%\" id=\"defects_table\" *ngIf=\"users_id && salaryFilterKey != 'profile'\">\n                    <thead>\n                      <tr class=\"display_all\">\n                        <th></th>\n                        <th *ngFor=\"let key of usersTimesheetTable | keyvalue\">\n                          <div class=\"fw-bold\">\n                            PROJECT: {{ key.key.split('__')[0] }}\n                          </div>\n                          <div>TASK: {{ key.key.split('__')[1] }}</div>\n                        </th>\n                        <th>Total</th>\n                      </tr>\n                    </thead>\n                    <tbody>\n                      <tr *ngFor=\"let day of daysInMonth\">\n                        <td>\n                            <b>{{(day.day < 10 ? '0' + day.day : day.day)}}</b>\n                        </td>\n\n                        <td *ngFor=\"let key of usersTimesheetTable | keyvalue\">\n                          <ng-container *ngIf=\"key.value[month +'-' + (day.day < 10 ? '0' + day.day : day.day)] as tasks\">\n                            <div *ngFor=\"let t of tasks\">\n                              <b>{{ t.decimal_time }}</b>\n                              <span *ngIf=\"t.note\"> - Note: {{ t.note }}</span>\n                            </div>\n                          </ng-container>\n                        </td>\n                        <td [innerHTML]=\"getTotalByDay(usersTimesheetTable, day.day)\"></td>\n                      </tr>\n                      <tr style=\"background-color: rgba(160, 136, 0, 0.11);\">\n                        <td>\n                            <b>Total</b>\n                        </td>\n\n                        <td *ngFor=\"let element of usersTimesheetTable | keyvalue\">\n                            <div [innerHTML]=\"getTotalByTask(element.value)\"></div>\n                        </td>\n                        <td [innerHTML]=\"getGrandTotal(usersTimesheetTable)\"></td>\n                      </tr>\n                    </tbody>\n                  </table> -->\n            </div>\n        </div>\n    </div>\n</div>\n");
 
 /***/ }),
 
@@ -149,8 +149,8 @@ var TimesheetService = /** @class */ (function () {
     TimesheetService.prototype.getUserSelect = function () {
         return this.http.get(this.apiUrl + "/api/get-user-select");
     };
-    TimesheetService.prototype.getUserMonthSelect = function (month) {
-        return this.http.get(this.apiUrl + "/api/get-user-month-select/" + month);
+    TimesheetService.prototype.getUserMonthSelect = function (params) {
+        return this.http.post(this.apiUrl + "/api/get-user-month-select", params);
     };
     TimesheetService.prototype.create = function (params) {
         return this.http.post(this.apiUrl + "/api/timesheets", params);
@@ -238,11 +238,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var date_fns__WEBPACK_IMPORTED_MODULE_10___default = /*#__PURE__*/__webpack_require__.n(date_fns__WEBPACK_IMPORTED_MODULE_10__);
 /* harmony import */ var _environments_environment__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../../../../../../environments/environment */ "./src/environments/environment.ts");
 /* harmony import */ var ngx_bootstrap_chronos__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ngx-bootstrap/chronos */ "./node_modules/ngx-bootstrap/chronos/fesm5/ngx-bootstrap-chronos.js");
-/* harmony import */ var ngx_bootstrap_locale__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ngx-bootstrap/locale */ "./node_modules/ngx-bootstrap/locale/fesm5/ngx-bootstrap-locale.js");
-/* harmony import */ var datatables_net__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! datatables.net */ "./node_modules/datatables.net/js/jquery.dataTables.js");
-/* harmony import */ var datatables_net__WEBPACK_IMPORTED_MODULE_14___default = /*#__PURE__*/__webpack_require__.n(datatables_net__WEBPACK_IMPORTED_MODULE_14__);
-/* harmony import */ var datatables_net_bs4__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! datatables.net-bs4 */ "./node_modules/datatables.net-bs4/js/dataTables.bootstrap4.js");
-/* harmony import */ var datatables_net_bs4__WEBPACK_IMPORTED_MODULE_15___default = /*#__PURE__*/__webpack_require__.n(datatables_net_bs4__WEBPACK_IMPORTED_MODULE_15__);
+/* harmony import */ var _core_services_project_service__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ../../../../../core/services/project.service */ "./src/app/core/services/project.service.ts");
+/* harmony import */ var ngx_bootstrap_locale__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ngx-bootstrap/locale */ "./node_modules/ngx-bootstrap/locale/fesm5/ngx-bootstrap-locale.js");
+/* harmony import */ var datatables_net__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! datatables.net */ "./node_modules/datatables.net/js/jquery.dataTables.js");
+/* harmony import */ var datatables_net__WEBPACK_IMPORTED_MODULE_15___default = /*#__PURE__*/__webpack_require__.n(datatables_net__WEBPACK_IMPORTED_MODULE_15__);
+/* harmony import */ var datatables_net_bs4__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! datatables.net-bs4 */ "./node_modules/datatables.net-bs4/js/dataTables.bootstrap4.js");
+/* harmony import */ var datatables_net_bs4__WEBPACK_IMPORTED_MODULE_16___default = /*#__PURE__*/__webpack_require__.n(datatables_net_bs4__WEBPACK_IMPORTED_MODULE_16__);
 
 
 
@@ -257,17 +258,19 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-Object(ngx_bootstrap_chronos__WEBPACK_IMPORTED_MODULE_12__["defineLocale"])('vi', ngx_bootstrap_locale__WEBPACK_IMPORTED_MODULE_13__["viLocale"]);
+
+Object(ngx_bootstrap_chronos__WEBPACK_IMPORTED_MODULE_12__["defineLocale"])('vi', ngx_bootstrap_locale__WEBPACK_IMPORTED_MODULE_14__["viLocale"]);
 
 
 var AllowanceReportsComponent = /** @class */ (function () {
-    function AllowanceReportsComponent(translate, http, datePipe, authenticationService, sanitizer, exportAsService) {
+    function AllowanceReportsComponent(translate, http, datePipe, authenticationService, sanitizer, projectService, exportAsService) {
         var _this = this;
         this.translate = translate;
         this.http = http;
         this.datePipe = datePipe;
         this.authenticationService = authenticationService;
         this.sanitizer = sanitizer;
+        this.projectService = projectService;
         this.exportAsService = exportAsService;
         this.apiUrl = _environments_environment__WEBPACK_IMPORTED_MODULE_11__["environment"].apiUrl;
         this.dtTrigger = new rxjs__WEBPACK_IMPORTED_MODULE_7__["Subject"]();
@@ -282,29 +285,44 @@ var AllowanceReportsComponent = /** @class */ (function () {
         this.totalData = 0;
         this.exportTableData = [];
         this.daysInMonth = [{}];
+        this.project = [];
         this.isPageLoaded = false;
         this.exportAsConfig = {
             type: 'csv',
             elementIdOrContent: 'export_table',
         };
+        this.selectedRange = [];
         this.datepickerConfig = {
-            dateInputFormat: 'YYYY-MM',
+            // dateInputFormat: 'YYYY-MM',
+            rangeInputFormat: 'YYYY-MM-DD',
+            dateInputFormat: 'YYYY-MM-DD',
             containerClass: 'theme-red',
-            minMode: 'month',
-            maxDate: new Date(),
+            // minMode: 'month',
+            // maxDate: new Date(),
             locale: 'vi',
         };
         this.authenticationService.loginUser.subscribe(function (x) { return _this.loginUser = x; });
     }
     AllowanceReportsComponent.prototype.ngOnInit = function () {
         // this.month = this.datePipe.transform("2025-08", 'yyyy-MM');
+        var start = Object(date_fns__WEBPACK_IMPORTED_MODULE_10__["startOfMonth"])(new Date());
+        var end = Object(date_fns__WEBPACK_IMPORTED_MODULE_10__["endOfMonth"])(new Date());
+        this.selectedRange = [start, end];
         this.daysInMonth = this.getTotalDaysInMonth(this.month);
+        this.getProjects();
         this.loadDatatable();
+    };
+    AllowanceReportsComponent.prototype.getProjects = function () {
+        var _this = this;
+        this.projectService.getProject()
+            .subscribe(function (data) {
+            _this.projects = data;
+        });
     };
     AllowanceReportsComponent.prototype.loadDatatable = function () {
         var _this = this;
         this.getWorkingDays(this.month);
-        this.http.post(this.apiUrl + '/api/leaves/leaves-report', { month: this.month }, {})
+        this.http.post(this.apiUrl + '/api/leaves/leaves-report', { month: this.month, selectedRange: { start: this.datePipe.transform(this.selectedRange[0], 'yyyy-MM-dd'), end: this.datePipe.transform(this.selectedRange[1], 'yyyy-MM-dd') } }, {})
             .subscribe(function (resp) {
             _this.leavesData = resp.data;
             _this.totalData = 0;
@@ -314,6 +332,32 @@ var AllowanceReportsComponent = /** @class */ (function () {
         });
         this.isPageLoaded = true;
         return;
+    };
+    AllowanceReportsComponent.prototype.onRangeChange = function (range) {
+        console.log(range);
+        if (!range || !Array.isArray(range) || range.length !== 2)
+            return;
+        var rawStart = range[0], rawEnd = range[1];
+        var startDate = (rawStart instanceof Date) ? rawStart : new Date(rawStart);
+        var endDate = (rawEnd instanceof Date) ? rawEnd : new Date(rawEnd);
+        // this.selectedRange = [ startOfDay(startDate), endOfDay(endDate) ];
+        this.month = this.datePipe.transform(startDate, 'yyyy-MM');
+        this.daysInMonth = this.getDaysBetween(this.selectedRange[0], this.selectedRange[1]);
+        this.loadDatatable();
+    };
+    AllowanceReportsComponent.prototype.getDaysBetween = function (start, end) {
+        var s = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+        var e = new Date(end.getFullYear(), end.getMonth(), end.getDate());
+        var days = [];
+        for (var d = new Date(s); d <= e; d.setDate(d.getDate() + 1)) {
+            var cur = new Date(d);
+            days.push({
+                date: this.datePipe.transform(cur, 'yyyy-MM-dd'),
+                stt: cur.getDay(),
+                day: cur.getDate()
+            });
+        }
+        return days;
     };
     AllowanceReportsComponent.prototype.getWorkingDays = function (month) {
         var _a = month.split('/').map(Number), year = _a[0], monthStr = _a[1];
@@ -489,6 +533,7 @@ var AllowanceReportsComponent = /** @class */ (function () {
         { type: _angular_common__WEBPACK_IMPORTED_MODULE_8__["DatePipe"] },
         { type: _core_services_authentication_service__WEBPACK_IMPORTED_MODULE_9__["AuthenticationService"] },
         { type: _angular_platform_browser__WEBPACK_IMPORTED_MODULE_2__["DomSanitizer"] },
+        { type: _core_services_project_service__WEBPACK_IMPORTED_MODULE_13__["ProjectService"] },
         { type: ngx_export_as__WEBPACK_IMPORTED_MODULE_4__["ExportAsService"] }
     ]; };
     tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
@@ -506,6 +551,7 @@ var AllowanceReportsComponent = /** @class */ (function () {
             _angular_common__WEBPACK_IMPORTED_MODULE_8__["DatePipe"],
             _core_services_authentication_service__WEBPACK_IMPORTED_MODULE_9__["AuthenticationService"],
             _angular_platform_browser__WEBPACK_IMPORTED_MODULE_2__["DomSanitizer"],
+            _core_services_project_service__WEBPACK_IMPORTED_MODULE_13__["ProjectService"],
             ngx_export_as__WEBPACK_IMPORTED_MODULE_4__["ExportAsService"]])
     ], AllowanceReportsComponent);
     return AllowanceReportsComponent;
@@ -575,6 +621,13 @@ Object(ngx_bootstrap_chronos__WEBPACK_IMPORTED_MODULE_12__["defineLocale"])('vi'
 
 
 var DefectReportsComponent = /** @class */ (function () {
+    // datepickerConfig = {
+    //     // dateInputFormat: 'YYYY-MM',
+    //     containerClass: 'theme-red',
+    //     minMode: 'month',
+    //     maxDate: new Date(),
+    //     locale: 'vi',
+    // };
     function DefectReportsComponent(translate, http, datePipe, authenticationService, sanitizer, exportAsService) {
         var _this = this;
         this.translate = translate;
@@ -599,24 +652,31 @@ var DefectReportsComponent = /** @class */ (function () {
             type: 'csv',
             elementIdOrContent: 'export_table',
         };
+        this.selectedRange = [];
         this.datepickerConfig = {
-            dateInputFormat: 'YYYY-MM',
+            rangeInputFormat: 'YYYY-MM-DD',
+            dateInputFormat: 'YYYY-MM-DD',
             containerClass: 'theme-red',
-            minMode: 'month',
-            maxDate: new Date(),
-            locale: 'vi',
+            // minMode: 'day',
+            // maxDate: new Date(),
+            locale: 'vi'
         };
         this.authenticationService.loginUser.subscribe(function (x) { return _this.loginUser = x; });
     }
     DefectReportsComponent.prototype.ngOnInit = function () {
         // this.month = this.datePipe.transform("2025-08", 'yyyy-MM');
+        var start = Object(date_fns__WEBPACK_IMPORTED_MODULE_10__["startOfMonth"])(new Date());
+        var end = Object(date_fns__WEBPACK_IMPORTED_MODULE_10__["endOfMonth"])(new Date());
+        this.selectedRange = [start, end];
         this.daysInMonth = this.getTotalDaysInMonth(this.month);
         this.loadDatatable();
     };
     DefectReportsComponent.prototype.loadDatatable = function () {
         var _this = this;
-        this.getWorkingDays(this.month);
-        this.http.post(this.apiUrl + '/api/defect/defect-report', { month: this.month }, {})
+        console.log(this.selectedRange);
+        this.getWorkingDays(this.month, this.selectedRange);
+        // , selectedRange:{start:this.datePipe.transform(this.selectedRange[0], 'yyyy-MM-dd'), end:this.datePipe.transform(this.selectedRange[1], 'yyyy-MM-dd')}
+        this.http.post(this.apiUrl + '/api/defect/defect-report', { month: this.month, daysInMonth: this.daysInMonth, selectedRange: { start: this.datePipe.transform(this.selectedRange[0], 'yyyy-MM-dd'), end: this.datePipe.transform(this.selectedRange[1], 'yyyy-MM-dd') } }, {})
             .subscribe(function (resp) {
             _this.exportTableData = resp.data;
             _this.leaves = resp.leaves;
@@ -650,14 +710,17 @@ var DefectReportsComponent = /** @class */ (function () {
         });
         return;
     };
-    DefectReportsComponent.prototype.getWorkingDays = function (month) {
-        var _a = month.split('-').map(Number), year = _a[0], monthStr = _a[1];
-        var daysInMonth = new Date(year, monthStr, 0).getDate();
+    DefectReportsComponent.prototype.getWorkingDays = function (month, range) {
+        if (!range || range.length !== 2) {
+            this.workingInMonth = 0;
+            return;
+        }
+        var start = new Date(range[0]);
+        var end = new Date(range[1]);
         var workingDays = 0;
-        for (var day = 1; day <= daysInMonth; day++) {
-            var current = new Date(year, monthStr - 1, day);
-            var dow = current.getDay();
-            if (dow !== 0 && dow !== 6) {
+        for (var d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+            var day = d.getDay(); // 0 = CN, 6 = T7
+            if (day !== 0 && day !== 6) {
                 workingDays++;
             }
         }
@@ -844,6 +907,32 @@ var DefectReportsComponent = /** @class */ (function () {
         this.month = this.datePipe.transform(selectedDate, 'yyyy-MM');
         this.daysInMonth = this.getTotalDaysInMonth(this.month);
         this.loadDatatable();
+    };
+    DefectReportsComponent.prototype.onRangeChange = function (range) {
+        console.log(range);
+        if (!range || !Array.isArray(range) || range.length !== 2)
+            return;
+        var rawStart = range[0], rawEnd = range[1];
+        var startDate = (rawStart instanceof Date) ? rawStart : new Date(rawStart);
+        var endDate = (rawEnd instanceof Date) ? rawEnd : new Date(rawEnd);
+        // this.selectedRange = [ startOfDay(startDate), endOfDay(endDate) ];
+        this.month = this.datePipe.transform(startDate, 'yyyy-MM');
+        this.daysInMonth = this.getDaysBetween(this.selectedRange[0], this.selectedRange[1]);
+        this.loadDatatable();
+    };
+    DefectReportsComponent.prototype.getDaysBetween = function (start, end) {
+        var s = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+        var e = new Date(end.getFullYear(), end.getMonth(), end.getDate());
+        var days = [];
+        for (var d = new Date(s); d <= e; d.setDate(d.getDate() + 1)) {
+            var cur = new Date(d);
+            days.push({
+                date: this.datePipe.transform(cur, 'yyyy-MM-dd'),
+                stt: cur.getDay(),
+                day: cur.getDate()
+            });
+        }
+        return days;
     };
     DefectReportsComponent.prototype.getTotalDaysInMonth = function (date) {
         var start = Object(date_fns__WEBPACK_IMPORTED_MODULE_10__["startOfMonth"])(date);
@@ -1249,16 +1338,22 @@ var PaymentReportsComponent = /** @class */ (function () {
             elementIdOrContent: 'export_table',
         };
         this.FilterKey = 'success';
+        this.selectedRange = [];
         this.datepickerConfig = {
-            dateInputFormat: 'YYYY-MM',
+            // dateInputFormat: 'YYYY-MM',
+            rangeInputFormat: 'YYYY-MM-DD',
+            dateInputFormat: 'YYYY-MM-DD',
             containerClass: 'theme-red',
-            minMode: 'month',
-            maxDate: new Date(),
+            // minMode: 'month',
+            // maxDate: new Date(),
             locale: 'vi',
         };
         this.authenticationService.loginUser.subscribe(function (x) { return _this.loginUser = x; });
     }
     PaymentReportsComponent.prototype.ngOnInit = function () {
+        var start = Object(date_fns__WEBPACK_IMPORTED_MODULE_10__["startOfMonth"])(new Date());
+        var end = Object(date_fns__WEBPACK_IMPORTED_MODULE_10__["endOfMonth"])(new Date());
+        this.selectedRange = [start, end];
         this.loadDatatable();
     };
     PaymentReportsComponent.prototype.filterByStatus = function (key) {
@@ -1267,12 +1362,38 @@ var PaymentReportsComponent = /** @class */ (function () {
     };
     PaymentReportsComponent.prototype.loadDatatable = function () {
         var _this = this;
-        this.http.post(this.apiUrl + '/api/todos/list-report', { month: this.month, module_id: 'all', 'filterKey': this.FilterKey }, {})
+        this.http.post(this.apiUrl + '/api/todos/list-report', { month: this.month, module_id: 'all', 'filterKey': this.FilterKey, selectedRange: { start: this.datePipe.transform(this.selectedRange[0], 'yyyy-MM-dd'), end: this.datePipe.transform(this.selectedRange[1], 'yyyy-MM-dd') } }, {})
             .subscribe(function (resp) {
             _this.payments = resp.data;
             _this.isPageLoaded = true;
         });
         return;
+    };
+    PaymentReportsComponent.prototype.onRangeChange = function (range) {
+        console.log(range);
+        if (!range || !Array.isArray(range) || range.length !== 2)
+            return;
+        var rawStart = range[0], rawEnd = range[1];
+        var startDate = (rawStart instanceof Date) ? rawStart : new Date(rawStart);
+        var endDate = (rawEnd instanceof Date) ? rawEnd : new Date(rawEnd);
+        // this.selectedRange = [ startOfDay(startDate), endOfDay(endDate) ];
+        this.month = this.datePipe.transform(startDate, 'yyyy-MM');
+        this.daysInMonth = this.getDaysBetween(this.selectedRange[0], this.selectedRange[1]);
+        this.loadDatatable();
+    };
+    PaymentReportsComponent.prototype.getDaysBetween = function (start, end) {
+        var s = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+        var e = new Date(end.getFullYear(), end.getMonth(), end.getDate());
+        var days = [];
+        for (var d = new Date(s); d <= e; d.setDate(d.getDate() + 1)) {
+            var cur = new Date(d);
+            days.push({
+                date: this.datePipe.transform(cur, 'yyyy-MM-dd'),
+                stt: cur.getDay(),
+                day: cur.getDate()
+            });
+        }
+        return days;
     };
     PaymentReportsComponent.prototype.nextMonth = function () {
         this.changeMonth(Object(date_fns__WEBPACK_IMPORTED_MODULE_10__["addMonths"])(this.month, 1));
@@ -2500,11 +2621,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _environments_environment__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../../../../../../environments/environment */ "./src/environments/environment.ts");
 /* harmony import */ var ngx_bootstrap_chronos__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ngx-bootstrap/chronos */ "./node_modules/ngx-bootstrap/chronos/fesm5/ngx-bootstrap-chronos.js");
 /* harmony import */ var ngx_bootstrap_locale__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ngx-bootstrap/locale */ "./node_modules/ngx-bootstrap/locale/fesm5/ngx-bootstrap-locale.js");
-/* harmony import */ var _core_services_timesheet_service__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ../../../../../core/services/timesheet.service */ "./src/app/core/services/timesheet.service.ts");
-/* harmony import */ var datatables_net__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! datatables.net */ "./node_modules/datatables.net/js/jquery.dataTables.js");
-/* harmony import */ var datatables_net__WEBPACK_IMPORTED_MODULE_15___default = /*#__PURE__*/__webpack_require__.n(datatables_net__WEBPACK_IMPORTED_MODULE_15__);
-/* harmony import */ var datatables_net_bs4__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! datatables.net-bs4 */ "./node_modules/datatables.net-bs4/js/dataTables.bootstrap4.js");
-/* harmony import */ var datatables_net_bs4__WEBPACK_IMPORTED_MODULE_16___default = /*#__PURE__*/__webpack_require__.n(datatables_net_bs4__WEBPACK_IMPORTED_MODULE_16__);
+/* harmony import */ var _core_services_project_service__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ../../../../../core/services/project.service */ "./src/app/core/services/project.service.ts");
+/* harmony import */ var _core_services_timesheet_service__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ../../../../../core/services/timesheet.service */ "./src/app/core/services/timesheet.service.ts");
+/* harmony import */ var datatables_net__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! datatables.net */ "./node_modules/datatables.net/js/jquery.dataTables.js");
+/* harmony import */ var datatables_net__WEBPACK_IMPORTED_MODULE_16___default = /*#__PURE__*/__webpack_require__.n(datatables_net__WEBPACK_IMPORTED_MODULE_16__);
+/* harmony import */ var datatables_net_bs4__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! datatables.net-bs4 */ "./node_modules/datatables.net-bs4/js/dataTables.bootstrap4.js");
+/* harmony import */ var datatables_net_bs4__WEBPACK_IMPORTED_MODULE_17___default = /*#__PURE__*/__webpack_require__.n(datatables_net_bs4__WEBPACK_IMPORTED_MODULE_17__);
+
 
 
 
@@ -2524,7 +2647,7 @@ Object(ngx_bootstrap_chronos__WEBPACK_IMPORTED_MODULE_12__["defineLocale"])('vi'
 
 
 var UserReportsComponent = /** @class */ (function () {
-    function UserReportsComponent(translate, http, datePipe, authenticationService, timesheetService, sanitizer, exportAsService) {
+    function UserReportsComponent(translate, http, datePipe, authenticationService, timesheetService, sanitizer, projectService, exportAsService) {
         var _this = this;
         this.translate = translate;
         this.http = http;
@@ -2532,6 +2655,7 @@ var UserReportsComponent = /** @class */ (function () {
         this.authenticationService = authenticationService;
         this.timesheetService = timesheetService;
         this.sanitizer = sanitizer;
+        this.projectService = projectService;
         this.exportAsService = exportAsService;
         this.apiUrl = _environments_environment__WEBPACK_IMPORTED_MODULE_11__["environment"].apiUrl;
         this.dtTrigger = new rxjs__WEBPACK_IMPORTED_MODULE_7__["Subject"]();
@@ -2544,33 +2668,66 @@ var UserReportsComponent = /** @class */ (function () {
         this.usersTimesheet = [];
         this.usersTimesheetTable = [];
         this.holidays = [];
+        this.project = [];
         this.department = [];
         this.workingInMonth = 0;
         this.FilterKey = 'user_list';
         this.exportTableData = [];
+        this.dataCall = {};
         this.daysInMonth = [{}];
         this.isPageLoaded = false;
         this.exportAsConfig = {
             type: 'csv',
             elementIdOrContent: 'export_table',
         };
+        this.selectedRange = [];
         this.datepickerConfig = {
-            dateInputFormat: 'YYYY-MM',
+            rangeInputFormat: 'YYYY-MM-DD',
+            dateInputFormat: 'YYYY-MM-DD',
+            // dateInputFormat: 'YYYY-MM',
             containerClass: 'theme-red',
-            minMode: 'month',
-            maxDate: new Date(),
+            // minMode: 'month',
+            // maxDate: new Date(),
             locale: 'vi',
         };
         this.authenticationService.loginUser.subscribe(function (x) { return _this.loginUser = x; });
     }
     UserReportsComponent.prototype.ngOnInit = function () {
+        var start = Object(date_fns__WEBPACK_IMPORTED_MODULE_10__["startOfMonth"])(new Date());
+        var end = Object(date_fns__WEBPACK_IMPORTED_MODULE_10__["endOfMonth"])(new Date());
+        this.selectedRange = [start, end];
         this.daysInMonth = this.getTotalDaysInMonth(this.month);
+        this.getProjects();
         this.getUsers();
         this.loadDatatable();
     };
+    UserReportsComponent.prototype.getProjects = function () {
+        var _this = this;
+        this.projectService.getProject()
+            .subscribe(function (data) {
+            _this.projects = data;
+        });
+    };
+    UserReportsComponent.prototype.projectChange = function (event) {
+        this.project = event;
+        // this.getUsers();
+    };
+    UserReportsComponent.prototype.submitFormFilter = function () {
+        var _this = this;
+        if (this.FilterKey = 'user_detail') {
+            this.FilterKey = null; // tắt
+            this.dataCall = { users_id: this.users_id, project: this.project, selectedRange: { start: this.datePipe.transform(this.selectedRange[0], 'yyyy-MM-dd'), end: this.datePipe.transform(this.selectedRange[1], 'yyyy-MM-dd') } };
+            setTimeout(function () {
+                _this.FilterKey = 'user_detail';
+            });
+        }
+        else {
+            this.getUsers();
+        }
+    };
     UserReportsComponent.prototype.getUsers = function () {
         var _this = this;
-        this.timesheetService.getUserMonthSelect(this.month).subscribe(function (data) {
+        this.timesheetService.getUserMonthSelect({ project: this.project, selectedRange: { start: this.datePipe.transform(this.selectedRange[0], 'yyyy-MM-dd'), end: this.datePipe.transform(this.selectedRange[1], 'yyyy-MM-dd') } }).subscribe(function (data) {
             // if(data['role']['department_name'] != 'Administration' && data['role']['department_name'] != 'BOD'){
             //     const allUsers = data['data'] || [];
             //     this.users = allUsers.filter(user => {
@@ -2579,7 +2736,7 @@ var UserReportsComponent = /** @class */ (function () {
             // } else {
             //     this.users = data['data'];
             // }
-            _this.getWorkingDays(_this.month);
+            _this.getWorkingDays(_this.month, _this.selectedRange);
             _this.users = data['data'];
             _this.users.forEach(function (element, index) {
                 element.salarytohour = 0;
@@ -2658,8 +2815,8 @@ var UserReportsComponent = /** @class */ (function () {
     };
     UserReportsComponent.prototype.loadDatatable = function () {
         var _this = this;
-        this.getWorkingDays(this.month);
-        this.http.post(this.apiUrl + '/api/defect/defect-report', { month: this.month, action: 'user' }, {})
+        this.getWorkingDays(this.month, this.selectedRange);
+        this.http.post(this.apiUrl + '/api/defect/defect-report', { month: this.month, action: 'user', daysInMonth: this.daysInMonth, selectedRange: { start: this.datePipe.transform(this.selectedRange[0], 'yyyy-MM-dd'), end: this.datePipe.transform(this.selectedRange[1], 'yyyy-MM-dd') } }, {})
             .subscribe(function (resp) {
             _this.usersTimesheet = resp.data;
             _this.leaves = resp.leaves;
@@ -2676,14 +2833,30 @@ var UserReportsComponent = /** @class */ (function () {
         });
         return;
     };
-    UserReportsComponent.prototype.getWorkingDays = function (month) {
-        var _a = month.split('-').map(Number), year = _a[0], monthStr = _a[1];
-        var daysInMonth = new Date(year, monthStr, 0).getDate();
+    // getWorkingDays(month) {
+    //     const [year, monthStr] = month.split('-').map(Number);
+    //     const daysInMonth = new Date(year, monthStr, 0).getDate();
+    //     let workingDays = 0;
+    //     for (let day = 1; day <= daysInMonth; day++) {
+    //       const current = new Date(year, monthStr - 1, day);
+    //       const dow = current.getDay();
+    //       if (dow !== 0 && dow !== 6) {
+    //         workingDays++;
+    //       }
+    //     }
+    //     this.workingInMonth = workingDays;
+    // }
+    UserReportsComponent.prototype.getWorkingDays = function (month, range) {
+        if (!range || range.length !== 2) {
+            this.workingInMonth = 0;
+            return;
+        }
+        var start = new Date(range[0]);
+        var end = new Date(range[1]);
         var workingDays = 0;
-        for (var day = 1; day <= daysInMonth; day++) {
-            var current = new Date(year, monthStr - 1, day);
-            var dow = current.getDay();
-            if (dow !== 0 && dow !== 6) {
+        for (var d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+            var day = d.getDay(); // 0 = CN, 6 = T7
+            if (day !== 0 && day !== 6) {
                 workingDays++;
             }
         }
@@ -2824,6 +2997,31 @@ var UserReportsComponent = /** @class */ (function () {
         }
         return daysInMonth;
     };
+    UserReportsComponent.prototype.onRangeChange = function (range) {
+        if (!range || !Array.isArray(range) || range.length !== 2)
+            return;
+        var rawStart = range[0], rawEnd = range[1];
+        var startDate = (rawStart instanceof Date) ? rawStart : new Date(rawStart);
+        var endDate = (rawEnd instanceof Date) ? rawEnd : new Date(rawEnd);
+        // this.selectedRange = [ startOfDay(startDate), endOfDay(endDate) ];
+        this.month = this.datePipe.transform(startDate, 'yyyy-MM');
+        this.daysInMonth = this.getDaysBetween(this.selectedRange[0], this.selectedRange[1]);
+        // this.getUsers();
+    };
+    UserReportsComponent.prototype.getDaysBetween = function (start, end) {
+        var s = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+        var e = new Date(end.getFullYear(), end.getMonth(), end.getDate());
+        var days = [];
+        for (var d = new Date(s); d <= e; d.setDate(d.getDate() + 1)) {
+            var cur = new Date(d);
+            days.push({
+                date: this.datePipe.transform(cur, 'yyyy-MM-dd'),
+                stt: cur.getDay(),
+                day: cur.getDate()
+            });
+        }
+        return days;
+    };
     UserReportsComponent.prototype.exportFiles = function (type) {
         this.exportAsService.save(this.exportAsConfig, 'Timesheet').subscribe(function () {
         });
@@ -2864,6 +3062,7 @@ var UserReportsComponent = /** @class */ (function () {
                 _this.usersTimesheetTable = _this.groupTimesheetByProject(element);
             }
         });
+        this.dataCall = { users_id: this.users_id, project: this.project, selectedRange: { start: this.datePipe.transform(this.selectedRange[0], 'yyyy-MM-dd'), end: this.datePipe.transform(this.selectedRange[1], 'yyyy-MM-dd') } };
         this.rerender();
     };
     UserReportsComponent.prototype.groupTimesheetByProject = function (user) {
@@ -2933,8 +3132,9 @@ var UserReportsComponent = /** @class */ (function () {
         { type: _angular_common_http__WEBPACK_IMPORTED_MODULE_3__["HttpClient"] },
         { type: _angular_common__WEBPACK_IMPORTED_MODULE_8__["DatePipe"] },
         { type: _core_services_authentication_service__WEBPACK_IMPORTED_MODULE_9__["AuthenticationService"] },
-        { type: _core_services_timesheet_service__WEBPACK_IMPORTED_MODULE_14__["TimesheetService"] },
+        { type: _core_services_timesheet_service__WEBPACK_IMPORTED_MODULE_15__["TimesheetService"] },
         { type: _angular_platform_browser__WEBPACK_IMPORTED_MODULE_2__["DomSanitizer"] },
+        { type: _core_services_project_service__WEBPACK_IMPORTED_MODULE_14__["ProjectService"] },
         { type: ngx_export_as__WEBPACK_IMPORTED_MODULE_4__["ExportAsService"] }
     ]; };
     tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
@@ -2951,8 +3151,9 @@ var UserReportsComponent = /** @class */ (function () {
             _angular_common_http__WEBPACK_IMPORTED_MODULE_3__["HttpClient"],
             _angular_common__WEBPACK_IMPORTED_MODULE_8__["DatePipe"],
             _core_services_authentication_service__WEBPACK_IMPORTED_MODULE_9__["AuthenticationService"],
-            _core_services_timesheet_service__WEBPACK_IMPORTED_MODULE_14__["TimesheetService"],
+            _core_services_timesheet_service__WEBPACK_IMPORTED_MODULE_15__["TimesheetService"],
             _angular_platform_browser__WEBPACK_IMPORTED_MODULE_2__["DomSanitizer"],
+            _core_services_project_service__WEBPACK_IMPORTED_MODULE_14__["ProjectService"],
             ngx_export_as__WEBPACK_IMPORTED_MODULE_4__["ExportAsService"]])
     ], UserReportsComponent);
     return UserReportsComponent;

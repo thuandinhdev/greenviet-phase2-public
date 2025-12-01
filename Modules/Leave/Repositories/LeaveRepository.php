@@ -176,15 +176,20 @@ class LeaveRepository
      * @return Object
      */
 
-     
+
     public function leavesReport($request){
         $leaves_table = config('core.acl.leaves_table');
         $leave_types_table = config('core.acl.leave_types_table');
         $user_table = config('core.acl.users_table');
         $user = Auth::user();
         $input = $request->all();
-        $startOfMonth = Carbon::createFromFormat('Y-m', $input['month'])->startOfMonth();
-        $endOfMonth   = Carbon::createFromFormat('Y-m', $input['month'])->endOfMonth();
+        if(isset($input['selectedRange'])){
+            $startOfMonth = Carbon::createFromFormat('Y-m-d', $input['selectedRange']['start']);
+            $endOfMonth   = Carbon::createFromFormat('Y-m-d', $input['selectedRange']['end']);
+        } else {
+            $startOfMonth = Carbon::createFromFormat('Y-m', $input['month'])->startOfMonth();
+            $endOfMonth   = Carbon::createFromFormat('Y-m', $input['month'])->endOfMonth();
+        }
 
         $leaves = Leave::with(['attachments'])->select(
             $leaves_table . '.*',
@@ -224,7 +229,7 @@ class LeaveRepository
             }
         }
 
-        
+
         if (isset($input['status']) && $input['status']) {
             $leaves = $leaves->where($leaves_table . '.status', $input['status']);
         }
@@ -388,6 +393,7 @@ class LeaveRepository
             return ['status'=>false, 'msg'=>'This day has been timesheeted'];
         }
         $remainingLeave = $this->commonHelper->getRemainingLeaveDays($input['user_id']);
+        $input['add_salary'] = $input['add_salary'] ? 1 : 0;
         if ($input['duration'] == 'multiple') {
             if($remainingLeave < count($input['multi_date']) && $input['leave_type_id'] == 1){
                 return ['status'=>false, 'msg'=>'No more leave to use'];
@@ -511,6 +517,7 @@ class LeaveRepository
         if($input['status'] == 4){
             $input['status'] = 1;
         }
+        $input['add_salary'] = $input['add_salary'] ? 1 : 0;
         if ($leave->fill($input)->save()) {
 
             // Delete attachment

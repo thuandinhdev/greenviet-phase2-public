@@ -15232,8 +15232,8 @@ var TimesheetService = /** @class */ (function () {
     TimesheetService.prototype.getUserSelect = function () {
         return this.http.get(this.apiUrl + "/api/get-user-select");
     };
-    TimesheetService.prototype.getUserMonthSelect = function (month) {
-        return this.http.get(this.apiUrl + "/api/get-user-month-select/" + month);
+    TimesheetService.prototype.getUserMonthSelect = function (params) {
+        return this.http.post(this.apiUrl + "/api/get-user-month-select", params);
     };
     TimesheetService.prototype.create = function (params) {
         return this.http.post(this.apiUrl + "/api/timesheets", params);

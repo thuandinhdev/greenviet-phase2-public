@@ -253,20 +253,23 @@ class ToDoRepository
             // ->leftjoin($incidents_table, $incidents_table . '.id', '=', $todo_table . '.module_related_id')
             ->whereIn($todo_table . '.status', [1,2]);
         if(isset($input['filterKey'])){
+            if(isset($input['selectedRange'])){
+                $startOfMonth = Carbon::createFromFormat('Y-m-d', $input['selectedRange']['start']);
+                $endOfMonth   = Carbon::createFromFormat('Y-m-d', $input['selectedRange']['end']);
+            } else {
+                $startOfMonth = Carbon::createFromFormat('Y-m', $input['month'])->startOfMonth();
+                $endOfMonth   = Carbon::createFromFormat('Y-m', $input['month'])->endOfMonth();
+            }
             switch ($input['filterKey']) {
                 case 'success':
                     $open_todos->where($todo_table . '.status', 2);
                     if ($input['month'] && $input['month'] != 'all') {
-                        $startOfMonth = Carbon::createFromFormat('Y-m', $input['month'])->startOfMonth();
-                        $endOfMonth   = Carbon::createFromFormat('Y-m', $input['month'])->endOfMonth();
                         $open_todos->whereBetween($todo_table . '.payment_date', [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')]);
                     }
                     break;
                 case 'pending':
                     $open_todos->where($todo_table . '.status', 1);
                     if ($input['month'] && $input['month'] != 'all') {
-                        $startOfMonth = Carbon::createFromFormat('Y-m', $input['month'])->startOfMonth();
-                        $endOfMonth   = Carbon::createFromFormat('Y-m', $input['month'])->endOfMonth();
                         $open_todos->whereBetween($todo_table . '.due_date', [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')]);
                     }
                     break;
@@ -275,14 +278,14 @@ class ToDoRepository
                     break;
             }
         }
-        
+
         return collect(
             [
             'data' => $open_todos->orderBy($todo_table . '.order', 'asc')->get(),
             ]
         );
     }
-    
+
     /**
      * Update the specified resource.
      *
