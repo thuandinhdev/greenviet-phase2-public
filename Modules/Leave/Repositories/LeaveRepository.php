@@ -183,9 +183,13 @@ class LeaveRepository
         $user_table = config('core.acl.users_table');
         $user = Auth::user();
         $input = $request->all();
+        $ids = [];
         if(isset($input['selectedRange'])){
             $startOfMonth = Carbon::createFromFormat('Y-m-d', $input['selectedRange']['start']);
             $endOfMonth   = Carbon::createFromFormat('Y-m-d', $input['selectedRange']['end']);
+            if($input['project']){
+                $ids = array_column($input['project'], 'id');
+            }
         } else {
             $startOfMonth = Carbon::createFromFormat('Y-m', $input['month'])->startOfMonth();
             $endOfMonth   = Carbon::createFromFormat('Y-m', $input['month'])->endOfMonth();
@@ -211,7 +215,14 @@ class LeaveRepository
             ->join($user_table, $user_table . '.id', '=', $leaves_table . '.user_id')
             ->leftJoin($user_table . ' as approved1', 'approved1.id', '=', $leaves_table . '.approved1')
             ->leftJoin($user_table . ' as approved2', 'approved2.id', '=', $leaves_table . '.approved2')
-            ->leftJoin($user_table . ' as reject', 'reject.id', '=', $leaves_table . '.reject_id')->where($leaves_table . '.leave_type_id', 3)->where($leaves_table . '.status', 2)->whereBetween($leaves_table . '.leave_date', [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')]);
+            ->leftJoin($user_table . ' as reject', 'reject.id', '=', $leaves_table . '.reject_id')->when(!empty($ids), function ($q) use ($ids) {
+                // $q->whereIn('project', $ids);
+                $q->where(function ($q2) use ($ids) {
+                    foreach ($ids as $id) {
+                        $q2->orWhereJsonContains('project', $id);
+                    }
+                });
+            })->where($leaves_table . '.leave_type_id', 3)->where($leaves_table . '.status', 2)->whereBetween($leaves_table . '.leave_date', [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')]);
         $checkRole = DB::table('gv_user_role_department')->where('user_id', $user->id)->first();
 
         if (!$user->hasRole('admin') && !$user->is_super_admin && !$user->is_super_admin && $checkRole->department_id != 6) {

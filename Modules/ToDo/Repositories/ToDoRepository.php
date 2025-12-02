@@ -227,7 +227,11 @@ class ToDoRepository
         $task_table = config('core.acl.task_table');
         $defects_table = config('core.acl.defects_table');
         $incidents_table = config('core.acl.incidents_table');
-
+        if($input['project']){
+            $ids = array_column($input['project'], 'id');
+        } else {
+            $ids = [];
+        }
         $user = Auth::user();
         $open_todos = $user->toDo()
             ->select(
@@ -251,7 +255,9 @@ class ToDoRepository
             // ->leftjoin($task_table, $task_table . '.id', '=', $todo_table . '.module_related_id')
             // ->leftjoin($defects_table, $defects_table . '.id', '=', $todo_table . '.module_related_id')
             // ->leftjoin($incidents_table, $incidents_table . '.id', '=', $todo_table . '.module_related_id')
-            ->whereIn($todo_table . '.status', [1,2]);
+            ->whereIn($todo_table . '.status', [1,2])->when(!empty($ids), function ($q) use ($ids) {
+                $q->whereIn('module_related_id', $ids);
+            });
         if(isset($input['filterKey'])){
             if(isset($input['selectedRange'])){
                 $startOfMonth = Carbon::createFromFormat('Y-m-d', $input['selectedRange']['start']);
