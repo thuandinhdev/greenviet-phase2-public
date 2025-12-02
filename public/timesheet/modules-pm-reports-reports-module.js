@@ -1916,7 +1916,7 @@ var SalaryReportsComponent = /** @class */ (function () {
                 });
                 element.allowance = 0;
                 _this.leaves.forEach(function (leave) {
-                    if (element.id == leave.user_id && leave.leave_type_id == 3) {
+                    if (element.id == leave.user_id && leave.leave_type_id == 3 && leave.add_salary == 1) {
                         element.allowance += leave.total;
                     }
                 });

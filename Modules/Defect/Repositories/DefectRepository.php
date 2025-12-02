@@ -1684,7 +1684,6 @@ class DefectRepository
         $startRow = $templateRow;
         $lastCol = 'AM'; // Cột cuối cùng trong file
         $sheet->setCellValue("O4", $input['month']);
-        $sheet->setCellValue("C{$row}", $item['lastname'] . ' ' . $item['firstname']);
         $row = 0;
         $colIndex = Coordinate::columnIndexFromString('D');
         foreach ($input['daysInMonth'] as $dayIndex => $dayValue) {
@@ -1695,6 +1694,7 @@ class DefectRepository
         }
         foreach ($data as $i => $item) {
 
+            $sheet->setCellValue("B{$row}", $item['lastname'] . ' ' . $item['firstname']);
             // salary
             $row = $startRow + $i;
 
@@ -1747,7 +1747,6 @@ class DefectRepository
         $startRow = $templateRow;
         $lastCol = 'AM'; // Cột cuối cùng trong file
         $sheet->setCellValue("O4", $input['month']);
-        $sheet->setCellValue("C{$row}", $item['lastname'] . ' ' . $item['firstname']);
         $row = 0;
         $colIndex = Coordinate::columnIndexFromString('D');
         foreach ($input['daysInMonth'] as $dayIndex => $dayValue) {
@@ -1758,6 +1757,7 @@ class DefectRepository
         }
         foreach ($data as $i => $item) {
 
+            $sheet->setCellValue("B{$row}", $item['lastname'] . ' ' . $item['firstname']);
             // salary
             $row = $startRow + $i;
 
