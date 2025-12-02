@@ -76,6 +76,11 @@ class DefectController extends Controller
         return $this->defectRepo->getAllDefects($request);
     }
 
+    public function exportProjects(Request $request)
+    {
+        return $this->defectRepo->exportProjects($request);
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -338,7 +343,7 @@ class DefectController extends Controller
     {
         return $this->defectRepo->exportPayment($request);
     }
-    
+
     /**
      * Get defect permission.
      *

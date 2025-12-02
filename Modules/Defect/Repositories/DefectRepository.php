@@ -1301,6 +1301,92 @@ class DefectRepository
         return response()->download($filePath)->deleteFileAfterSend(true);
     }
 
+    public function exportProjects($request)
+    {
+        $templatePath = storage_path('app/templates/projects.xlsx');
+        if (!file_exists($templatePath)) {
+            abort(404, 'Không tìm thấy file mẫu projects.xlsx');
+        }
+        // 🔹 Load template
+        $spreadsheet = IOFactory::load($templatePath);
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $templateRow = 9; // Dòng mẫu (format gốc)
+        $startRow = $templateRow;
+        $lastCol = 'K'; // Cột cuối cùng trong file
+        $project_table = config('core.acl.projects_table');
+        $projects = Project::select(
+                $project_table.".*",
+                DB::raw('(SELECT SUM(actual_hours) FROM gv_tasks WHERE gv_tasks.project_id = gv_projects.id) as total_actual_hours'),
+        )->get();
+        foreach ($projects as $i => $item) {
+            $row = $startRow + $i;
+
+            // --- Copy style ---
+            $sheet->duplicateStyle(
+                $sheet->getStyle("A{$templateRow}:{$lastCol}{$templateRow}"),
+                "A{$row}:{$lastCol}{$row}"
+            );
+
+            // --- Copy công thức có điều chỉnh dòng ---
+            $delta = $row - $templateRow;
+            for ($col = 'A'; $col !== Coordinate::stringFromColumnIndex(
+                Coordinate::columnIndexFromString($lastCol) + 1
+            ); $col = Coordinate::stringFromColumnIndex(
+                Coordinate::columnIndexFromString($col) + 1
+            )) {
+                $cell = $sheet->getCell("{$col}{$templateRow}");
+                $value = $cell->getValue();
+
+                if ($cell->isFormula()) {
+                    $sheet->setCellValue("{$col}{$row}", $this->shiftFormulaRows($value, $delta));
+                }
+            }
+            $item['workallowance'] = 0;
+            $leaves = DB::table('gv_leaves')->where('leave_type_id', 3)->whereJsonContains('project', $item->id)->get();
+            foreach ($leaves as $leavesValue) {
+                $item['workallowance'] += floor($leavesValue->total/count(json_decode($leavesValue->project)));
+            }
+            $item['payment'] = DB::table('gv_todos')->where('module_id', 1)->where('module_related_id', $item->id)->where('status', 2)->sum('price');
+            $item['paymentTotal'] = DB::table('gv_todos')->where('module_id', 1)->where('module_related_id', $item->id)->sum('price');
+            // --- Ghi dữ liệu mới ---
+            $sheet->setCellValue("A{$row}", $i + 1);
+            $sheet->setCellValue("B{$row}", $item['project_name'] );
+            $sheet->setCellValue("C{$row}", $item['total_actual_hours'] );
+            $sheet->setCellValue("D{$row}", $item['start_date'] );
+            $sheet->setCellValue("E{$row}", $item['end_date'] );
+            $sheet->setCellValue("F{$row}", $item['price_rate'] );
+            $sheet->setCellValue("G{$row}", $item['price_rate'] );
+            $sheet->setCellValue("H{$row}", $item['workallowance'] );
+            $sheet->setCellValue("I{$row}", $item['paymentTotal'] );
+            $sheet->setCellValue("J{$row}", $item['payment'] );
+            switch ($item['status']) {
+                case '1':
+                    $sheet->setCellValue("K{$row}", 'Open' );
+                    break;
+                case '2':
+                    $sheet->setCellValue("K{$row}", 'InProgress' );
+                    break;
+                case '3':
+                    $sheet->setCellValue("K{$row}", 'OnHold' );
+                    break;
+                case '4':
+                    $sheet->setCellValue("K{$row}", 'Cancel' );
+                    break;
+                case '5':
+                    $sheet->setCellValue("K{$row}", 'Completed' );
+                    break;
+            }
+        }
+
+        $fileName = 'projects' . time() . '.xlsx';
+        $filePath = storage_path('app/' . $fileName);
+
+        $writer = new Xlsx($spreadsheet);
+        $writer->save($filePath);
+
+        return response()->download($filePath)->deleteFileAfterSend(true);
+    }
     public function exportTimesheet($request){
         $input = $request->all();
         $data = $input['data'];
@@ -1495,7 +1581,6 @@ class DefectRepository
 
         return '';
     }
-
 
     public function exportSalary($request)
     {

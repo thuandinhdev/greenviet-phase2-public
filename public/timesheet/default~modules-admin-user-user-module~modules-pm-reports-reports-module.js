@@ -241,7 +241,7 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = ("<!-- Card header -->\n<div class=\"card-header pl-0 pb-0 pr-0 border-bottom\">\n\t<h4 class=\"main-title mt-2\"><span>{{'tasks.title' | translate}}</span></h4>\n</div>\n<!-- Card body -->\n<div class=\"card-body pt-3 hide_empty_message\">\n\t<div class=\"row\">\n\t\t<div class=\"col-sm-12\">\n\t\t\t<div class=\"table-responsive-xs table-responsive-sm table-responsive-md table-responsive-lg table-responsive-xl\">\n\t\t\t\t<table  class=\"table table-bordered table-hover b4-datatable\" id=\"tasks_table\" width=\"100%\">\n\t\t\t\t\t<thead>\n\t\t\t\t\t\t<tr>\n\t\t\t\t\t\t\t<th>{{'projects.columns.project_name' | translate}}</th>\n\t\t\t\t\t\t\t<th>{{ 'tasks.columns.task_name' | translate }}</th>\n\t\t\t\t\t\t\t<th>{{ 'tasks.columns.start_date' | translate }}</th>\n\t\t\t\t\t\t\t<th>{{ 'tasks.columns.end_date' | translate }}</th>\n\t\t\t\t\t\t\t<th>Total hour</th>\n\t\t\t\t\t\t\t<th>Total Cost(VNĐ)</th>\n\t\t\t\t\t\t</tr>\n\t\t\t\t\t</thead>\n\t\t\t\t\t<tbody *ngIf=\"tasks?.length != 0\">\n\t\t\t\t\t\t<tr *ngFor=\"let task of tasks\">\n\t\t\t\t\t\t\t<td>{{task.project_name}}</td>\n\t\t\t\t\t\t\t<td>{{task.name}}</td>\n\t\t\t\t\t\t\t<td>{{task.task_start_date | dateTimeFormatFilter: loginUser.settings.date_format}}</td>\n\t\t\t\t\t\t\t<td>{{task.task_end_date | dateTimeFormatFilter: loginUser.settings.date_format}}</td>\n\t\t\t\t\t\t\t<td>{{task.timesheet.total_time | number:'1.0-1'}}</td>\n\t\t\t\t\t\t\t<td>{{task.timesheet.total_cost | number:'1.0-1'}}</td>\n\t\t\t\t\t\t</tr>\n\t\t\t\t\t</tbody>\n\t\t\t\t</table>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</div>\n");
+/* harmony default export */ __webpack_exports__["default"] = ("<!-- Card header -->\n<div class=\"card-header pl-0 pb-0 pr-0 border-bottom\">\n\t<h4 class=\"main-title mt-2\"><span>{{'tasks.title' | translate}}</span></h4>\n</div>\n<!-- Card body -->\n<div class=\"card-body pt-3 hide_empty_message\">\n\t<div class=\"row\">\n\t\t<div class=\"col-sm-12\">\n\t\t\t<div class=\"table-responsive-xs table-responsive-sm table-responsive-md table-responsive-lg table-responsive-xl\">\n\t\t\t\t<table  class=\"table table-bordered table-hover b4-datatable\" id=\"tasks_table\" width=\"100%\">\n\t\t\t\t\t<thead>\n\t\t\t\t\t\t<tr>\n\t\t\t\t\t\t\t<th>{{'projects.columns.project_name' | translate}}</th>\n\t\t\t\t\t\t\t<th>{{ 'tasks.columns.task_name' | translate }}</th>\n\t\t\t\t\t\t\t<th>{{ 'tasks.columns.start_date' | translate }}</th>\n\t\t\t\t\t\t\t<th>{{ 'tasks.columns.end_date' | translate }}</th>\n\t\t\t\t\t\t\t<th>Total hour</th>\n\t\t\t\t\t\t\t<th>Total Cost(VNĐ)</th>\n\t\t\t\t\t\t</tr>\n\t\t\t\t\t</thead>\n\t\t\t\t\t<tbody *ngIf=\"tasks?.length != 0\">\n\t\t\t\t\t\t<tr *ngFor=\"let task of tasks\">\n\t\t\t\t\t\t\t<td>{{task.project_name}}</td>\n\t\t\t\t\t\t\t<td>{{task.name}}</td>\n\t\t\t\t\t\t\t<td>{{task.task_start_date | dateTimeFormatFilter: loginUser.settings.date_format}}</td>\n\t\t\t\t\t\t\t<td>{{task.task_end_date | dateTimeFormatFilter: loginUser.settings.date_format}}</td>\n\t\t\t\t\t\t\t<td>{{task.timesheet.total_time | number:'1.0-1'}}</td>\n\t\t\t\t\t\t\t<td>{{task.timesheet.total_cost | number:'1.0-1'}}</td>\n\t\t\t\t\t\t</tr>\n                        <tr style=\"background-color: rgba(160, 136, 0, 0.11);\">\n                            <td colspan=\"4\"><b>Total:</b></td>\n                            <td><b>{{total_time | number:'1.0-0'}}</b></td>\n                            <td><b>{{total_cost | number:'1.0-0'}}</b></td>\n                        </tr>\n\t\t\t\t\t</tbody>\n\t\t\t\t</table>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</div>\n");
 
 /***/ }),
 
@@ -1166,7 +1166,7 @@ var ImportUserComponent = /** @class */ (function () {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = (".hide_empty_message ::ng-deep .odd {\n  display: none;\n}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi9BcHBsaWNhdGlvbnMvTUFNUC9odGRvY3MvZ3JlZW52aWV0LXBoYXNlMi9hbmd1bGFyL3NyYy9hcHAvbW9kdWxlcy9hZG1pbi91c2VyL2NvbXBvbmVudHMvdXNlci1hY3Rpdml0aWVzL3VzZXItYWN0aXZpdGllcy5jb21wb25lbnQuc2NzcyIsInNyYy9hcHAvbW9kdWxlcy9hZG1pbi91c2VyL2NvbXBvbmVudHMvdXNlci1hY3Rpdml0aWVzL3VzZXItYWN0aXZpdGllcy5jb21wb25lbnQuc2NzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQTtFQUNJLGFBQUE7QUNDSiIsImZpbGUiOiJzcmMvYXBwL21vZHVsZXMvYWRtaW4vdXNlci9jb21wb25lbnRzL3VzZXItYWN0aXZpdGllcy91c2VyLWFjdGl2aXRpZXMuY29tcG9uZW50LnNjc3MiLCJzb3VyY2VzQ29udGVudCI6WyIuaGlkZV9lbXB0eV9tZXNzYWdlIDo6bmctZGVlcCAub2RkIHtcbiAgICBkaXNwbGF5OiBub25lXG59IiwiLmhpZGVfZW1wdHlfbWVzc2FnZSA6Om5nLWRlZXAgLm9kZCB7XG4gIGRpc3BsYXk6IG5vbmU7XG59Il19 */");
+/* harmony default export */ __webpack_exports__["default"] = (".hide_empty_message ::ng-deep .odd {\n  display: none;\n}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9hcHAvbW9kdWxlcy9hZG1pbi91c2VyL2NvbXBvbmVudHMvdXNlci1hY3Rpdml0aWVzL0M6XFx4YW1wcFxcaHRkb2NzXFxncmVlbnZpZXQtcGhhc2UyXFxhbmd1bGFyL3NyY1xcYXBwXFxtb2R1bGVzXFxhZG1pblxcdXNlclxcY29tcG9uZW50c1xcdXNlci1hY3Rpdml0aWVzXFx1c2VyLWFjdGl2aXRpZXMuY29tcG9uZW50LnNjc3MiLCJzcmMvYXBwL21vZHVsZXMvYWRtaW4vdXNlci9jb21wb25lbnRzL3VzZXItYWN0aXZpdGllcy91c2VyLWFjdGl2aXRpZXMuY29tcG9uZW50LnNjc3MiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7RUFDSSxhQUFBO0FDQ0oiLCJmaWxlIjoic3JjL2FwcC9tb2R1bGVzL2FkbWluL3VzZXIvY29tcG9uZW50cy91c2VyLWFjdGl2aXRpZXMvdXNlci1hY3Rpdml0aWVzLmNvbXBvbmVudC5zY3NzIiwic291cmNlc0NvbnRlbnQiOlsiLmhpZGVfZW1wdHlfbWVzc2FnZSA6Om5nLWRlZXAgLm9kZCB7XG4gICAgZGlzcGxheTogbm9uZVxufSIsIi5oaWRlX2VtcHR5X21lc3NhZ2UgOjpuZy1kZWVwIC5vZGQge1xuICBkaXNwbGF5OiBub25lO1xufSJdfQ== */");
 
 /***/ }),
 
@@ -1528,7 +1528,7 @@ var UserAvatarModalComponent = /** @class */ (function () {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = (".hide_empty_message ::ng-deep .odd {\n  display: none;\n}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi9BcHBsaWNhdGlvbnMvTUFNUC9odGRvY3MvZ3JlZW52aWV0LXBoYXNlMi9hbmd1bGFyL3NyYy9hcHAvbW9kdWxlcy9hZG1pbi91c2VyL2NvbXBvbmVudHMvdXNlci1kZWZlY3RzL3VzZXItZGVmZWN0cy5jb21wb25lbnQuc2NzcyIsInNyYy9hcHAvbW9kdWxlcy9hZG1pbi91c2VyL2NvbXBvbmVudHMvdXNlci1kZWZlY3RzL3VzZXItZGVmZWN0cy5jb21wb25lbnQuc2NzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQTtFQUNJLGFBQUE7QUNDSiIsImZpbGUiOiJzcmMvYXBwL21vZHVsZXMvYWRtaW4vdXNlci9jb21wb25lbnRzL3VzZXItZGVmZWN0cy91c2VyLWRlZmVjdHMuY29tcG9uZW50LnNjc3MiLCJzb3VyY2VzQ29udGVudCI6WyIuaGlkZV9lbXB0eV9tZXNzYWdlIDo6bmctZGVlcCAub2RkIHtcbiAgICBkaXNwbGF5OiBub25lXG59IiwiLmhpZGVfZW1wdHlfbWVzc2FnZSA6Om5nLWRlZXAgLm9kZCB7XG4gIGRpc3BsYXk6IG5vbmU7XG59Il19 */");
+/* harmony default export */ __webpack_exports__["default"] = (".hide_empty_message ::ng-deep .odd {\n  display: none;\n}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9hcHAvbW9kdWxlcy9hZG1pbi91c2VyL2NvbXBvbmVudHMvdXNlci1kZWZlY3RzL0M6XFx4YW1wcFxcaHRkb2NzXFxncmVlbnZpZXQtcGhhc2UyXFxhbmd1bGFyL3NyY1xcYXBwXFxtb2R1bGVzXFxhZG1pblxcdXNlclxcY29tcG9uZW50c1xcdXNlci1kZWZlY3RzXFx1c2VyLWRlZmVjdHMuY29tcG9uZW50LnNjc3MiLCJzcmMvYXBwL21vZHVsZXMvYWRtaW4vdXNlci9jb21wb25lbnRzL3VzZXItZGVmZWN0cy91c2VyLWRlZmVjdHMuY29tcG9uZW50LnNjc3MiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7RUFDSSxhQUFBO0FDQ0oiLCJmaWxlIjoic3JjL2FwcC9tb2R1bGVzL2FkbWluL3VzZXIvY29tcG9uZW50cy91c2VyLWRlZmVjdHMvdXNlci1kZWZlY3RzLmNvbXBvbmVudC5zY3NzIiwic291cmNlc0NvbnRlbnQiOlsiLmhpZGVfZW1wdHlfbWVzc2FnZSA6Om5nLWRlZXAgLm9kZCB7XG4gICAgZGlzcGxheTogbm9uZVxufSIsIi5oaWRlX2VtcHR5X21lc3NhZ2UgOjpuZy1kZWVwIC5vZGQge1xuICBkaXNwbGF5OiBub25lO1xufSJdfQ== */");
 
 /***/ }),
 
@@ -1957,7 +1957,7 @@ var UserDetailUpdateComponent = /** @class */ (function () {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = (".hide_empty_message ::ng-deep .odd {\n  display: none;\n}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi9BcHBsaWNhdGlvbnMvTUFNUC9odGRvY3MvZ3JlZW52aWV0LXBoYXNlMi9hbmd1bGFyL3NyYy9hcHAvbW9kdWxlcy9hZG1pbi91c2VyL2NvbXBvbmVudHMvdXNlci1pbmNpZGVudHMvdXNlci1pbmNpZGVudHMuY29tcG9uZW50LnNjc3MiLCJzcmMvYXBwL21vZHVsZXMvYWRtaW4vdXNlci9jb21wb25lbnRzL3VzZXItaW5jaWRlbnRzL3VzZXItaW5jaWRlbnRzLmNvbXBvbmVudC5zY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0VBQ0ksYUFBQTtBQ0NKIiwiZmlsZSI6InNyYy9hcHAvbW9kdWxlcy9hZG1pbi91c2VyL2NvbXBvbmVudHMvdXNlci1pbmNpZGVudHMvdXNlci1pbmNpZGVudHMuY29tcG9uZW50LnNjc3MiLCJzb3VyY2VzQ29udGVudCI6WyIuaGlkZV9lbXB0eV9tZXNzYWdlIDo6bmctZGVlcCAub2RkIHtcbiAgICBkaXNwbGF5OiBub25lXG59IiwiLmhpZGVfZW1wdHlfbWVzc2FnZSA6Om5nLWRlZXAgLm9kZCB7XG4gIGRpc3BsYXk6IG5vbmU7XG59Il19 */");
+/* harmony default export */ __webpack_exports__["default"] = (".hide_empty_message ::ng-deep .odd {\n  display: none;\n}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9hcHAvbW9kdWxlcy9hZG1pbi91c2VyL2NvbXBvbmVudHMvdXNlci1pbmNpZGVudHMvQzpcXHhhbXBwXFxodGRvY3NcXGdyZWVudmlldC1waGFzZTJcXGFuZ3VsYXIvc3JjXFxhcHBcXG1vZHVsZXNcXGFkbWluXFx1c2VyXFxjb21wb25lbnRzXFx1c2VyLWluY2lkZW50c1xcdXNlci1pbmNpZGVudHMuY29tcG9uZW50LnNjc3MiLCJzcmMvYXBwL21vZHVsZXMvYWRtaW4vdXNlci9jb21wb25lbnRzL3VzZXItaW5jaWRlbnRzL3VzZXItaW5jaWRlbnRzLmNvbXBvbmVudC5zY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0VBQ0ksYUFBQTtBQ0NKIiwiZmlsZSI6InNyYy9hcHAvbW9kdWxlcy9hZG1pbi91c2VyL2NvbXBvbmVudHMvdXNlci1pbmNpZGVudHMvdXNlci1pbmNpZGVudHMuY29tcG9uZW50LnNjc3MiLCJzb3VyY2VzQ29udGVudCI6WyIuaGlkZV9lbXB0eV9tZXNzYWdlIDo6bmctZGVlcCAub2RkIHtcbiAgICBkaXNwbGF5OiBub25lXG59IiwiLmhpZGVfZW1wdHlfbWVzc2FnZSA6Om5nLWRlZXAgLm9kZCB7XG4gIGRpc3BsYXk6IG5vbmU7XG59Il19 */");
 
 /***/ }),
 
@@ -2186,7 +2186,7 @@ var UserIncidentsComponent = /** @class */ (function () {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = (".hide_empty_message ::ng-deep .odd {\n  display: none;\n}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi9BcHBsaWNhdGlvbnMvTUFNUC9odGRvY3MvZ3JlZW52aWV0LXBoYXNlMi9hbmd1bGFyL3NyYy9hcHAvbW9kdWxlcy9hZG1pbi91c2VyL2NvbXBvbmVudHMvdXNlci1wcm9qZWN0cy91c2VyLXByb2plY3RzLmNvbXBvbmVudC5zY3NzIiwic3JjL2FwcC9tb2R1bGVzL2FkbWluL3VzZXIvY29tcG9uZW50cy91c2VyLXByb2plY3RzL3VzZXItcHJvamVjdHMuY29tcG9uZW50LnNjc3MiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7RUFDSSxhQUFBO0FDQ0oiLCJmaWxlIjoic3JjL2FwcC9tb2R1bGVzL2FkbWluL3VzZXIvY29tcG9uZW50cy91c2VyLXByb2plY3RzL3VzZXItcHJvamVjdHMuY29tcG9uZW50LnNjc3MiLCJzb3VyY2VzQ29udGVudCI6WyIuaGlkZV9lbXB0eV9tZXNzYWdlIDo6bmctZGVlcCAub2RkIHtcbiAgICBkaXNwbGF5OiBub25lXG59IiwiLmhpZGVfZW1wdHlfbWVzc2FnZSA6Om5nLWRlZXAgLm9kZCB7XG4gIGRpc3BsYXk6IG5vbmU7XG59Il19 */");
+/* harmony default export */ __webpack_exports__["default"] = (".hide_empty_message ::ng-deep .odd {\n  display: none;\n}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9hcHAvbW9kdWxlcy9hZG1pbi91c2VyL2NvbXBvbmVudHMvdXNlci1wcm9qZWN0cy9DOlxceGFtcHBcXGh0ZG9jc1xcZ3JlZW52aWV0LXBoYXNlMlxcYW5ndWxhci9zcmNcXGFwcFxcbW9kdWxlc1xcYWRtaW5cXHVzZXJcXGNvbXBvbmVudHNcXHVzZXItcHJvamVjdHNcXHVzZXItcHJvamVjdHMuY29tcG9uZW50LnNjc3MiLCJzcmMvYXBwL21vZHVsZXMvYWRtaW4vdXNlci9jb21wb25lbnRzL3VzZXItcHJvamVjdHMvdXNlci1wcm9qZWN0cy5jb21wb25lbnQuc2NzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQTtFQUNJLGFBQUE7QUNDSiIsImZpbGUiOiJzcmMvYXBwL21vZHVsZXMvYWRtaW4vdXNlci9jb21wb25lbnRzL3VzZXItcHJvamVjdHMvdXNlci1wcm9qZWN0cy5jb21wb25lbnQuc2NzcyIsInNvdXJjZXNDb250ZW50IjpbIi5oaWRlX2VtcHR5X21lc3NhZ2UgOjpuZy1kZWVwIC5vZGQge1xuICAgIGRpc3BsYXk6IG5vbmVcbn0iLCIuaGlkZV9lbXB0eV9tZXNzYWdlIDo6bmctZGVlcCAub2RkIHtcbiAgZGlzcGxheTogbm9uZTtcbn0iXX0= */");
 
 /***/ }),
 
@@ -2412,7 +2412,7 @@ var UserProjectsComponent = /** @class */ (function () {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = (".hide_empty_message ::ng-deep .odd {\n  display: none;\n}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi9BcHBsaWNhdGlvbnMvTUFNUC9odGRvY3MvZ3JlZW52aWV0LXBoYXNlMi9hbmd1bGFyL3NyYy9hcHAvbW9kdWxlcy9hZG1pbi91c2VyL2NvbXBvbmVudHMvdXNlci10YXNrcy91c2VyLXRhc2tzLmNvbXBvbmVudC5zY3NzIiwic3JjL2FwcC9tb2R1bGVzL2FkbWluL3VzZXIvY29tcG9uZW50cy91c2VyLXRhc2tzL3VzZXItdGFza3MuY29tcG9uZW50LnNjc3MiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7RUFDSSxhQUFBO0FDQ0oiLCJmaWxlIjoic3JjL2FwcC9tb2R1bGVzL2FkbWluL3VzZXIvY29tcG9uZW50cy91c2VyLXRhc2tzL3VzZXItdGFza3MuY29tcG9uZW50LnNjc3MiLCJzb3VyY2VzQ29udGVudCI6WyIuaGlkZV9lbXB0eV9tZXNzYWdlIDo6bmctZGVlcCAub2RkIHtcbiAgICBkaXNwbGF5OiBub25lXG59IiwiLmhpZGVfZW1wdHlfbWVzc2FnZSA6Om5nLWRlZXAgLm9kZCB7XG4gIGRpc3BsYXk6IG5vbmU7XG59Il19 */");
+/* harmony default export */ __webpack_exports__["default"] = (".hide_empty_message ::ng-deep .odd {\n  display: none;\n}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9hcHAvbW9kdWxlcy9hZG1pbi91c2VyL2NvbXBvbmVudHMvdXNlci10YXNrcy9DOlxceGFtcHBcXGh0ZG9jc1xcZ3JlZW52aWV0LXBoYXNlMlxcYW5ndWxhci9zcmNcXGFwcFxcbW9kdWxlc1xcYWRtaW5cXHVzZXJcXGNvbXBvbmVudHNcXHVzZXItdGFza3NcXHVzZXItdGFza3MuY29tcG9uZW50LnNjc3MiLCJzcmMvYXBwL21vZHVsZXMvYWRtaW4vdXNlci9jb21wb25lbnRzL3VzZXItdGFza3MvdXNlci10YXNrcy5jb21wb25lbnQuc2NzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQTtFQUNJLGFBQUE7QUNDSiIsImZpbGUiOiJzcmMvYXBwL21vZHVsZXMvYWRtaW4vdXNlci9jb21wb25lbnRzL3VzZXItdGFza3MvdXNlci10YXNrcy5jb21wb25lbnQuc2NzcyIsInNvdXJjZXNDb250ZW50IjpbIi5oaWRlX2VtcHR5X21lc3NhZ2UgOjpuZy1kZWVwIC5vZGQge1xuICAgIGRpc3BsYXk6IG5vbmVcbn0iLCIuaGlkZV9lbXB0eV9tZXNzYWdlIDo6bmctZGVlcCAub2RkIHtcbiAgZGlzcGxheTogbm9uZTtcbn0iXX0= */");
 
 /***/ }),
 
@@ -2463,6 +2463,8 @@ var UserTasksComponent = /** @class */ (function () {
         this.dtTrigger = new rxjs__WEBPACK_IMPORTED_MODULE_7__["Subject"]();
         this.dtOptions = {};
         this.tasks = [];
+        this.total_time = 0;
+        this.total_cost = 0;
         this.userId = this.route.snapshot.paramMap.get('id');
         this.exportAsConfig = {
             type: 'pdf',
@@ -2479,6 +2481,12 @@ var UserTasksComponent = /** @class */ (function () {
         this.http.post(this.apiUrl + '/api/all-tasks-report', { user_id: this.userIdReport, selectedRange: this.dataCall.selectedRange, project: this.dataCall.project }, {})
             .subscribe(function (resp) {
             _this.tasks = resp.data;
+            _this.total_time = 0;
+            _this.total_cost = 0;
+            _this.tasks.forEach(function (task) {
+                _this.total_time += parseFloat(task.timesheet.total_time);
+                _this.total_cost += parseFloat(task.timesheet.total_cost);
+            });
         });
         return;
         var that = this;
@@ -3672,7 +3680,7 @@ var UserEditComponent = /** @class */ (function () {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = (".hide_empty_message ::ng-deep .odd {\n  display: none;\n}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi9BcHBsaWNhdGlvbnMvTUFNUC9odGRvY3MvZ3JlZW52aWV0LXBoYXNlMi9hbmd1bGFyL3NyYy9hcHAvbW9kdWxlcy9hZG1pbi91c2VyL3BhZ2VzL3VzZXIvdXNlci5jb21wb25lbnQuc2NzcyIsInNyYy9hcHAvbW9kdWxlcy9hZG1pbi91c2VyL3BhZ2VzL3VzZXIvdXNlci5jb21wb25lbnQuc2NzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQTtFQUNJLGFBQUE7QUNDSiIsImZpbGUiOiJzcmMvYXBwL21vZHVsZXMvYWRtaW4vdXNlci9wYWdlcy91c2VyL3VzZXIuY29tcG9uZW50LnNjc3MiLCJzb3VyY2VzQ29udGVudCI6WyIuaGlkZV9lbXB0eV9tZXNzYWdlIDo6bmctZGVlcCAub2RkIHtcbiAgICBkaXNwbGF5OiBub25lXG59IiwiLmhpZGVfZW1wdHlfbWVzc2FnZSA6Om5nLWRlZXAgLm9kZCB7XG4gIGRpc3BsYXk6IG5vbmU7XG59Il19 */");
+/* harmony default export */ __webpack_exports__["default"] = (".hide_empty_message ::ng-deep .odd {\n  display: none;\n}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9hcHAvbW9kdWxlcy9hZG1pbi91c2VyL3BhZ2VzL3VzZXIvQzpcXHhhbXBwXFxodGRvY3NcXGdyZWVudmlldC1waGFzZTJcXGFuZ3VsYXIvc3JjXFxhcHBcXG1vZHVsZXNcXGFkbWluXFx1c2VyXFxwYWdlc1xcdXNlclxcdXNlci5jb21wb25lbnQuc2NzcyIsInNyYy9hcHAvbW9kdWxlcy9hZG1pbi91c2VyL3BhZ2VzL3VzZXIvdXNlci5jb21wb25lbnQuc2NzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQTtFQUNJLGFBQUE7QUNDSiIsImZpbGUiOiJzcmMvYXBwL21vZHVsZXMvYWRtaW4vdXNlci9wYWdlcy91c2VyL3VzZXIuY29tcG9uZW50LnNjc3MiLCJzb3VyY2VzQ29udGVudCI6WyIuaGlkZV9lbXB0eV9tZXNzYWdlIDo6bmctZGVlcCAub2RkIHtcbiAgICBkaXNwbGF5OiBub25lXG59IiwiLmhpZGVfZW1wdHlfbWVzc2FnZSA6Om5nLWRlZXAgLm9kZCB7XG4gIGRpc3BsYXk6IG5vbmU7XG59Il19 */");
 
 /***/ }),
 

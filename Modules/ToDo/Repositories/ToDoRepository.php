@@ -273,6 +273,12 @@ class ToDoRepository
                         $open_todos->whereBetween($todo_table . '.due_date', [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')]);
                     }
                     break;
+                case 'chart':
+                    // $open_todos->where($todo_table . '.status', 1);
+                    if ($input['month'] && $input['month'] != 'all') {
+                        $open_todos->whereBetween($todo_table . '.due_date', [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')]);
+                    }
+                    break;
                 case 'overdue':
                     $open_todos->where($todo_table . '.status', 1)->where($todo_table . '.due_date',  '<', Carbon::now());
                     break;
