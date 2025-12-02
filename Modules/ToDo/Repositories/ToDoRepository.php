@@ -227,7 +227,7 @@ class ToDoRepository
         $task_table = config('core.acl.task_table');
         $defects_table = config('core.acl.defects_table');
         $incidents_table = config('core.acl.incidents_table');
-        if($input['project']){
+        if(isset($input['project']) && $input['project']){
             $ids = array_column($input['project'], 'id');
         } else {
             $ids = [];
