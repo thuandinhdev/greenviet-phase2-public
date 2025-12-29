@@ -65,7 +65,7 @@ class TaskRepository
      *
      * @return Array
      */
-    
+
     public function getAllTaskReport($request)
     {
         $task_table = config('core.acl.task_table');
@@ -83,7 +83,7 @@ class TaskRepository
             $listTaskID = DB::table('gv_timesheets')->where('created_user_id', $request->get('user_id'))->where('module_id', 2)->where('status', 2)->when(!empty($ids), function ($q) use ($ids) {
                 $q->whereIn('project_id', $ids);
             })->whereBetween('start_time', [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')])->groupBy('module_related_id')->pluck('module_related_id');
-            
+
             $task = Task::leftjoin($user_table, $user_table . '.id', '=', $task_table . '.assign_to')
                 ->leftjoin($project_table, $project_table.'.id', '=', $task_table . '.project_id')
                 ->whereIn($task_table . '.id', $listTaskID)
@@ -139,8 +139,8 @@ class TaskRepository
         $user = Auth::user();
 
         $columns = array(
-            0 => $task_table . '.name',
-            1 => $project_table . '.project_name',
+            0 => $project_table . '.project_name',
+            1 => $task_table . '.name',
             2 => $task_table . '.task_start_date',
             3 => $task_table . '.task_end_date',
             4 => $task_table . '.actual_hours',
@@ -158,8 +158,8 @@ class TaskRepository
             $statusCount = [];
 
             $columns = array(
-                0 => $task_table . '.name',
-                1 => $project_table . '.project_name',
+                0 => $project_table . '.project_name',
+                1 => $task_table . '.name',
                 2 => $task_table . '.task_start_date',
                 3 => $task_table . '.task_end_date',
                 4 => $task_table . '.progress',

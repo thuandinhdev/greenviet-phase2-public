@@ -12,6 +12,7 @@ use Modules\Helper\Helpers\AdminHelper;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpWord\TemplateProcessor;
 use ZipArchive;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * Class FileController
@@ -170,92 +171,82 @@ class FileController extends Controller
             return response()->json(['error' => 'Error while creating.'], 400);
         }
     }
-
-
     public function exportSalaryDocx($fileId)
     {
         $file = File::findOrFail($fileId);
 
         $excelPath    = public_path('/uploads/filebrowser/' . $file->file_hash);
-        // $templatePath = public_path('/templates/MAU_PHIEU_LUONG.docx');
         $templatePath = storage_path('app/templates/MAU_PHIEU_LUONG.docx');
 
-        $tmpDocxDir = public_path('/uploads/tmp_salary_docx/');
-        $zipDir = storage_path('app/salary_zip/');
+        $tmpDocxDir = storage_path('framework/cache/payslip_docx');
+        if (!is_dir($tmpDocxDir)) {
+            mkdir($tmpDocxDir, 0777, true);
+        }
 
-        if (!file_exists($tmpDocxDir)) mkdir($tmpDocxDir, 0777, true);
-        if (!file_exists($zipDir))     mkdir($zipDir, 0777, true);
-
-        // 1️⃣ Load Excel
+        // Load Excel TRƯỚC
         $sheet = IOFactory::load($excelPath)->getActiveSheet();
         $startRow = 12;
         $lastRow  = $sheet->getHighestRow();
 
-        // 2️⃣ Tạo ZIP
-        $zipFileName = 'PHIEU_LUONG_' . auth()->id() . '_' . time() . '.zip';
-        $zipPath = $zipDir . $zipFileName;
+        $zipName = 'PHIEU_LUONG_' . date('Ym_His') . '.zip';
 
-        $zip = new \ZipArchive();
-        $result = $zip->open($zipPath, \ZipArchive::CREATE);
-        if (!is_dir($zipDir)) {
-            mkdir($zipDir, 0777, true);
-        }
-        chmod($zipDir, 0777);
-        if ($result !== true) {
-            return response()->json([
-                'error' => 'ZIP open failed',
-                'zip_code' => $result,
-                'zip_path' => $zipPath,
-                'dir_writable' => is_writable($zipDir)
-            ], 500);
-        }
+        return response()->streamDownload(function () use (
+            $sheet,
+            $startRow,
+            $lastRow,
+            $templatePath,
+            $tmpDocxDir
+        ) {
+            // clear buffer
+            while (ob_get_level() > 0) {
+                ob_end_clean();
+            }
 
-        // 3️⃣ Loop row → DOCX → add vào ZIP
-        for ($row = $startRow; $row <= $lastRow; $row++) {
+            $zipPath = storage_path('framework/cache/payslip_' . uniqid() . '.zip');
 
-            $hoTen = trim($sheet->getCell("C$row")->getValue());
-            if ($hoTen === '') break;
+            $zip = new ZipArchive();
+            $zip->open($zipPath, ZipArchive::CREATE);
 
-            $template = new TemplateProcessor($templatePath);
+            for ($row = $startRow; $row <= $lastRow; $row++) {
 
-            $template->setValue('HO_TEN', $hoTen);
-            $template->setValue('CHUC_VU', $sheet->getCell("D$row")->getValue());
+                $hoTen = trim($sheet->getCell("C$row")->getValue());
+                if ($hoTen === '') break;
 
-            $template->setValue('LUONG_CB', number_format($sheet->getCell("F$row")->getValue()));
-            $template->setValue('HIEU_QUA', number_format($sheet->getCell("G$row")->getValue()));
-            $template->setValue('TONG_LUONG', number_format($sheet->getCell("H$row")->getValue()));
+                $template = new TemplateProcessor($templatePath);
 
-            $template->setValue('NGAY_CONG', $sheet->getCell("I$row")->getValue());
-            $template->setValue('LUONG_LV', number_format($sheet->getCell("J$row")->getValue()));
+                $template->setValue('HO_TEN', $hoTen);
+                $template->setValue('CHUC_VU', $sheet->getCell("D$row")->getValue());
+                $template->setValue('LUONG_CB', number_format($sheet->getCell("F$row")->getValue()));
+                $template->setValue('HIEU_QUA', number_format($sheet->getCell("G$row")->getValue()));
+                $template->setValue('TONG_LUONG', number_format($sheet->getCell("H$row")->getValue()));
+                $template->setValue('NGAY_CONG', $sheet->getCell("I$row")->getValue());
+                $template->setValue('LUONG_LV', number_format($sheet->getCell("J$row")->getValue()));
+                $template->setValue('PHU_CAP_AN', number_format($sheet->getCell("P$row")->getValue()));
+                $template->setValue('PHU_CAP_DT', number_format($sheet->getCell("Q$row")->getValue()));
+                $template->setValue('PHU_CAP_CT', number_format($sheet->getCell("R$row")->getValue()));
+                $template->setValue('TONG_THU_NHAP', number_format($sheet->getCell("S$row")->getValue()));
 
-            $template->setValue('PHU_CAP_AN', number_format($sheet->getCell("P$row")->getValue()));
-            $template->setValue('PHU_CAP_DT', number_format($sheet->getCell("Q$row")->getValue()));
-            $template->setValue('PHU_CAP_CT', number_format($sheet->getCell("R$row")->getValue()));
+                $safeName = preg_replace('/[^a-zA-Z0-9_\-]/u', '_', $hoTen);
+                $docxPath = $tmpDocxDir . '/PHIEU_LUONG_' . $safeName . '.docx';
 
-            $template->setValue('TONG_THU_NHAP', number_format($sheet->getCell("S$row")->getValue()));
+                $template->saveAs($docxPath);
+                $zip->addFile($docxPath, basename($docxPath));
+            }
 
-            // Save tạm DOCX
-            $safeName = preg_replace('/[^a-zA-Z0-9_\-]/u', '_', $hoTen);
-            $docxPath = $tmpDocxDir . 'PHIEU_LUONG_' . $safeName . '.docx';
+            $zip->close();
 
-            $template->saveAs($docxPath);
+            // ⚠️ KHÔNG fopen – CHỈ readfile
+            readfile($zipPath);
 
-            // Add vào ZIP
-            $zip->addFile($docxPath, basename($docxPath));
-        }
+            // cleanup
+            @unlink($zipPath);
+            foreach (glob($tmpDocxDir . '/*.docx') as $f) {
+                @unlink($f);
+            }
 
-        // đảm bảo ZIP tồn tại
-        if (!file_exists($zipPath)) {
-            return response()->json(['error' => 'ZIP create failed'], 500);
-        }
-
-        // dọn docx tạm
-        foreach (glob($tmpDocxDir . '*.docx') as $tmpFile) {
-            @unlink($tmpFile);
-        }
-
-        // ❌ KHÔNG deleteFileAfterSend
-        return response()->download($zipPath);
+        }, $zipName, [
+            'Content-Type' => 'application/zip',
+        ]);
     }
 
     /**

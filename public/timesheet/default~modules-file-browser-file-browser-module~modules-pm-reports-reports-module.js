@@ -2566,13 +2566,6 @@ var UploadFilesModelComponent = /** @class */ (function () {
         this.uploader.onBeforeUploadItem = function (item) {
             item.withCredentials = false;
         };
-        // this.uploader.onCompleteItem = (item: any, response: any, status: any, headers: any) => {
-        // 	let obj = JSON.parse(response);
-        // 	if(obj.success) {
-        // 		this.attachmentsArr.push(obj.id);
-        // 		this.toastr.success(this.translate.instant('file_browser.messages.upload_file'), this.translate.instant('file_browser.title'));
-        // 	}
-        // };
         this.uploader.onCompleteItem = function (item, response, status, headers) {
             var obj = JSON.parse(response);
             if (obj.success) {
@@ -2587,7 +2580,19 @@ var UploadFilesModelComponent = /** @class */ (function () {
     };
     UploadFilesModelComponent.prototype.downloadPayslipZip = function (fileId) {
         var _this = this;
-        this.http.get(this.apiUrl + ("/api/salary/export-docx/" + fileId), { responseType: 'blob' }).subscribe(function (blob) {
+        var headers = {
+            Authorization: this.loginToken.token_type + ' ' + this.loginToken.token
+        };
+        this.http.get(this.apiUrl + ("/api/salary/export-docx/" + fileId), {
+            headers: headers,
+            responseType: 'blob',
+            observe: 'response'
+        }).subscribe(function (res) {
+            if (!res.body || res.body.size === 0) {
+                console.error('ZIP response empty');
+                return;
+            }
+            var blob = new Blob([res.body], { type: 'application/zip' });
             var url = window.URL.createObjectURL(blob);
             var a = document.createElement('a');
             a.href = url;
@@ -2597,7 +2602,8 @@ var UploadFilesModelComponent = /** @class */ (function () {
             document.body.removeChild(a);
             window.URL.revokeObjectURL(url);
         }, function (err) {
-            _this.toastr.error('Không thể xuất phiếu lương');
+            console.error(err);
+            _this.toastr.error('Không thể tải file phiếu lương');
         });
     };
     UploadFilesModelComponent.prototype.fileOverBase = function (e) {
