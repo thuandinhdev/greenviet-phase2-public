@@ -171,11 +171,11 @@ class ProjectRepository
                     "estimated_date", DATE_FORMAT(gv_todos.estimated_date, "%Y-%m-%d"),
                     "invoice_date", DATE_FORMAT(gv_todos.invoice_date, "%Y-%m-%d")
                 ))
-                FROM gv_todos 
+                FROM gv_todos
                 WHERE gv_todos.module_related_id = gv_projects.id
                ) as payments')
             )
-            
+
             ->leftjoin($user_table, $user_table . '.id', '=', $project_table . '.client_id')
             ->leftjoin($user_table . ' as project_created', 'project_created.id', '=', $project_table . '.user_id')
             ->leftjoin($team_table, $team_table . '.id', '=', $project_table . '.assign_to');
@@ -1311,17 +1311,65 @@ class ProjectRepository
                 $user_table . '.lastname as client_lastname',
                 DB::raw('(SELECT SUM(actual_hours) FROM gv_tasks WHERE gv_tasks.project_id = gv_projects.id) as total_actual_hours'),
                 $user_table . '.avatar as client_avatar',
-                DB::raw('(SELECT JSON_ARRAYAGG(JSON_OBJECT(
-                    "id", gv_todos.id,
-                    "description", gv_todos.description,
-                    "due_date", gv_todos.due_date,
-                    "status", gv_todos.status,
-                    "price", gv_todos.price,
-                    "payment_date", gv_todos.payment_date
-                ))
-                FROM gv_todos 
-                WHERE gv_todos.module_related_id = gv_projects.id
-               ) as payments')
+                DB::raw('(
+                    SELECT JSON_ARRAYAGG(
+                        JSON_OBJECT(
+                            "id", ts.id,
+                            "username", u.username,
+                            "note", ts.note,
+                            "start_time", ts.start_time,
+                            "cost", ts.cost,
+                            "decimal_time", ts.decimal_time
+                        )
+                        ORDER BY ts.start_time DESC
+                    )
+                    FROM gv_timesheets ts
+                    LEFT JOIN gv_users u ON u.id = ts.created_user_id
+                    WHERE ts.project_id = gv_projects.id
+                ) as payments')
+            //     DB::raw('(SELECT JSON_ARRAYAGG(JSON_OBJECT(
+            //         "id", gv_todos.id,
+            //         "description", gv_todos.description,
+            //         "due_date", gv_todos.due_date,
+            //         "status", gv_todos.status,
+            //         "price", gv_todos.price,
+            //         "payment_date", gv_todos.payment_date
+            //     ))
+            //     FROM gv_todos
+            //     WHERE gv_todos.module_related_id = gv_projects.id
+            //    ) as payments')
+                // DB::raw('(
+                //     SELECT GROUP_CONCAT(
+                //         CONCAT_WS("::",
+                //             ts.id,
+                //             u.username,
+                //             ts.note,
+                //             ts.start_time,
+                //             ts.cost,
+                //             ts.decimal_time
+                //         )
+                //         SEPARATOR "||"
+                //     )
+                //     FROM gv_timesheets ts
+                //     LEFT JOIN gv_users u ON u.id = ts.created_user_id
+                //     WHERE ts.project_id = gv_projects.id
+                //     ORDER BY ts.start_time DESC
+                // ) as payments'),
+                // DB::raw('(
+                //     SELECT GROUP_CONCAT(
+                //         CONCAT_WS("::",
+                //             gv_todos.id,
+                //             gv_todos.description,
+                //             gv_todos.due_date,
+                //             gv_todos.status,
+                //             gv_todos.price,
+                //             gv_todos.payment_date
+                //         )
+                //         SEPARATOR "||"
+                //     )
+                //     FROM gv_todos
+                //     WHERE gv_todos.module_related_id = gv_projects.id
+                // ) as payments')
             )
             ->leftjoin($user_table . ' as project_created', 'project_created.id', '=', $project_table . '.user_id')
             ->leftjoin($user_table, $user_table . '.id', '=', $project_table . '.client_id');
