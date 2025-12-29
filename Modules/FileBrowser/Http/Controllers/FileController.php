@@ -9,6 +9,9 @@ use Modules\FileBrowser\Entities\File;
 use Modules\FileBrowser\Http\Requests\EditFileRequest;
 use Modules\FileBrowser\Repositories\FileRepository;
 use Modules\Helper\Helpers\AdminHelper;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpWord\TemplateProcessor;
+use ZipArchive;
 
 /**
  * Class FileController
@@ -123,44 +126,136 @@ class FileController extends Controller
         }
 
         if ($request->hasFile('file')) {
-            $user_id = \Auth::id();
-            // --
-            // Image file
-            $size = $request->file('file')->getSize();
-            $fileName = $request->file('file')->getClientOriginalName();
-            $fileExt = $request->file('file')->getClientOriginalExtension();
-            $fileBaseName = basename(
-                $request->file('file')->getClientOriginalName(),
-                '.' . $request->file('file')->getClientOriginalExtension()
-            );
-            $path = uniqid() . '.' . $fileExt;
-            $folder = $request->input('folder');
-            $request->file('file')->move(public_path("/uploads/filebrowser"), $path);
+            $action = $request->get('action');
+                $user_id = \Auth::id();
+                // --
+                // Image file
+                $size = $request->file('file')->getSize();
+                $fileName = $request->file('file')->getClientOriginalName();
+                $fileExt = $request->file('file')->getClientOriginalExtension();
+                $fileBaseName = basename(
+                    $request->file('file')->getClientOriginalName(),
+                    '.' . $request->file('file')->getClientOriginalExtension()
+                );
+                $path = uniqid() . '.' . $fileExt;
+                $folder = $request->input('folder');
+                $request->file('file')->move(public_path("/uploads/filebrowser"), $path);
 
-            if (!(\File::exists(public_path('/uploads/filebrowser/' . 'index.php')))) {
-                \File::put(public_path('/uploads/filebrowser/' . 'index.php'), "");
+                if (!(\File::exists(public_path('/uploads/filebrowser/' . 'index.php')))) {
+                    \File::put(public_path('/uploads/filebrowser/' . 'index.php'), "");
+                }
+
+                // --
+                // Save file
+                $file = new File();
+                $file->user_id = $user_id;
+                $file->folder_id = $folder;
+                $file->file_name = $fileBaseName . '.' . $fileExt;
+                $file->file_extension = $fileExt;
+                $file->file_size = $size;
+                $file->file_hash = $path;
+                $file->save();
+
+            if($action == 'payslip'){
+                return $this->exportSalaryDocx($file->id);
+            } else {
+                return response()->json(
+                    [
+                    'success' => 'File has been uploaded.',
+                    'id' => $file->id,
+                    ], 200
+                );
             }
-
-            // --
-            // Save file
-            $file = new File();
-            $file->user_id = $user_id;
-            $file->folder_id = $folder;
-            $file->file_name = $fileBaseName . '.' . $fileExt;
-            $file->file_extension = $fileExt;
-            $file->file_size = $size;
-            $file->file_hash = $path;
-            $file->save();
-
-            return response()->json(
-                [
-                'success' => 'File has been uploaded.',
-                'id' => $file->id,
-                ], 200
-            );
         } else {
             return response()->json(['error' => 'Error while creating.'], 400);
         }
+    }
+
+
+    public function exportSalaryDocx($fileId)
+    {
+        $file = File::findOrFail($fileId);
+
+        $excelPath    = public_path('/uploads/filebrowser/' . $file->file_hash);
+        // $templatePath = public_path('/templates/MAU_PHIEU_LUONG.docx');
+        $templatePath = storage_path('app/templates/MAU_PHIEU_LUONG.docx');
+
+        $tmpDocxDir = public_path('/uploads/tmp_salary_docx/');
+        $zipDir = storage_path('app/salary_zip/');
+
+        if (!file_exists($tmpDocxDir)) mkdir($tmpDocxDir, 0777, true);
+        if (!file_exists($zipDir))     mkdir($zipDir, 0777, true);
+
+        // 1️⃣ Load Excel
+        $sheet = IOFactory::load($excelPath)->getActiveSheet();
+        $startRow = 12;
+        $lastRow  = $sheet->getHighestRow();
+
+        // 2️⃣ Tạo ZIP
+        $zipFileName = 'PHIEU_LUONG_' . auth()->id() . '_' . time() . '.zip';
+        $zipPath = $zipDir . $zipFileName;
+
+        $zip = new \ZipArchive();
+        $result = $zip->open($zipPath, \ZipArchive::CREATE);
+        if (!is_dir($zipDir)) {
+            mkdir($zipDir, 0777, true);
+        }
+        chmod($zipDir, 0777);
+        if ($result !== true) {
+            return response()->json([
+                'error' => 'ZIP open failed',
+                'zip_code' => $result,
+                'zip_path' => $zipPath,
+                'dir_writable' => is_writable($zipDir)
+            ], 500);
+        }
+
+        // 3️⃣ Loop row → DOCX → add vào ZIP
+        for ($row = $startRow; $row <= $lastRow; $row++) {
+
+            $hoTen = trim($sheet->getCell("C$row")->getValue());
+            if ($hoTen === '') break;
+
+            $template = new TemplateProcessor($templatePath);
+
+            $template->setValue('HO_TEN', $hoTen);
+            $template->setValue('CHUC_VU', $sheet->getCell("D$row")->getValue());
+
+            $template->setValue('LUONG_CB', number_format($sheet->getCell("F$row")->getValue()));
+            $template->setValue('HIEU_QUA', number_format($sheet->getCell("G$row")->getValue()));
+            $template->setValue('TONG_LUONG', number_format($sheet->getCell("H$row")->getValue()));
+
+            $template->setValue('NGAY_CONG', $sheet->getCell("I$row")->getValue());
+            $template->setValue('LUONG_LV', number_format($sheet->getCell("J$row")->getValue()));
+
+            $template->setValue('PHU_CAP_AN', number_format($sheet->getCell("P$row")->getValue()));
+            $template->setValue('PHU_CAP_DT', number_format($sheet->getCell("Q$row")->getValue()));
+            $template->setValue('PHU_CAP_CT', number_format($sheet->getCell("R$row")->getValue()));
+
+            $template->setValue('TONG_THU_NHAP', number_format($sheet->getCell("S$row")->getValue()));
+
+            // Save tạm DOCX
+            $safeName = preg_replace('/[^a-zA-Z0-9_\-]/u', '_', $hoTen);
+            $docxPath = $tmpDocxDir . 'PHIEU_LUONG_' . $safeName . '.docx';
+
+            $template->saveAs($docxPath);
+
+            // Add vào ZIP
+            $zip->addFile($docxPath, basename($docxPath));
+        }
+
+        // đảm bảo ZIP tồn tại
+        if (!file_exists($zipPath)) {
+            return response()->json(['error' => 'ZIP create failed'], 500);
+        }
+
+        // dọn docx tạm
+        foreach (glob($tmpDocxDir . '*.docx') as $tmpFile) {
+            @unlink($tmpFile);
+        }
+
+        // ❌ KHÔNG deleteFileAfterSend
+        return response()->download($zipPath);
     }
 
     /**

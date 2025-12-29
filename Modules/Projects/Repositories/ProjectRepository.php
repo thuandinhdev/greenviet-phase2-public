@@ -163,10 +163,13 @@ class ProjectRepository
                 DB::raw('(SELECT JSON_ARRAYAGG(JSON_OBJECT(
                     "id", gv_todos.id,
                     "description", gv_todos.description,
-                    "due_date", gv_todos.due_date,
+                    "due_date", DATE_FORMAT(gv_todos.due_date, "%Y-%m-%d"),
                     "status", gv_todos.status,
                     "price", gv_todos.price,
-                    "payment_date", gv_todos.payment_date
+                    "payment_date", DATE_FORMAT(gv_todos.payment_date, "%Y-%m-%d"),
+                    "cash_flow", gv_todos.cash_flow,
+                    "estimated_date", DATE_FORMAT(gv_todos.estimated_date, "%Y-%m-%d"),
+                    "invoice_date", DATE_FORMAT(gv_todos.invoice_date, "%Y-%m-%d")
                 ))
                 FROM gv_todos 
                 WHERE gv_todos.module_related_id = gv_projects.id
@@ -455,8 +458,14 @@ class ProjectRepository
                 $value['module_id'] = 1;
                 $value['user_id'] = $user->id;
                 $value['module_related_id'] = $projects['id'];
-                if($value['status'] == 1){
+                if(!isset($value['payment_date']) || $value['payment_date'] == '' || $value['payment_date'] == NULL){
                     unset($value['payment_date']);
+                }
+                if(!isset($value['invoice_date']) || $value['invoice_date'] == '' || $value['invoice_date'] == NULL){
+                    unset($value['invoice_date']);
+                }
+                if(!isset($value['estimated_date']) || $value['estimated_date'] == '' || $value['estimated_date'] == NULL){
+                    unset($value['estimated_date']);
                 }
                 DB::table('gv_todos')->insert($value);
             }
@@ -640,8 +649,14 @@ class ProjectRepository
                 $value['module_id'] = 1;
                 $value['user_id'] = $user->id;
                 $value['module_related_id'] = $project['id'];
-                if($value['status'] == 1){
+                if(!isset($value['payment_date']) || $value['payment_date'] == '' || $value['payment_date'] == NULL){
                     unset($value['payment_date']);
+                }
+                if(!isset($value['invoice_date']) || $value['invoice_date'] == '' || $value['invoice_date'] == NULL){
+                    unset($value['invoice_date']);
+                }
+                if(!isset($value['estimated_date']) || $value['estimated_date'] == '' || $value['estimated_date'] == NULL){
+                    unset($value['estimated_date']);
                 }
                 DB::table('gv_todos')->insert($value);
             }

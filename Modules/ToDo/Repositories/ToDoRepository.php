@@ -242,6 +242,9 @@ class ToDoRepository
                 $todo_table . '.price',
                 $todo_table . '.due_date',
                 $todo_table . '.payment_date',
+                $todo_table . '.estimated_date',
+                $todo_table . '.cash_flow',
+                $todo_table . '.invoice_date',
                 $todo_table . '.status',
                 // $modules_table . '.module_name',
                 $projects_table . '.project_name as project_name',
@@ -259,41 +262,81 @@ class ToDoRepository
                 $q->whereIn('module_related_id', $ids);
             });
         if(isset($input['filterKey'])){
-            if(isset($input['selectedRange'])){
-                $startOfMonth = Carbon::createFromFormat('Y-m-d', $input['selectedRange']['start']);
-                $endOfMonth   = Carbon::createFromFormat('Y-m-d', $input['selectedRange']['end']);
+            if(isset($input['rangerMonth'])){
+                $startOfMonth = Carbon::createFromFormat('Y-m', $input['rangerMonth']['start'])->startOfMonth();
+                $endOfMonth   = Carbon::createFromFormat('Y-m', $input['rangerMonth']['end'])->endOfMonth();
             } else {
-                $startOfMonth = Carbon::createFromFormat('Y-m', $input['month'])->startOfMonth();
-                $endOfMonth   = Carbon::createFromFormat('Y-m', $input['month'])->endOfMonth();
+                if(isset($input['selectedRange'])){
+                    $startOfMonth = Carbon::createFromFormat('Y-m-d', $input['selectedRange']['start']);
+                    $endOfMonth   = Carbon::createFromFormat('Y-m-d', $input['selectedRange']['end']);
+                } else {
+                    $startOfMonth = Carbon::createFromFormat('Y-m', $input['month'])->startOfMonth();
+                    $endOfMonth   = Carbon::createFromFormat('Y-m', $input['month'])->endOfMonth();
+                }
             }
             switch ($input['filterKey']) {
                 case 'success':
-                    $open_todos->where($todo_table . '.status', 2);
+                    $open_todos->whereNotNull($todo_table . '.payment_date');
                     if ($input['month'] && $input['month'] != 'all') {
-                        $open_todos->whereBetween($todo_table . '.payment_date', [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')]);
+                        $open_todos->whereBetween($todo_table . '.payment_date', [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')])->orderBy($todo_table . '.payment_date', 'desc');
                     }
                     break;
                 case 'pending':
-                    $open_todos->where($todo_table . '.status', 1);
+                    $open_todos->whereNull($todo_table . '.payment_date');
                     if ($input['month'] && $input['month'] != 'all') {
-                        $open_todos->whereBetween($todo_table . '.due_date', [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')]);
+                        $open_todos->where(function ($q) use ($todo_table, $startOfMonth, $endOfMonth) {
+                            $q->whereBetween(
+                                $todo_table . '.invoice_date',
+                                [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')]
+                            )
+                            ->orWhereBetween(
+                                $todo_table . '.estimated_date',
+                                [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')]
+                            );
+                        })->orderBy($todo_table . '.estimated_date', 'desc');
                     }
                     break;
                 case 'chart':
-                    // $open_todos->where($todo_table . '.status', 1);
-                    if ($input['month'] && $input['month'] != 'all') {
-                        $open_todos->whereBetween($todo_table . '.due_date', [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')]);
-                    }
+                    // if ($input['month'] && $input['month'] != 'all') {
+                        // $open_todos->whereBetween($todo_table . '.due_date', [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')]);
+                        $open_todos->where(function ($q) use ($todo_table, $startOfMonth, $endOfMonth) {
+                            $q->whereBetween(
+                                $todo_table . '.invoice_date',
+                                [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')]
+                            )
+                            ->orWhereBetween(
+                                $todo_table . '.estimated_date',
+                                [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')]
+                            )
+                            ->orWhereBetween(
+                                $todo_table . '.payment_date',
+                                [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')]
+                            );
+                        });
+                    // }
                     break;
                 case 'overdue':
-                    $open_todos->where($todo_table . '.status', 1)->where($todo_table . '.due_date',  '<', Carbon::now());
+                    $open_todos->whereNull($todo_table . '.payment_date')->where(function ($q) use ($todo_table, $startOfMonth, $endOfMonth) {
+                        $q->whereBetween(
+                            $todo_table . '.invoice_date',
+                            [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')]
+                        )
+                        ->orWhereBetween(
+                            $todo_table . '.estimated_date',
+                            [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')]
+                        );
+                    });
+                    $open_todos->where(function ($q) use ($todo_table, $startOfMonth, $endOfMonth) {
+                        $q->where($todo_table . '.invoice_date',  '<', Carbon::now())
+                        ->orWhere($todo_table . '.estimated_date',  '<', Carbon::now());
+                    })->orderBy($todo_table . '.estimated_date', 'desc');
                     break;
             }
         }
 
         return collect(
             [
-            'data' => $open_todos->orderBy($todo_table . '.order', 'asc')->get(),
+            'data' => $open_todos->get(),
             ]
         );
     }

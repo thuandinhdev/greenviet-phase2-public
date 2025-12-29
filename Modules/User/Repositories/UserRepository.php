@@ -78,6 +78,7 @@ class UserRepository
     {
         return User::with(['departments', 'roles'])
             ->where('is_client', false)
+            ->where('is_active', 1)
             ->orderBy('username')
             ->get();
     }

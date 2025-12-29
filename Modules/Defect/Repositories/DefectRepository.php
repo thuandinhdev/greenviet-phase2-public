@@ -1016,7 +1016,7 @@ class DefectRepository
                 $contract = DB::table('gv_users_contract')
                     ->where('user_id', $value->id)
                     ->where('start_date', '<=', $startOfMonth->format('Y-m-d'))
-                    ->where('end_date', '>=', $startOfMonth->format('Y-m-d'))
+                    ->where('end_date', '>=', $endOfMonth->format('Y-m-d'))
                     ->orderBy('id', 'desc')
                     ->first();
 
@@ -1080,7 +1080,7 @@ class DefectRepository
                 $contract = DB::table('gv_users_contract')
                 ->where('user_id', $value->id)
                 ->where('start_date', '<=', $startOfMonth->format('Y-m-d'))
-                ->where('end_date', '>=', $startOfMonth->format('Y-m-d'))
+                ->where('end_date', '>=', $endOfMonth->format('Y-m-d'))
                 ->orderBy('id', 'desc')->first();
                 $value->working_days = $working_days + 2;
                 if($contract){
@@ -1223,14 +1223,15 @@ class DefectRepository
             $sheet->setCellValue("B{$row}", $i + 1);
             $sheet->setCellValue("C{$row}", $item['project_name']);
             $sheet->setCellValue("D{$row}", $item['description']);
-            $sheet->setCellValue("E{$row}", Carbon::parse($item['due_date'])->format('Y-m-d'));
-            $sheet->setCellValue("F{$row}", Carbon::parse($item['payment_date'])->format('Y-m-d'));
-            $sheet->setCellValue("G{$row}", $input['filterKey']);
-            $sheet->setCellValue("H{$row}", $item['price']);
-            $sheet->getStyle("H{$row}")->getNumberFormat()->setFormatCode('#,##0');
+            $sheet->setCellValue("E{$row}", Carbon::parse($item['estimated_date'])->format('Y-m-d'));
+            $sheet->setCellValue("F{$row}", Carbon::parse($item['invoice_date'])->format('Y-m-d'));
+            $sheet->setCellValue("G{$row}", Carbon::parse($item['payment_date'])->format('Y-m-d'));
+            $sheet->setCellValue("H{$row}", $input['filterKey']);
+            $sheet->setCellValue("I{$row}", $item['price']);
+            $sheet->getStyle("I{$row}")->getNumberFormat()->setFormatCode('#,##0');
         }
         // --- Lưu file ---
-        $fileName = 'salary_export_' . time() . '.xlsx';
+        $fileName = 'payment_export_' . time() . '.xlsx';
         $filePath = storage_path('app/' . $fileName);
 
         $writer = new Xlsx($spreadsheet);
@@ -1554,7 +1555,7 @@ class DefectRepository
                                 return 4.5;
                             }
                         } else {
-                            return 'P'; // Full paid leave
+                            return 'P/'; // Full paid leave
                         }
                     } else {
                         if($action== 'time'){
@@ -1628,23 +1629,23 @@ class DefectRepository
                 }
             }
 
-            $sheet->setCellValue("AK{$row}",  $input['workingInMonth']);
+            // $sheet->setCellValue("AK{$row}",  $input['workingInMonth']);
             // --- Ghi dữ liệu mới ---
             $sheet->setCellValue("A{$row}", $i + 1);
             $sheet->setCellValue("C{$row}", $item['lastname'] . ' ' . $item['firstname']);
             $sheet->setCellValue("E{$row}", $item['salary_total']);
             $sheet->setCellValue("F{$row}", $item['salary_basic']);
             $sheet->setCellValue("G{$row}", $item['salary_performance']);
-            $sheet->setCellValue("I{$row}", $item['salary_working_day']);
-            $sheet->setCellValue("K{$row}", $item['salary_leave_salary']);
-            $sheet->setCellValue("L{$row}", $item['salary_ot_working_day']/8.5);
-            $sheet->setCellValue("M{$row}", $item['salary_ot_working_salary']);
+            // $sheet->setCellValue("I{$row}", $item['salary_working_day']);
+            // $sheet->setCellValue("K{$row}", $item['salary_leave_salary']);
+            // $sheet->setCellValue("L{$row}", $item['salary_ot_working_day']/8.5);
+            // $sheet->setCellValue("M{$row}", $item['salary_ot_working_salary']);
             $sheet->setCellValue("P{$row}", $item['salary_lunch']);
             $sheet->setCellValue("Q{$row}", 0);
             $sheet->setCellValue("R{$row}", $item['allowance']);
             $sheet->setCellValue("T{$row}", $item['dependents']);
             $sheet->setCellValue("V{$row}", $input['settings']['personal']);
-            $sheet->setCellValue("W{$row}", $item['salary_lunch']);
+            // $sheet->setCellValue("W{$row}", $item['salary_lunch']);
 
             // timesheet
         }
@@ -1694,7 +1695,6 @@ class DefectRepository
         }
         foreach ($data as $i => $item) {
 
-            $sheet->setCellValue("B{$row}", $item['lastname'] . ' ' . $item['firstname']);
             // salary
             $row = $startRow + $i;
 
@@ -1704,6 +1704,7 @@ class DefectRepository
                 "A{$row}:{$lastCol}{$row}"
             );
 
+            $sheet->setCellValue("B{$row}", $item['lastname'] . ' ' . $item['firstname']);
             // --- Copy công thức có điều chỉnh dòng ---
             $delta = $row - $templateRow;
             for ($col = 'A'; $col !== Coordinate::stringFromColumnIndex(
@@ -1729,23 +1730,51 @@ class DefectRepository
             foreach ($input['daysInMonth'] as $dayIndex => $dayValue) {
                 $col = Coordinate::stringFromColumnIndex($colIndex);
                 $value = $this->getTimesheetByDay($item, $dayIndex, $input['month'], $input['holidays'], $input['leaves'], 'day');
+                $dateWoking = date('N', strtotime($input['month'].'-'.$dayIndex+1));
+                if($input['month']<=date('Y-m')){
+                    if($dayIndex > 19 && $value == ''){
+                        $timesheets_draft = DB::table('gv_timesheets_draft')->where('start_time', '=', date('y-m-d H:i:s', strtotime($input['month']."-".$dayIndex+1)))->where('created_user_id', $item['id'])->sum('decimal_time');
+                        if($timesheets_draft == 0){
+                            $timesheets_draft = DB::table('gv_timesheets')->where('start_time', '=', date('y-m-d H:i:s', strtotime($input['month']."-".$dayIndex+1)))->where('created_user_id', $item['id'])->sum('decimal_time');
+                        } 
+                        if($timesheets_draft == 8.5){
+                            $value = 'x';
+                        }
+                        if($timesheets_draft == 4.5 || $timesheets_draft == 4){
+                            $value = '/';
+                        }
+                        
+                        if($value == '' &&  $dateWoking >= 1 && $dateWoking <= 5){
+                            $value = 'x';
+                        }
+                    }
+                }
+                if($value == ''&&$dateWoking >= 1 && $dateWoking <= 5){
+                    $checkRole = DB::table('gv_user_role_department')->where('user_id', $item['id'])->whereIn('department_id', [1,6])->count();
+                    if($checkRole > 0){
+                        $value = 'x';
+                    }
+                }
+
                 $sheet->setCellValue("{$col}{$row}", $value);
                 $colIndex++;
             }
-            $sheet->setCellValue("AI{$row}", $item['total_day']);
-            $sheet->setCellValue("AJ{$row}", $item['total_leave']);
-            $sheet->setCellValue("AK{$row}", $item['total_total']);
-            $sheet->setCellValue("AL{$row}", $input['workingInMonth']);
+
+
+            // $sheet->setCellValue("AI{$row}", $item['total_day']);
+            // $sheet->setCellValue("AJ{$row}", $item['total_leave']);
+            // $sheet->setCellValue("AK{$row}", $item['total_total']);
+            $sheet->setCellValue("AL{$row}", $input['workingInMonth']+2);
 
 
         }
 
-        //sheet 2
+        //sheet 3
         $sheet = $spreadsheet->getSheet(2);
 
         $templateRow = 12; // Dòng mẫu (format gốc)
         $startRow = $templateRow;
-        $lastCol = 'AM'; // Cột cuối cùng trong file
+        $lastCol = 'AO'; // Cột cuối cùng trong file
         $sheet->setCellValue("O4", $input['month']);
         $row = 0;
         $colIndex = Coordinate::columnIndexFromString('D');
@@ -1757,7 +1786,6 @@ class DefectRepository
         }
         foreach ($data as $i => $item) {
 
-            $sheet->setCellValue("B{$row}", $item['lastname'] . ' ' . $item['firstname']);
             // salary
             $row = $startRow + $i;
 
@@ -1767,6 +1795,8 @@ class DefectRepository
                 "A{$row}:{$lastCol}{$row}"
             );
 
+            $sheet->setCellValue("B{$row}", $item['lastname'] . ' ' . $item['firstname']);
+            $sheet->setCellValue("B{$row}", $item['lastname'] . ' ' . $item['firstname']);
             // --- Copy công thức có điều chỉnh dòng ---
             $delta = $row - $templateRow;
             for ($col = 'A'; $col !== Coordinate::stringFromColumnIndex(

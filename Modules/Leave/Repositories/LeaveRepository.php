@@ -292,6 +292,7 @@ class LeaveRepository
             $user_table . '.firstname',
             $user_table . '.lastname',
             $user_table . '.avatar',
+            $user_table . '.username',
             'approved1.firstname as approved1_firstname',
             'approved1.lastname as approved1_lastname',
             'approved1.avatar as approved1_avatar',
@@ -344,9 +345,19 @@ class LeaveRepository
         $order = $columns[$request->input('order.0.column')];
         $dir = $request->input('order.0.dir');
 
-        if (isset($input['status']) && $input['status']) {
-            $leaves = $leaves->where($leaves_table . '.status', $input['status']);
+        if (isset($input['statusId']) && $input['statusId']  && $input['statusId'] != 'all') {
+            if($input['statusId'] == 4){
+                $leaves = $leaves->whereIn($leaves_table . '.status', [3,4]);
+            } else {
+                $leaves = $leaves->where($leaves_table . '.status', $input['statusId']);
+            }
         }
+        if (isset($input['user_id']) && $input['user_id']) {
+            $leaves = $leaves->where($leaves_table . '.user_id', $input['user_id']);
+        }
+        // if (isset($input['status']) && $input['status']) {
+        //     $leaves = $leaves->where($leaves_table . '.status', $input['status']);
+        // }
 
         $totalData = $leaves->count();
         $totalFiltered = $totalData;

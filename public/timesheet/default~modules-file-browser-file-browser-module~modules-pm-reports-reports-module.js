@@ -2104,7 +2104,7 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = ("<section>\n\t<div class=\"row\">\n\t\t<div class=\"col-sm-12\">\n\t\t\t<div class=\"card pl-2 pr-2\">\n\t\t\t\t<div class=\"card-header pl-0 pr-0 border-bottom\">\n\t\t\t\t\t<h4 class=\"main-title mt-2\"></h4>\n\t\t\t\t\t<div class=\"card-buttons\">\n\t\t\t\t\t\t<button class=\"btn btn-create\" *ngxPermissionsOnly=\"['filemanager_create']\" (click)=\"uploadFileModal();\" tooltip=\"{{'common.upload' | translate}}\"><i class=\"fa fa-upload\"></i></button>\n\t\t\t\t\t\t<button class=\"btn btn-create\" *ngxPermissionsOnly=\"['filemanager_create']\" (click)=\"openFolderCreateModal();\" tooltip=\"{{'common.create' | translate}}\"><i class=\"fa fa-plus\"></i></button>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t\t<div class=\"card-content\">\n\t\t\t\t\t<div class=\"card-body\">\n\t\t\t\t\t\t<div class=\"row\">\n\t\t\t\t\t\t\t<div class=\"col-sm-3 mt-2\">\n\t\t\t\t\t\t\t\t<div class=\"folder-list p-2\" *ngIf=\"breadcrumbs?.length != 0\">\n\t\t\t\t\t\t\t\t\t<h4>Folders</h4>\n\t\t\t\t\t\t\t\t\t<ul>\n\t\t\t\t\t\t\t\t\t\t<li *ngFor=\"let breadcrumb of breadcrumbs;\"><a (click)=\"getFileFolders(breadcrumb.parent_folder)\"><i class=\"fa fa-folder\"></i>&nbsp;{{breadcrumb.folder_name}}</a></li>\n\t\t\t\t\t\t\t\t\t</ul>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t<div class=\"col-sm-9 mt-2\">\n\t\t\t\t\t\t\t\t<div class=\"row\">\n\t\t\t\t\t\t\t\t\t<!-- Folders -->\n\t\t\t\t\t\t\t\t\t<div class=\"col-sm-4\" *ngFor=\"let folder of folders;\">\n\t\t\t\t\t\t\t\t\t\t<div class=\"file-browser\">\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"actions-dropdown text-right m-1 pr-2\">\n\t\t\t\t\t\t\t\t\t\t\t\t<div class=\"btn-group\" dropdown>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a href=\"javascript:void(0);\" dropdownToggle class=\"dropdown-toggle\" id=\"button-basic-1\" aria-controls=\"dropdown-basic-1\"><i class=\"fa fa-ellipsis-v\"></i></a>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<ul id=\"dropdown-basic-1\" *dropdownMenu class=\"dropdown-menu animated fadeIn\" role=\"menu\" aria-labelledby=\"button-basic-1\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<li role=\"menuitem\" *ngxPermissionsOnly=\"['filemanager_edit']\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<a tooltip=\"{{'common.edit' | translate}}\" (click)=\"openFolderEditModal(folder)\" class=\"dropdown-item btn btn-edit btn-raised\"><i class=\"fa fa-pencil-square-o\"></i></a>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t</li>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<li role=\"menuitem\" *ngxPermissionsOnly=\"['filemanager_edit']\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<a tooltip=\"{{'common.delete' | translate}}\" (click)=\"deleteFolder(folder.id)\" class=\"dropdown-item btn btn-delete btn-raised\"><i class=\"fa fa-trash-o\"></i></a>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t</li>\n\t\t\t\t\t\t\t\t\t\t\t\t\t</ul>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"file-box\">\n\t\t\t\t\t\t\t\t\t\t\t\t<div class=\"files\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a (click)=\"getFileFolders(folder.id)\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<div class=\"icon docx\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<i class=\"fa fa-folder-o\"></i>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<div class=\"file-name\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<h4>{{ (folder.folder_name.length>20)? (folder.folder_name | slice:0:20)+'..':(folder.folder_name) }}</h4>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<p>{{'file_browser.title7' | translate}}: {{ folder.updated_at | dateTimeFormatFilter: loginUser.settings.date_time_format }}</p>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"corner\"></span>\n\t\t\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t<!-- Files -->\n\t\t\t\t\t\t\t\t\t<div class=\"col-sm-4\" *ngFor=\"let file of files; index as i\">\n\t\t\t\t\t\t\t\t\t\t<div class=\"file-browser\">\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"actions-dropdown text-right m-1 pr-2\">\n\t\t\t\t\t\t\t\t\t\t\t\t<div class=\"btn-group\" dropdown>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a href=\"javascript:void(0);\" dropdownToggle class=\"dropdown-toggle\" id=\"button-basic-1\" aria-controls=\"dropdown-basic-1\"><i class=\"fa fa-ellipsis-v\"></i></a>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<ul id=\"dropdown-basic-1\" *dropdownMenu class=\"dropdown-menu animated fadeIn\" role=\"menu\" aria-labelledby=\"button-basic-1\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<li role=\"menuitem\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<a tooltip=\"{{'common.download' | translate}}\" class=\"dropdown-item btn btn-download btn-raised\" target=\"_blank\" download=\"{{file.file_name}}\" href=\"{{apiUrl}}/uploads/filebrowser/{{file.file_hash}}\"><i class=\"fa fa-download\"></i></a>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t</li>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<li role=\"menuitem\" *ngxPermissionsOnly=\"['filemanager_edit']\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<a tooltip=\"{{'common.edit' | translate}}\" (click)=\"opneFileEditModal(file)\" class=\"dropdown-item btn btn-edit btn-raised\"><i class=\"fa fa-pencil-square-o\"></i></a>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t</li>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<li role=\"menuitem\" *ngxPermissionsOnly=\"['filemanager_edit']\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<a tooltip=\"{{'common.delete' | translate}}\" (click)=\"deleteFile(file.id)\" class=\"dropdown-item btn btn-delete btn-raised\"><i class=\"fa fa-trash-o\"></i></a>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t</li>\n\t\t\t\t\t\t\t\t\t\t\t\t\t</ul>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"file-box\">\n\t\t\t\t\t\t\t\t\t\t\t\t<div class=\"files\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t<div *ngIf=\"file.icon\" class=\"icon docx\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<i [ngClass]=\"file.icon\"></i>\n\t\t\t\t\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<div *ngIf=\"file.isImageFile\" class=\"image\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<img alt=\"image\" class=\"img-fluid height-100\" src=\"{{ apiUrl }}/uploads/filebrowser/{{file.file_hash}}\" />\n\t\t\t\t\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<div class=\"file-name\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<a target=\"_blank\" tooltip=\"{{file.file_name}}\" download=\"{{file.file_name}}\" href=\"{{apiUrl}}/uploads/filebrowser/{{file.file_hash}}\"><h4>{{ (file.file_name.length>20)? (file.file_name | slice:0:20)+'..':(file.file_name) }}</h4></a>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<p>{{'file_browser.title7' | translate}}: {{ file.updated_at | dateTimeFormatFilter:loginUser.settings.date_time_format }}</p>\n\t\t\t\t\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"corner\"></span>\n\t\t\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"row\" *ngIf=\"isEmptyObject(folders) && isEmptyObject(files)\">\n\t\t\t\t\t\t\t\t\t<div class=\"col-sm-12 text-center\">\n\t\t\t\t\t\t\t\t\t\t<img src=\"assets/img/norecord-img.png\" width=\"50\">\n\t\t\t\t\t\t\t\t\t\t<p class=\"mt-1\">{{'common.empty_message.file_browser' | translate}}</p>\n\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</section>\n");
+/* harmony default export */ __webpack_exports__["default"] = ("<section>\n\t<div class=\"row\">\n\t\t<div class=\"col-sm-12\">\n\t\t\t<div class=\"card pl-2 pr-2\">\n\t\t\t\t<div class=\"card-header pl-0 pr-0 border-bottom\">\n\t\t\t\t\t<h4 class=\"main-title mt-2\"></h4>\n\t\t\t\t\t<div class=\"card-buttons\">\n\t\t\t\t\t\t<button class=\"btn btn-create\" *ngxPermissionsOnly=\"['filemanager_create']\" (click)=\"uploadFileModal('payslip');\" tooltip=\"{{'common.upload' | translate}}\">Payslip</button>\n\t\t\t\t\t\t<button class=\"btn btn-create\" *ngxPermissionsOnly=\"['filemanager_create']\" (click)=\"uploadFileModal('upload');\" tooltip=\"{{'common.upload' | translate}}\"><i class=\"fa fa-upload\"></i></button>\n\t\t\t\t\t\t<button class=\"btn btn-create\" *ngxPermissionsOnly=\"['filemanager_create']\" (click)=\"openFolderCreateModal();\" tooltip=\"{{'common.create' | translate}}\"><i class=\"fa fa-plus\"></i></button>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t\t<div class=\"card-content\">\n\t\t\t\t\t<div class=\"card-body\">\n\t\t\t\t\t\t<div class=\"row\">\n\t\t\t\t\t\t\t<div class=\"col-sm-3 mt-2\">\n\t\t\t\t\t\t\t\t<div class=\"folder-list p-2\" *ngIf=\"breadcrumbs?.length != 0\">\n\t\t\t\t\t\t\t\t\t<h4>Folders</h4>\n\t\t\t\t\t\t\t\t\t<ul>\n\t\t\t\t\t\t\t\t\t\t<li *ngFor=\"let breadcrumb of breadcrumbs;\"><a (click)=\"getFileFolders(breadcrumb.parent_folder)\"><i class=\"fa fa-folder\"></i>&nbsp;{{breadcrumb.folder_name}}</a></li>\n\t\t\t\t\t\t\t\t\t</ul>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t<div class=\"col-sm-9 mt-2\">\n\t\t\t\t\t\t\t\t<div class=\"row\">\n\t\t\t\t\t\t\t\t\t<!-- Folders -->\n\t\t\t\t\t\t\t\t\t<div class=\"col-sm-4\" *ngFor=\"let folder of folders;\">\n\t\t\t\t\t\t\t\t\t\t<div class=\"file-browser\">\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"actions-dropdown text-right m-1 pr-2\">\n\t\t\t\t\t\t\t\t\t\t\t\t<div class=\"btn-group\" dropdown>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a href=\"javascript:void(0);\" dropdownToggle class=\"dropdown-toggle\" id=\"button-basic-1\" aria-controls=\"dropdown-basic-1\"><i class=\"fa fa-ellipsis-v\"></i></a>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<ul id=\"dropdown-basic-1\" *dropdownMenu class=\"dropdown-menu animated fadeIn\" role=\"menu\" aria-labelledby=\"button-basic-1\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<li role=\"menuitem\" *ngxPermissionsOnly=\"['filemanager_edit']\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<a tooltip=\"{{'common.edit' | translate}}\" (click)=\"openFolderEditModal(folder)\" class=\"dropdown-item btn btn-edit btn-raised\"><i class=\"fa fa-pencil-square-o\"></i></a>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t</li>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<li role=\"menuitem\" *ngxPermissionsOnly=\"['filemanager_edit']\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<a tooltip=\"{{'common.delete' | translate}}\" (click)=\"deleteFolder(folder.id)\" class=\"dropdown-item btn btn-delete btn-raised\"><i class=\"fa fa-trash-o\"></i></a>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t</li>\n\t\t\t\t\t\t\t\t\t\t\t\t\t</ul>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"file-box\">\n\t\t\t\t\t\t\t\t\t\t\t\t<div class=\"files\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a (click)=\"getFileFolders(folder.id)\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<div class=\"icon docx\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<i class=\"fa fa-folder-o\"></i>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<div class=\"file-name\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<h4>{{ (folder.folder_name.length>20)? (folder.folder_name | slice:0:20)+'..':(folder.folder_name) }}</h4>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<p>{{'file_browser.title7' | translate}}: {{ folder.updated_at | dateTimeFormatFilter: loginUser.settings.date_time_format }}</p>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"corner\"></span>\n\t\t\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t<!-- Files -->\n\t\t\t\t\t\t\t\t\t<div class=\"col-sm-4\" *ngFor=\"let file of files; index as i\">\n\t\t\t\t\t\t\t\t\t\t<div class=\"file-browser\">\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"actions-dropdown text-right m-1 pr-2\">\n\t\t\t\t\t\t\t\t\t\t\t\t<div class=\"btn-group\" dropdown>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a href=\"javascript:void(0);\" dropdownToggle class=\"dropdown-toggle\" id=\"button-basic-1\" aria-controls=\"dropdown-basic-1\"><i class=\"fa fa-ellipsis-v\"></i></a>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<ul id=\"dropdown-basic-1\" *dropdownMenu class=\"dropdown-menu animated fadeIn\" role=\"menu\" aria-labelledby=\"button-basic-1\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<li role=\"menuitem\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<a tooltip=\"{{'common.download' | translate}}\" class=\"dropdown-item btn btn-download btn-raised\" target=\"_blank\" download=\"{{file.file_name}}\" href=\"{{apiUrl}}/uploads/filebrowser/{{file.file_hash}}\"><i class=\"fa fa-download\"></i></a>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t</li>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<li role=\"menuitem\" *ngxPermissionsOnly=\"['filemanager_edit']\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<a tooltip=\"{{'common.edit' | translate}}\" (click)=\"opneFileEditModal(file)\" class=\"dropdown-item btn btn-edit btn-raised\"><i class=\"fa fa-pencil-square-o\"></i></a>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t</li>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<li role=\"menuitem\" *ngxPermissionsOnly=\"['filemanager_edit']\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<a tooltip=\"{{'common.delete' | translate}}\" (click)=\"deleteFile(file.id)\" class=\"dropdown-item btn btn-delete btn-raised\"><i class=\"fa fa-trash-o\"></i></a>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t</li>\n\t\t\t\t\t\t\t\t\t\t\t\t\t</ul>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"file-box\">\n\t\t\t\t\t\t\t\t\t\t\t\t<div class=\"files\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t<div *ngIf=\"file.icon\" class=\"icon docx\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<i [ngClass]=\"file.icon\"></i>\n\t\t\t\t\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<div *ngIf=\"file.isImageFile\" class=\"image\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<img alt=\"image\" class=\"img-fluid height-100\" src=\"{{ apiUrl }}/uploads/filebrowser/{{file.file_hash}}\" />\n\t\t\t\t\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<div class=\"file-name\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<a target=\"_blank\" tooltip=\"{{file.file_name}}\" download=\"{{file.file_name}}\" href=\"{{apiUrl}}/uploads/filebrowser/{{file.file_hash}}\"><h4>{{ (file.file_name.length>20)? (file.file_name | slice:0:20)+'..':(file.file_name) }}</h4></a>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<p>{{'file_browser.title7' | translate}}: {{ file.updated_at | dateTimeFormatFilter:loginUser.settings.date_time_format }}</p>\n\t\t\t\t\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"corner\"></span>\n\t\t\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"row\" *ngIf=\"isEmptyObject(folders) && isEmptyObject(files)\">\n\t\t\t\t\t\t\t\t\t<div class=\"col-sm-12 text-center\">\n\t\t\t\t\t\t\t\t\t\t<img src=\"assets/img/norecord-img.png\" width=\"50\">\n\t\t\t\t\t\t\t\t\t\t<p class=\"mt-1\">{{'common.empty_message.file_browser' | translate}}</p>\n\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</section>\n");
 
 /***/ }),
 
@@ -2523,9 +2523,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var ngx_bootstrap_modal__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ngx-bootstrap/modal */ "./node_modules/ngx-bootstrap/modal/fesm5/ngx-bootstrap-modal.js");
 /* harmony import */ var ng2_file_upload__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ng2-file-upload */ "./node_modules/ng2-file-upload/fesm5/ng2-file-upload.js");
 /* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! rxjs */ "./node_modules/rxjs/_esm5/index.js");
-/* harmony import */ var _core_services_authentication_service__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../../../core/services/authentication.service */ "./src/app/core/services/authentication.service.ts");
-/* harmony import */ var _core_services_file_browser_service__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../../../../core/services/file-browser.service */ "./src/app/core/services/file-browser.service.ts");
-/* harmony import */ var _environments_environment__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../../../../environments/environment */ "./src/environments/environment.ts");
+/* harmony import */ var _angular_common_http__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @angular/common/http */ "./node_modules/@angular/common/fesm5/http.js");
+/* harmony import */ var _core_services_authentication_service__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../../../../core/services/authentication.service */ "./src/app/core/services/authentication.service.ts");
+/* harmony import */ var _core_services_file_browser_service__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../../../core/services/file-browser.service */ "./src/app/core/services/file-browser.service.ts");
+/* harmony import */ var _environments_environment__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../../../../../environments/environment */ "./src/environments/environment.ts");
+
 
 
 
@@ -2537,13 +2539,14 @@ __webpack_require__.r(__webpack_exports__);
 
 
 var UploadFilesModelComponent = /** @class */ (function () {
-    function UploadFilesModelComponent(translate, bsCreateFileModalRef, toastr, fbService, authenticationService) {
+    function UploadFilesModelComponent(translate, bsCreateFileModalRef, toastr, http, fbService, authenticationService) {
         this.translate = translate;
         this.bsCreateFileModalRef = bsCreateFileModalRef;
         this.toastr = toastr;
+        this.http = http;
         this.fbService = fbService;
         this.authenticationService = authenticationService;
-        this.apiUrl = _environments_environment__WEBPACK_IMPORTED_MODULE_9__["environment"].apiUrl;
+        this.apiUrl = _environments_environment__WEBPACK_IMPORTED_MODULE_10__["environment"].apiUrl;
         this.attachmentsArr = [];
         this.loginToken = this.authenticationService.currentTokenValue;
     }
@@ -2552,7 +2555,7 @@ var UploadFilesModelComponent = /** @class */ (function () {
         this.uploader = new ng2_file_upload__WEBPACK_IMPORTED_MODULE_5__["FileUploader"]({
             url: this.apiUrl + '/api/files/upload',
             authToken: this.loginToken.token_type + ' ' + this.loginToken.token,
-            additionalParameter: { folder: this.current_folder },
+            additionalParameter: { folder: this.current_folder, action: this.action },
             method: 'post',
             removeAfterUpload: false,
             autoUpload: true,
@@ -2563,13 +2566,39 @@ var UploadFilesModelComponent = /** @class */ (function () {
         this.uploader.onBeforeUploadItem = function (item) {
             item.withCredentials = false;
         };
+        // this.uploader.onCompleteItem = (item: any, response: any, status: any, headers: any) => {
+        // 	let obj = JSON.parse(response);
+        // 	if(obj.success) {
+        // 		this.attachmentsArr.push(obj.id);
+        // 		this.toastr.success(this.translate.instant('file_browser.messages.upload_file'), this.translate.instant('file_browser.title'));
+        // 	}
+        // };
         this.uploader.onCompleteItem = function (item, response, status, headers) {
             var obj = JSON.parse(response);
             if (obj.success) {
                 _this.attachmentsArr.push(obj.id);
                 _this.toastr.success(_this.translate.instant('file_browser.messages.upload_file'), _this.translate.instant('file_browser.title'));
+                // 🔥 Nếu là payslip → export + download luôn
+                if (_this.action === 'payslip') {
+                    _this.downloadPayslipZip(obj.id);
+                }
             }
         };
+    };
+    UploadFilesModelComponent.prototype.downloadPayslipZip = function (fileId) {
+        var _this = this;
+        this.http.get(this.apiUrl + ("/api/salary/export-docx/" + fileId), { responseType: 'blob' }).subscribe(function (blob) {
+            var url = window.URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = 'PHIEU_LUONG.zip';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }, function (err) {
+            _this.toastr.error('Không thể xuất phiếu lương');
+        });
     };
     UploadFilesModelComponent.prototype.fileOverBase = function (e) {
         this.hasBaseDropZoneOver = e;
@@ -2595,8 +2624,9 @@ var UploadFilesModelComponent = /** @class */ (function () {
         { type: _ngx_translate_core__WEBPACK_IMPORTED_MODULE_2__["TranslateService"] },
         { type: ngx_bootstrap_modal__WEBPACK_IMPORTED_MODULE_4__["BsModalRef"] },
         { type: ngx_toastr__WEBPACK_IMPORTED_MODULE_3__["ToastrService"] },
-        { type: _core_services_file_browser_service__WEBPACK_IMPORTED_MODULE_8__["FileBrowserService"] },
-        { type: _core_services_authentication_service__WEBPACK_IMPORTED_MODULE_7__["AuthenticationService"] }
+        { type: _angular_common_http__WEBPACK_IMPORTED_MODULE_7__["HttpClient"] },
+        { type: _core_services_file_browser_service__WEBPACK_IMPORTED_MODULE_9__["FileBrowserService"] },
+        { type: _core_services_authentication_service__WEBPACK_IMPORTED_MODULE_8__["AuthenticationService"] }
     ]; };
     UploadFilesModelComponent = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Component"])({
@@ -2607,8 +2637,9 @@ var UploadFilesModelComponent = /** @class */ (function () {
         tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [_ngx_translate_core__WEBPACK_IMPORTED_MODULE_2__["TranslateService"],
             ngx_bootstrap_modal__WEBPACK_IMPORTED_MODULE_4__["BsModalRef"],
             ngx_toastr__WEBPACK_IMPORTED_MODULE_3__["ToastrService"],
-            _core_services_file_browser_service__WEBPACK_IMPORTED_MODULE_8__["FileBrowserService"],
-            _core_services_authentication_service__WEBPACK_IMPORTED_MODULE_7__["AuthenticationService"]])
+            _angular_common_http__WEBPACK_IMPORTED_MODULE_7__["HttpClient"],
+            _core_services_file_browser_service__WEBPACK_IMPORTED_MODULE_9__["FileBrowserService"],
+            _core_services_authentication_service__WEBPACK_IMPORTED_MODULE_8__["AuthenticationService"]])
     ], UploadFilesModelComponent);
     return UploadFilesModelComponent;
 }());
@@ -2771,7 +2802,7 @@ var FileBrowserComponent = /** @class */ (function () {
             _this.getFileFolders(_this.current_folder);
         });
     };
-    FileBrowserComponent.prototype.uploadFileModal = function () {
+    FileBrowserComponent.prototype.uploadFileModal = function (action) {
         var _this = this;
         var modalConfig = {
             animated: true,
@@ -2780,6 +2811,7 @@ var FileBrowserComponent = /** @class */ (function () {
             ignoreBackdropClick: false,
             class: "inmodal modal-dialog-centered modal-md animated fadeIn",
             initialState: {
+                action: action,
                 current_folder: this.current_folder
             }
         };
