@@ -57,7 +57,6 @@ class Leave extends Model
         'total',
         'approved1',
         'add_salary',
-        'cd',
         'approved2',
         'status',
     ];

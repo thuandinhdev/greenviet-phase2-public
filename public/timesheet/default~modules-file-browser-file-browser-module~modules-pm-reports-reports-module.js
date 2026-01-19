@@ -2523,11 +2523,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var ngx_bootstrap_modal__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ngx-bootstrap/modal */ "./node_modules/ngx-bootstrap/modal/fesm5/ngx-bootstrap-modal.js");
 /* harmony import */ var ng2_file_upload__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ng2-file-upload */ "./node_modules/ng2-file-upload/fesm5/ng2-file-upload.js");
 /* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! rxjs */ "./node_modules/rxjs/_esm5/index.js");
-/* harmony import */ var _angular_common_http__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @angular/common/http */ "./node_modules/@angular/common/fesm5/http.js");
-/* harmony import */ var _core_services_authentication_service__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../../../../core/services/authentication.service */ "./src/app/core/services/authentication.service.ts");
-/* harmony import */ var _core_services_file_browser_service__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../../../core/services/file-browser.service */ "./src/app/core/services/file-browser.service.ts");
-/* harmony import */ var _environments_environment__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../../../../../environments/environment */ "./src/environments/environment.ts");
-
+/* harmony import */ var _core_services_authentication_service__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../../../core/services/authentication.service */ "./src/app/core/services/authentication.service.ts");
+/* harmony import */ var _core_services_file_browser_service__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../../../../core/services/file-browser.service */ "./src/app/core/services/file-browser.service.ts");
+/* harmony import */ var _environments_environment__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../../../../environments/environment */ "./src/environments/environment.ts");
 
 
 
@@ -2539,14 +2537,13 @@ __webpack_require__.r(__webpack_exports__);
 
 
 var UploadFilesModelComponent = /** @class */ (function () {
-    function UploadFilesModelComponent(translate, bsCreateFileModalRef, toastr, http, fbService, authenticationService) {
+    function UploadFilesModelComponent(translate, bsCreateFileModalRef, toastr, fbService, authenticationService) {
         this.translate = translate;
         this.bsCreateFileModalRef = bsCreateFileModalRef;
         this.toastr = toastr;
-        this.http = http;
         this.fbService = fbService;
         this.authenticationService = authenticationService;
-        this.apiUrl = _environments_environment__WEBPACK_IMPORTED_MODULE_10__["environment"].apiUrl;
+        this.apiUrl = _environments_environment__WEBPACK_IMPORTED_MODULE_9__["environment"].apiUrl;
         this.attachmentsArr = [];
         this.loginToken = this.authenticationService.currentTokenValue;
     }
@@ -2571,40 +2568,8 @@ var UploadFilesModelComponent = /** @class */ (function () {
             if (obj.success) {
                 _this.attachmentsArr.push(obj.id);
                 _this.toastr.success(_this.translate.instant('file_browser.messages.upload_file'), _this.translate.instant('file_browser.title'));
-                // 🔥 Nếu là payslip → export + download luôn
-                if (_this.action === 'payslip') {
-                    _this.downloadPayslipZip(obj.id);
-                }
             }
         };
-    };
-    UploadFilesModelComponent.prototype.downloadPayslipZip = function (fileId) {
-        var _this = this;
-        var headers = {
-            Authorization: this.loginToken.token_type + ' ' + this.loginToken.token
-        };
-        this.http.get(this.apiUrl + ("/api/salary/export-docx/" + fileId), {
-            headers: headers,
-            responseType: 'blob',
-            observe: 'response'
-        }).subscribe(function (res) {
-            if (!res.body || res.body.size === 0) {
-                console.error('ZIP response empty');
-                return;
-            }
-            var blob = new Blob([res.body], { type: 'application/zip' });
-            var url = window.URL.createObjectURL(blob);
-            var a = document.createElement('a');
-            a.href = url;
-            a.download = 'PHIEU_LUONG.zip';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            window.URL.revokeObjectURL(url);
-        }, function (err) {
-            console.error(err);
-            _this.toastr.error('Không thể tải file phiếu lương');
-        });
     };
     UploadFilesModelComponent.prototype.fileOverBase = function (e) {
         this.hasBaseDropZoneOver = e;
@@ -2630,9 +2595,8 @@ var UploadFilesModelComponent = /** @class */ (function () {
         { type: _ngx_translate_core__WEBPACK_IMPORTED_MODULE_2__["TranslateService"] },
         { type: ngx_bootstrap_modal__WEBPACK_IMPORTED_MODULE_4__["BsModalRef"] },
         { type: ngx_toastr__WEBPACK_IMPORTED_MODULE_3__["ToastrService"] },
-        { type: _angular_common_http__WEBPACK_IMPORTED_MODULE_7__["HttpClient"] },
-        { type: _core_services_file_browser_service__WEBPACK_IMPORTED_MODULE_9__["FileBrowserService"] },
-        { type: _core_services_authentication_service__WEBPACK_IMPORTED_MODULE_8__["AuthenticationService"] }
+        { type: _core_services_file_browser_service__WEBPACK_IMPORTED_MODULE_8__["FileBrowserService"] },
+        { type: _core_services_authentication_service__WEBPACK_IMPORTED_MODULE_7__["AuthenticationService"] }
     ]; };
     UploadFilesModelComponent = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Component"])({
@@ -2643,9 +2607,8 @@ var UploadFilesModelComponent = /** @class */ (function () {
         tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [_ngx_translate_core__WEBPACK_IMPORTED_MODULE_2__["TranslateService"],
             ngx_bootstrap_modal__WEBPACK_IMPORTED_MODULE_4__["BsModalRef"],
             ngx_toastr__WEBPACK_IMPORTED_MODULE_3__["ToastrService"],
-            _angular_common_http__WEBPACK_IMPORTED_MODULE_7__["HttpClient"],
-            _core_services_file_browser_service__WEBPACK_IMPORTED_MODULE_9__["FileBrowserService"],
-            _core_services_authentication_service__WEBPACK_IMPORTED_MODULE_8__["AuthenticationService"]])
+            _core_services_file_browser_service__WEBPACK_IMPORTED_MODULE_8__["FileBrowserService"],
+            _core_services_authentication_service__WEBPACK_IMPORTED_MODULE_7__["AuthenticationService"]])
     ], UploadFilesModelComponent);
     return UploadFilesModelComponent;
 }());

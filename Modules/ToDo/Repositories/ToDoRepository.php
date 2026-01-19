@@ -262,18 +262,24 @@ class ToDoRepository
                 $q->whereIn('module_related_id', $ids);
             });
         if(isset($input['filterKey'])){
-            if(isset($input['rangerMonth'])){
-                $startOfMonth = Carbon::createFromFormat('Y-m', $input['rangerMonth']['start'])->startOfMonth();
-                $endOfMonth   = Carbon::createFromFormat('Y-m', $input['rangerMonth']['end'])->endOfMonth();
+            if($input['filterKey'] == 'year'){
+                $startOfMonth = Carbon::createFromFormat('Y-m', $input['year'].'-01')->startOfMonth();
+                $endOfMonth   = Carbon::createFromFormat('Y-m', $input['year'].'-12')->endOfMonth();
             } else {
-                if(isset($input['selectedRange'])){
-                    $startOfMonth = Carbon::createFromFormat('Y-m-d', $input['selectedRange']['start']);
-                    $endOfMonth   = Carbon::createFromFormat('Y-m-d', $input['selectedRange']['end']);
+                if(isset($input['rangerMonth'])){
+                    $startOfMonth = Carbon::createFromFormat('Y-m', $input['rangerMonth']['start'])->startOfMonth();
+                    $endOfMonth   = Carbon::createFromFormat('Y-m', $input['rangerMonth']['end'])->endOfMonth();
                 } else {
-                    $startOfMonth = Carbon::createFromFormat('Y-m', $input['month'])->startOfMonth();
-                    $endOfMonth   = Carbon::createFromFormat('Y-m', $input['month'])->endOfMonth();
+                    if(isset($input['selectedRange'])){
+                        $startOfMonth = Carbon::createFromFormat('Y-m-d', $input['selectedRange']['start']);
+                        $endOfMonth   = Carbon::createFromFormat('Y-m-d', $input['selectedRange']['end']);
+                    } else {
+                        $startOfMonth = Carbon::createFromFormat('Y-m', $input['month'])->startOfMonth();
+                        $endOfMonth   = Carbon::createFromFormat('Y-m', $input['month'])->endOfMonth();
+                    }
                 }
             }
+            
             switch ($input['filterKey']) {
                 case 'success':
                     $open_todos->whereNotNull($todo_table . '.payment_date');

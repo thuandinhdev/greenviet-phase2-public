@@ -416,7 +416,6 @@ class LeaveRepository
         }
         $remainingLeave = $this->commonHelper->getRemainingLeaveDays($input['user_id']);
         $input['add_salary'] = $input['add_salary'] ? 1 : 0;
-        $input['cd'] = $input['cd'] ? 1 : 0;
         if ($input['duration'] == 'multiple') {
             if($remainingLeave < count($input['multi_date']) && $input['leave_type_id'] == 1){
                 return ['status'=>false, 'msg'=>'No more leave to use'];
@@ -541,7 +540,6 @@ class LeaveRepository
             $input['status'] = 1;
         }
         $input['add_salary'] = $input['add_salary'] ? 1 : 0;
-        $input['cd'] = $input['cd'] ? 1 : 0;
         if ($leave->fill($input)->save()) {
 
             // Delete attachment
