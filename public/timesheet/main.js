@@ -10146,7 +10146,7 @@ var environment;
 environment = {
     production: false,
     // apiUrl: 'http://localhost:8888/greenviet-phase2/laravel/public'
-    apiUrl: 'https://greenviet.cuortech.com'
+    apiUrl: 'https://greenvietdev.cuortech.com'
     // apiUrl: 'https://greenviet.azurewebsites.net'
     // apiUrl: 'http://chetsapp.de:8899'
 };
