@@ -1732,7 +1732,7 @@ class DefectRepository
                 $value = $this->getTimesheetByDay($item, $dayIndex, $input['month'], $input['holidays'], $input['leaves'], 'day');
                 $dateWoking = date('N', strtotime($input['month'].'-'.$dayIndex+1));
                 if($input['month']<=date('Y-m')){
-                    if($dayIndex > 19 && $value == ''){
+                    if($dayIndex > 23 && $value == ''){
                         $timesheets_draft = DB::table('gv_timesheets_draft')->where('start_time', '=', date('y-m-d H:i:s', strtotime($input['month']."-".$dayIndex+1)))->where('created_user_id', $item['id'])->sum('decimal_time');
                         if($timesheets_draft == 0){
                             $timesheets_draft = DB::table('gv_timesheets')->where('start_time', '=', date('y-m-d H:i:s', strtotime($input['month']."-".$dayIndex+1)))->where('created_user_id', $item['id'])->sum('decimal_time');

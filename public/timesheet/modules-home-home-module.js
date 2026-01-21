@@ -38386,7 +38386,7 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = ("<div class=\"card card-height-chart\">\n\t<div class=\"card-header\">\n\t\t<h4 class=\"card-title\">Payment 2025</h4>\n\t</div>\n\t<div class=\"card-body\">\n\t\t<div class=\"card-block\">\n\t\t\t<div id=\"bar-bar1\" class=\"height-500\">\n\t\t\t\t<canvas baseChart\n\t\t\t\t*ngIf=\"barChartData?.length\"\n\t\t\t\t\tclass=\"chart\"\n\t\t\t\t\t[datasets]=\"barChartData\"\n\t\t\t\t\t[labels]=\"barChartLabels\"\n\t\t\t\t\t[options]=\"barChartOptions\"\n\t\t\t\t\t[colors]=\"barChartColors\"\n\t\t\t\t\t[legend]=\"barChartLegend\"\n\t\t\t\t\t[chartType]=\"barChartType\">\n\t\t\t\t</canvas>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</div>");
+/* harmony default export */ __webpack_exports__["default"] = ("<div class=\"card card-height-chart\">\n\t<div class=\"card-header\">\n\t\t<h4 class=\"card-title\">Payment</h4>\n\t</div>\n\t<div class=\"card-body\">\n\t\t<div class=\"card-block\">\n\t\t\t<div id=\"bar-bar1\" class=\"height-500\">\n\t\t\t\t<canvas baseChart\n\t\t\t\t*ngIf=\"barChartData?.length\"\n\t\t\t\t\tclass=\"chart\"\n\t\t\t\t\t[datasets]=\"barChartData\"\n\t\t\t\t\t[labels]=\"barChartLabels\"\n\t\t\t\t\t[options]=\"barChartOptions\"\n\t\t\t\t\t[colors]=\"barChartColors\"\n\t\t\t\t\t[legend]=\"barChartLegend\"\n\t\t\t\t\t[chartType]=\"barChartType\">\n\t\t\t\t</canvas>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</div>");
 
 /***/ }),
 
@@ -38677,9 +38677,13 @@ var PmDashboardChart2Component = /** @class */ (function () {
         this.defects = [];
         this.incidents = [];
         this.barChartData = [];
-        this.estimated = Array(12).fill(0);
-        this.invoiced = Array(12).fill(0);
-        this.paid = Array(12).fill(0);
+        // estimated = Array(12).fill(0);
+        // invoiced  = Array(12).fill(0);
+        // paid      = Array(12).fill(0);
+        this.monthKeys = [];
+        this.estimated = [];
+        this.invoiced = [];
+        this.paid = [];
         // barChartOptions: any = {
         // 	scaleShowVerticalLines: false,
         // 	responsive: true,
@@ -38727,30 +38731,63 @@ var PmDashboardChart2Component = /** @class */ (function () {
         this.barChartLabels = this.translate.instant('months');
     }
     PmDashboardChart2Component.prototype.ngOnInit = function () {
+        var _this = this;
+        this.monthKeys = this.generateMonthRange('2025-01', '2026-01');
+        this.barChartLabels = this.monthKeys.map(function (m) {
+            return _this.datePipe.transform(m + '-01', 'MM/yyyy');
+        });
+        this.estimated = Array(this.monthKeys.length).fill(0);
+        this.invoiced = Array(this.monthKeys.length).fill(0);
+        this.paid = Array(this.monthKeys.length).fill(0);
         this.renderChart();
     };
     PmDashboardChart2Component.prototype.renderChart = function () {
         var _this = this;
         this.http.post(this.apiUrl + '/api/todos/list-report', { year: this.datePipe.transform(this.currentDate, 'yyyy'), month: '2026-01', project: [], module_id: '', 'filterKey': 'year', selectedRange: { start: "2026-01", end: "2026-12" }, rangerMonth: { start: "2026-01-01", end: "2026-01-31" } }, {}).subscribe(function (resp) {
             _this.payments = resp.data;
+            // this.payments.forEach(p => {
+            // 	const price = Number(p.price || 0);
+            // 	// PAID
+            // 	if (p.payment_date) {
+            // 	  const m = this.getMonthIndex(p.payment_date);
+            // 	  this.paid[m] += price;
+            // 	  return;
+            // 	}
+            // 	// INVOICED
+            // 	if (p.invoice_date) {
+            // 	  const m = this.getMonthIndex(p.invoice_date);
+            // 	  this.invoiced[m] += price;
+            // 	  return;
+            // 	}
+            // 	// ESTIMATED
+            // 	if (p.estimated_date) {
+            // 	  const m = this.getMonthIndex(p.estimated_date);
+            // 	  this.estimated[m] += price;
+            // 	}
+            //   });
             _this.payments.forEach(function (p) {
                 var price = Number(p.price || 0);
-                // PAID
+                var index = -1;
+                // 1. PAID
                 if (p.payment_date) {
-                    var m = _this.getMonthIndex(p.payment_date);
-                    _this.paid[m] += price;
-                    return;
+                    index = _this.getMonthIndexByRange(p.payment_date);
+                    if (index !== -1) {
+                        _this.paid[index] += price;
+                    }
                 }
-                // INVOICED
+                // 2. INVOICED (chưa paid)
                 if (p.invoice_date) {
-                    var m = _this.getMonthIndex(p.invoice_date);
-                    _this.invoiced[m] += price;
-                    return;
+                    index = _this.getMonthIndexByRange(p.invoice_date);
+                    if (index !== -1) {
+                        _this.invoiced[index] += price;
+                    }
                 }
-                // ESTIMATED
+                // 3. ESTIMATED (chưa invoice & chưa paid)
                 if (p.estimated_date) {
-                    var m = _this.getMonthIndex(p.estimated_date);
-                    _this.estimated[m] += price;
+                    index = _this.getMonthIndexByRange(p.estimated_date);
+                    if (index !== -1) {
+                        _this.estimated[index] += price;
+                    }
                 }
             });
             _this.barChartData = [
@@ -38762,6 +38799,22 @@ var PmDashboardChart2Component = /** @class */ (function () {
     };
     PmDashboardChart2Component.prototype.getMonthIndex = function (date) {
         return new Date(date).getMonth(); // Jan = 0
+    };
+    PmDashboardChart2Component.prototype.generateMonthRange = function (start, end) {
+        var result = [];
+        var current = new Date(start + '-01');
+        var endDate = new Date(end + '-01');
+        while (current <= endDate) {
+            var y = current.getFullYear();
+            var m = (current.getMonth() + 1).toString().padStart(2, '0');
+            result.push(y + "-" + m);
+            current.setMonth(current.getMonth() + 1);
+        }
+        return result;
+    };
+    PmDashboardChart2Component.prototype.getMonthIndexByRange = function (date) {
+        var key = this.datePipe.transform(date, 'yyyy-MM');
+        return this.monthKeys.indexOf(key);
     };
     PmDashboardChart2Component.ctorParameters = function () { return [
         { type: _ngx_translate_core__WEBPACK_IMPORTED_MODULE_2__["TranslateService"] },
