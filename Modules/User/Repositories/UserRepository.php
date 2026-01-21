@@ -574,13 +574,7 @@ class UserRepository
 
             $totalFiltered = $userLists->count();
         }
-        
-        $active = (clone $userLists)->where('is_active', 1)->count();
-        $deactive = (clone $userLists)->where('is_active', 0)->count();
-        $statusfilterId = $request->input('statusfilterId');
-        if ($statusfilterId !== null && $statusfilterId !== '' && $statusfilterId !== 'all') {
-            $userLists->where('is_active', (int) $statusfilterId);
-        }
+
         $userLists = $userLists->offset($start)
             ->limit($limit)
             ->orderBy($order, $dir === 'desc' ? 'desc' : 'asc')
@@ -593,7 +587,6 @@ class UserRepository
             "draw" => intval($request->input('draw')),
             "recordsTotal" => intval($totalData),
             "recordsFiltered" => intval($totalFiltered),
-            "other"=>['active'=>$active, 'deactive'=>$deactive],
             "data" => $userLists,
         );
 

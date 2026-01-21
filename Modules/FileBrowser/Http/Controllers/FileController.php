@@ -9,6 +9,10 @@ use Modules\FileBrowser\Entities\File;
 use Modules\FileBrowser\Http\Requests\EditFileRequest;
 use Modules\FileBrowser\Repositories\FileRepository;
 use Modules\Helper\Helpers\AdminHelper;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpWord\TemplateProcessor;
+use ZipArchive;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * Class FileController
@@ -124,9 +128,6 @@ class FileController extends Controller
 
         if ($request->hasFile('file')) {
             $action = $request->get('action');
-            if($action == 'payslip'){
-
-            } else {
                 $user_id = \Auth::id();
                 // --
                 // Image file
@@ -156,6 +157,9 @@ class FileController extends Controller
                 $file->file_hash = $path;
                 $file->save();
 
+            if($action == 'payslip'){
+                return $this->exportSalaryDocx($file->id);
+            } else {
                 return response()->json(
                     [
                     'success' => 'File has been uploaded.',
@@ -166,6 +170,83 @@ class FileController extends Controller
         } else {
             return response()->json(['error' => 'Error while creating.'], 400);
         }
+    }
+    public function exportSalaryDocx($fileId)
+    {
+        $file = File::findOrFail($fileId);
+
+        $excelPath    = public_path('/uploads/filebrowser/' . $file->file_hash);
+        $templatePath = storage_path('app/templates/MAU_PHIEU_LUONG.docx');
+
+        $tmpDocxDir = storage_path('framework/cache/payslip_docx');
+        if (!is_dir($tmpDocxDir)) {
+            mkdir($tmpDocxDir, 0777, true);
+        }
+
+        // Load Excel TRƯỚC
+        $sheet = IOFactory::load($excelPath)->getActiveSheet();
+        $startRow = 12;
+        $lastRow  = $sheet->getHighestRow();
+
+        $zipName = 'PHIEU_LUONG_' . date('Ym_His') . '.zip';
+
+        return response()->streamDownload(function () use (
+            $sheet,
+            $startRow,
+            $lastRow,
+            $templatePath,
+            $tmpDocxDir
+        ) {
+            // clear buffer
+            while (ob_get_level() > 0) {
+                ob_end_clean();
+            }
+
+            $zipPath = storage_path('framework/cache/payslip_' . uniqid() . '.zip');
+
+            $zip = new ZipArchive();
+            $zip->open($zipPath, ZipArchive::CREATE);
+
+            for ($row = $startRow; $row <= $lastRow; $row++) {
+
+                $hoTen = trim($sheet->getCell("C$row")->getValue());
+                if ($hoTen === '') break;
+
+                $template = new TemplateProcessor($templatePath);
+
+                $template->setValue('HO_TEN', $hoTen);
+                $template->setValue('CHUC_VU', $sheet->getCell("D$row")->getValue());
+                $template->setValue('LUONG_CB', number_format($sheet->getCell("F$row")->getValue()));
+                $template->setValue('HIEU_QUA', number_format($sheet->getCell("G$row")->getValue()));
+                $template->setValue('TONG_LUONG', number_format($sheet->getCell("H$row")->getValue()));
+                $template->setValue('NGAY_CONG', $sheet->getCell("I$row")->getValue());
+                $template->setValue('LUONG_LV', number_format($sheet->getCell("J$row")->getValue()));
+                $template->setValue('PHU_CAP_AN', number_format($sheet->getCell("P$row")->getValue()));
+                $template->setValue('PHU_CAP_DT', number_format($sheet->getCell("Q$row")->getValue()));
+                $template->setValue('PHU_CAP_CT', number_format($sheet->getCell("R$row")->getValue()));
+                $template->setValue('TONG_THU_NHAP', number_format($sheet->getCell("S$row")->getValue()));
+
+                $safeName = preg_replace('/[^a-zA-Z0-9_\-]/u', '_', $hoTen);
+                $docxPath = $tmpDocxDir . '/PHIEU_LUONG_' . $safeName . '.docx';
+
+                $template->saveAs($docxPath);
+                $zip->addFile($docxPath, basename($docxPath));
+            }
+
+            $zip->close();
+
+            // ⚠️ KHÔNG fopen – CHỈ readfile
+            readfile($zipPath);
+
+            // cleanup
+            @unlink($zipPath);
+            foreach (glob($tmpDocxDir . '/*.docx') as $f) {
+                @unlink($f);
+            }
+
+        }, $zipName, [
+            'Content-Type' => 'application/zip',
+        ]);
     }
 
     /**

@@ -65,7 +65,7 @@ class TaskRepository
      *
      * @return Array
      */
-    
+
     public function getAllTaskReport($request)
     {
         $task_table = config('core.acl.task_table');
@@ -83,7 +83,8 @@ class TaskRepository
             $listTaskID = DB::table('gv_timesheets')->where('created_user_id', $request->get('user_id'))->where('module_id', 2)->where('status', 2)->when(!empty($ids), function ($q) use ($ids) {
                 $q->whereIn('project_id', $ids);
             })->whereBetween('start_time', [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')])->groupBy('module_related_id')->pluck('module_related_id');
-            
+            $start = $startOfMonth->format('Y-m-d');
+            $end   = $endOfMonth->format('Y-m-d');
             $task = Task::leftjoin($user_table, $user_table . '.id', '=', $task_table . '.assign_to')
                 ->leftjoin($project_table, $project_table.'.id', '=', $task_table . '.project_id')
                 ->whereIn($task_table . '.id', $listTaskID)
@@ -95,17 +96,19 @@ class TaskRepository
                     $user_table . '.avatar as assign_avatar'
                 )->orderBy('project_name')->get();
             foreach ($task as $value) {
-                $value->timesheet = DB::table('gv_timesheets')
+                $timesheetQuery =  DB::table('gv_timesheets')
                 ->where('created_user_id', $request->get('user_id'))
                 ->where('module_id', 2)
                 ->where('status', 2)
                 ->whereBetween('start_time', [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')])
                 ->when(!empty($ids), function ($q) use ($ids) {
                     $q->whereIn('project_id', $ids);
-                })
-                ->where('module_related_id', $value->id)
-                ->selectRaw('SUM(decimal_time) as total_time, SUM(cost) as total_cost')
+                })->where('module_related_id', $value->id);
+                $timesheetQueryDetail = clone $timesheetQuery;
+
+                $value->timesheet = $timesheetQuery->selectRaw('SUM(decimal_time) as total_time, SUM(cost) as total_cost')
                 ->first();
+                $value->timesheet_detail = $timesheetQueryDetail->select('start_time as date', 'decimal_time as time', 'cost')->orderBy('start_time', 'desc')->get();
             }
         } else {
             $listTaskID = DB::table('gv_timesheets')->where('created_user_id', $request->get('user_id'))->where('module_id', 2)->where('status', 2)->groupBy('module_related_id')->pluck('module_related_id');
@@ -117,16 +120,36 @@ class TaskRepository
                     $project_table.'.project_name',
                     $user_table . '.firstname as assign_firstname',
                     $user_table . '.lastname as assign_lastname',
-                    $user_table . '.avatar as assign_avatar'
+                    $user_table . '.avatar as assign_avatar',
+                    DB::raw('(SELECT JSON_ARRAYAGG(JSON_OBJECT(
+                        "time", gv_timesheets.decimal_time,
+                        "cost", gv_timesheets.cost,
+                        "date", DATE_FORMAT(gv_timesheets.start_time, "%Y-%m-%d")
+                    ))
+                    FROM gv_timesheets
+                    WHERE gv_timesheets.module_related_id = gv_tasks.id
+                   ) as timesheet_detail')
                 )->orderBy('project_name')->get();
+            // foreach ($task as $value) {
+            //     $value->timesheet = DB::table('gv_timesheets')
+            //     ->where('created_user_id', $request->get('user_id'))
+            //     ->where('module_id', 2)
+            //     ->where('status', 2)
+            //     ->where('module_related_id', $value->id)
+            //     ->selectRaw('SUM(decimal_time) as total_time, SUM(cost) as total_cost')
+            //     ->first();
+            // }
             foreach ($task as $value) {
-                $value->timesheet = DB::table('gv_timesheets')
+                $timesheetQuery =  DB::table('gv_timesheets')
                 ->where('created_user_id', $request->get('user_id'))
                 ->where('module_id', 2)
                 ->where('status', 2)
-                ->where('module_related_id', $value->id)
-                ->selectRaw('SUM(decimal_time) as total_time, SUM(cost) as total_cost')
+                ->where('module_related_id', $value->id);
+                $timesheetQueryDetail = clone $timesheetQuery;
+
+                $value->timesheet = $timesheetQuery->selectRaw('SUM(decimal_time) as total_time, SUM(cost) as total_cost')
                 ->first();
+                $value->timesheet_detail = $timesheetQueryDetail->select('start_time as date', 'decimal_time as time', 'cost')->orderBy('start_time', 'desc')->get();
             }
         }
         return ['data'=>$task];
@@ -139,8 +162,8 @@ class TaskRepository
         $user = Auth::user();
 
         $columns = array(
-            0 => $task_table . '.name',
-            1 => $project_table . '.project_name',
+            0 => $project_table . '.project_name',
+            1 => $task_table . '.name',
             2 => $task_table . '.task_start_date',
             3 => $task_table . '.task_end_date',
             4 => $task_table . '.actual_hours',
@@ -158,8 +181,8 @@ class TaskRepository
             $statusCount = [];
 
             $columns = array(
-                0 => $task_table . '.name',
-                1 => $project_table . '.project_name',
+                0 => $project_table . '.project_name',
+                1 => $task_table . '.name',
                 2 => $task_table . '.task_start_date',
                 3 => $task_table . '.task_end_date',
                 4 => $task_table . '.progress',

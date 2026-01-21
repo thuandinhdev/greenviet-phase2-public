@@ -5,6 +5,7 @@ use Auth;
 use Modules\ToDo\Entities\ToDo;
 use Modules\User\Entities\User\User;
 use Carbon\Carbon;
+use DB;
 
 /**
  * Class ToDoRepository
@@ -217,7 +218,6 @@ class ToDoRepository
             ]
         );
     }
-
     public function listReport($request)
     {
         $input = $request->all();
@@ -231,6 +231,11 @@ class ToDoRepository
             $ids = array_column($input['project'], 'id');
         } else {
             $ids = [];
+        }
+        if(isset($input['leader']) && $input['leader']){
+            $leaderids = array_column($input['leader'], 'id');
+        } else {
+            $leaderids = [];
         }
         $user = Auth::user();
         $open_todos = $user->toDo()
@@ -260,6 +265,8 @@ class ToDoRepository
             // ->leftjoin($incidents_table, $incidents_table . '.id', '=', $todo_table . '.module_related_id')
             ->whereIn($todo_table . '.status', [1,2])->when(!empty($ids), function ($q) use ($ids) {
                 $q->whereIn('module_related_id', $ids);
+            })->when(!empty($leaderids), function ($q) use ($leaderids) {
+                $q->whereIn('gv_projects.assign_to', $leaderids);
             });
         if(isset($input['filterKey'])){
             if($input['filterKey'] == 'year'){
@@ -339,10 +346,28 @@ class ToDoRepository
                     break;
             }
         }
+        $leader = DB::table('gv_projects')
+        ->join('gv_users', 'gv_users.id', '=', 'gv_projects.assign_to')
+        ->select(
+            'gv_users.id',
+            'gv_users.firstname',
+            'gv_users.lastname',
+            'gv_users.username',
+            'gv_users.email'
+        )
+        ->groupBy(
+            'gv_users.id',
+            'gv_users.firstname',
+            'gv_users.lastname',
+            'gv_users.username',
+            'gv_users.email'
+        )
+        ->get();
 
         return collect(
             [
             'data' => $open_todos->get(),
+            'leader' => $leader
             ]
         );
     }

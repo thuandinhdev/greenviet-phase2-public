@@ -39408,9 +39408,6 @@ var HomeComponent = /** @class */ (function () {
             _this.userLists = data;
         });
     };
-    // this.http.post<DatatablesResponse>(this.apiUrl + '/api/todos/list-report', { month: this.month, project: this.project, module_id: 'all', 'filterKey': this.FilterKey, selectedRange: { start: this.datePipe.transform(this.selectedRange[0], 'yyyy-MM-dd'), end: this.datePipe.transform(this.selectedRange[1], 'yyyy-MM-dd') }, rangerMonth: { start: this.selectedRangeStart, end: this.selectedRangeEnd } }, {}).subscribe(resp => {
-    // 	this.payments = resp.data;
-    // });
     HomeComponent.prototype.getDashboardCounts = function (length) {
         var _this = this;
         this.dashboardService.getDashboardCounts(length)

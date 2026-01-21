@@ -171,11 +171,11 @@ class ProjectRepository
                     "estimated_date", DATE_FORMAT(gv_todos.estimated_date, "%Y-%m-%d"),
                     "invoice_date", DATE_FORMAT(gv_todos.invoice_date, "%Y-%m-%d")
                 ))
-                FROM gv_todos 
+                FROM gv_todos
                 WHERE gv_todos.module_related_id = gv_projects.id
                ) as payments')
             )
-            
+
             ->leftjoin($user_table, $user_table . '.id', '=', $project_table . '.client_id')
             ->leftjoin($user_table . ' as project_created', 'project_created.id', '=', $project_table . '.user_id')
             ->leftjoin($team_table, $team_table . '.id', '=', $project_table . '.assign_to');
@@ -1293,6 +1293,11 @@ class ProjectRepository
         $order = $columns[$request->input('order.0.column')];
         $dir = $request->input('order.0.dir');
         $columns_search = $request->input('columns');
+        if(isset($input['leader']) && $input['leader']){
+            $leaderids = array_column($input['leader'], 'id');
+        } else {
+            $leaderids = [];
+        }
 
         // $projects = $user->projects()->with(
         //     [
@@ -1314,17 +1319,81 @@ class ProjectRepository
                 DB::raw('(SELECT JSON_ARRAYAGG(JSON_OBJECT(
                     "id", gv_todos.id,
                     "description", gv_todos.description,
-                    "due_date", gv_todos.due_date,
+                    "due_date", DATE_FORMAT(gv_todos.due_date, "%Y-%m-%d"),
                     "status", gv_todos.status,
                     "price", gv_todos.price,
-                    "payment_date", gv_todos.payment_date
+                    "payment_date", DATE_FORMAT(gv_todos.payment_date, "%Y-%m-%d"),
+                    "cash_flow", gv_todos.cash_flow,
+                    "estimated_date", DATE_FORMAT(gv_todos.estimated_date, "%Y-%m-%d"),
+                    "invoice_date", DATE_FORMAT(gv_todos.invoice_date, "%Y-%m-%d")
                 ))
-                FROM gv_todos 
+                FROM gv_todos
                 WHERE gv_todos.module_related_id = gv_projects.id
                ) as payments')
+                // DB::raw('(
+                //     SELECT JSON_ARRAYAGG(
+                //         JSON_OBJECT(
+                //             "id", ts.id,
+                //             "username", u.username,
+                //             "note", ts.note,
+                //             "start_time", ts.start_time,
+                //             "cost", ts.cost,
+                //             "decimal_time", ts.decimal_time
+                //         )
+                //         ORDER BY ts.start_time DESC
+                //     )
+                //     FROM gv_timesheets ts
+                //     LEFT JOIN gv_users u ON u.id = ts.created_user_id
+                //     WHERE ts.project_id = gv_projects.id
+                // ) as payments')
+            //     DB::raw('(SELECT JSON_ARRAYAGG(JSON_OBJECT(
+            //         "id", gv_todos.id,
+            //         "description", gv_todos.description,
+            //         "due_date", gv_todos.due_date,
+            //         "status", gv_todos.status,
+            //         "price", gv_todos.price,
+            //         "payment_date", gv_todos.payment_date
+            //     ))
+            //     FROM gv_todos
+            //     WHERE gv_todos.module_related_id = gv_projects.id
+            //    ) as payments')
+                // DB::raw('(
+                //     SELECT GROUP_CONCAT(
+                //         CONCAT_WS("::",
+                //             ts.id,
+                //             u.username,
+                //             ts.note,
+                //             ts.start_time,
+                //             ts.cost,
+                //             ts.decimal_time
+                //         )
+                //         SEPARATOR "||"
+                //     )
+                //     FROM gv_timesheets ts
+                //     LEFT JOIN gv_users u ON u.id = ts.created_user_id
+                //     WHERE ts.project_id = gv_projects.id
+                //     ORDER BY ts.start_time DESC
+                // ) as payments'),
+                // DB::raw('(
+                //     SELECT GROUP_CONCAT(
+                //         CONCAT_WS("::",
+                //             gv_todos.id,
+                //             gv_todos.description,
+                //             gv_todos.due_date,
+                //             gv_todos.status,
+                //             gv_todos.price,
+                //             gv_todos.payment_date
+                //         )
+                //         SEPARATOR "||"
+                //     )
+                //     FROM gv_todos
+                //     WHERE gv_todos.module_related_id = gv_projects.id
+                // ) as payments')
             )
             ->leftjoin($user_table . ' as project_created', 'project_created.id', '=', $project_table . '.user_id')
-            ->leftjoin($user_table, $user_table . '.id', '=', $project_table . '.client_id');
+            ->leftjoin($user_table, $user_table . '.id', '=', $project_table . '.client_id')->when(!empty($leaderids), function ($q) use ($leaderids) {
+                $q->whereIn('gv_projects.assign_to', $leaderids);
+            });
             if (!empty($request->input('search.value'))) {
                 $search = $request->input('search.value');
                 $projects->where($project_table . '.project_name', 'LIKE', "%{$search}%");
@@ -1339,18 +1408,25 @@ class ProjectRepository
         //     }
         // }
 
+        $statusfilterId = $request->input('statusfilterId');
+        if($statusfilterId){
+            if ($statusfilterId == 6) {
+                // Overdue
+                $projects = $projects->whereIn($project_table . '.status', [1, 2, 3])
+                    ->whereDate($project_table . '.end_date', '<', Carbon::now());
+            } else {
+                $projects->where($project_table . '.status', $statusfilterId);
+            }
+        }
         $totalData = $projects->count();
         $totalFiltered = $totalData;
-
         if (!empty($matchThese)) {
             $projects = $projects->where($matchThese);
             $totalFiltered = $projects->count();
         }
-        $order = $project_table . '.project_name';
-        $dir = "desc";
         $data = $projects->offset($start)
             ->limit($limit)
-            ->orderBy($order, $dir === 'desc' ? 'desc' : 'asc')
+            ->orderBy( $project_table . '.project_name', 'desc')
             ->get();
         foreach ($data as $key => $value) {
             $value->workallowance = 0;
@@ -1358,13 +1434,33 @@ class ProjectRepository
             foreach ($leaves as $leavesValue) {
                 $value->workallowance += floor($leavesValue->total/count(json_decode($leavesValue->project)));
             }
-            $value->payment = DB::table('gv_todos')->where('module_id', 1)->where('module_related_id', $value->id)->where('status', 2)->sum('price');
-            $value->paymentTotal = DB::table('gv_todos')->where('module_id', 1)->where('module_related_id', $value->id)->sum('price');
+            $value->payment = DB::table('gv_todos')->where('module_id', 1)->where('module_related_id', $value->id)->where('cash_flow', 1)->where('status', 2)->sum('price');
+            $value->paymentTotal = DB::table('gv_todos')->where('module_id', 1)->where('module_related_id', $value->id)->where('cash_flow', 1)->sum('price');
         }
+        $statusCount = $this->_getAllProjectCount();
+        $leader = DB::table('gv_projects')
+        ->join('gv_users', 'gv_users.id', '=', 'gv_projects.assign_to')
+        ->select(
+            'gv_users.id',
+            'gv_users.firstname',
+            'gv_users.lastname',
+            'gv_users.username',
+            'gv_users.email'
+        )
+        ->groupBy(
+            'gv_users.id',
+            'gv_users.firstname',
+            'gv_users.lastname',
+            'gv_users.username',
+            'gv_users.email'
+        )
+        ->get();
         return array(
             "draw" => intval($request->input('draw')),
             "recordsTotal" => intval($totalData),
+            'statusCount' => $statusCount,
             "recordsFiltered" => intval($totalFiltered),
+            'leader'=>$leader,
             "data" => $data,
         );
     }
