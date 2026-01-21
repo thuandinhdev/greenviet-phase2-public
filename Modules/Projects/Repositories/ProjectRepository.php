@@ -1286,12 +1286,16 @@ class ProjectRepository
             2 => $project_table . '.start_date',
             3 => $project_table . '.end_date',
         );
-
         $input = $request->input();
         $limit = $request->input('length');
         $start = $request->input('start');
-        $order = $columns[$request->input('order.0.column')];
-        $dir = $request->input('order.0.dir');
+        if($request->input('order.0.column') == $project_table . '.id'){
+            $order = $project_table . '.project_name';
+            $dir = "desc";
+        } else {
+            $order = $columns[$request->input('order.0.column')];
+            $dir = $request->input('order.0.dir');
+        }
         $columns_search = $request->input('columns');
         if(isset($input['leader']) && $input['leader']){
             $leaderids = array_column($input['leader'], 'id');
@@ -1425,8 +1429,10 @@ class ProjectRepository
             $totalFiltered = $projects->count();
         }
         $data = $projects->offset($start)
+            // ->limit($limit)
+            // ->orderBy( $project_table . '.project_name', 'desc')
             ->limit($limit)
-            ->orderBy( $project_table . '.project_name', 'desc')
+            ->orderBy($order, $dir === 'asc' ? 'asc' : 'desc')
             ->get();
         foreach ($data as $key => $value) {
             $value->workallowance = 0;
