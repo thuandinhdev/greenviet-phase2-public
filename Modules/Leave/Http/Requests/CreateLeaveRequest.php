@@ -41,21 +41,51 @@ class CreateLeaveRequest extends FormRequest
             'leave_date' => [
                 'required_if:duration,single,half',
                 'date',
-                'nullable',
-                Rule::unique(config('core.acl.leaves_table'))->where(
-                    function ($query) use ($request) {
-                        return $query->where('user_id', $request->get('user_id'))
-                            ->where('leave_date', $request->get('leave_date'))
-                            ->where('status', '!=', 3)
-                            ->where('deleted_at', null);
-                    }
-                ),
+                'nullable'
             ],
             'multi_date' => [
                 'required_if:duration,multiple',
             ],
             // 'reason' => 'required',
         ];
+    }
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+
+            // chỉ check khi là single hoặc half
+            if (!in_array($this->duration, ['full', 'half'])) {
+                return;
+            }
+
+            $leaves = \DB::table(config('core.acl.leaves_table'))
+                ->where('user_id', $this->user_id)
+                ->where('leave_date', $this->leave_date)
+                ->where('status', '!=', 3)
+                ->where('status', '!=', 4)
+                ->whereNull('deleted_at')
+                ->get();
+
+            $fullExists = $leaves->contains('duration', 'full');
+            $halfCount = $leaves->where('duration', 'half')->count();
+            // ❌ already has full
+            if ($fullExists) {
+                $validator->errors()->add('leave_date', 'A full-day leave already exists for this date.');
+                return;
+            }
+
+            // ❌ already has 2 half
+            if ($halfCount >= 2) {
+                $validator->errors()->add('leave_date', 'This date already has two half-day leaves.');
+                return;
+            }
+
+            // ❌ adding full but already has half
+            if ($this->duration === 'full' && $halfCount > 0) {
+                $validator->errors()->add('leave_date', 'A half-day leave already exists, cannot add a full-day leave.');
+                return;
+            }
+        });
     }
 
     /**

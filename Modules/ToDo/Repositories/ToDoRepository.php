@@ -290,9 +290,9 @@ class ToDoRepository
             switch ($input['filterKey']) {
                 case 'success':
                     $open_todos->whereNotNull($todo_table . '.payment_date');
-                    if ($input['month'] && $input['month'] != 'all') {
-                        $open_todos->whereBetween($todo_table . '.payment_date', [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')])->orderBy($todo_table . '.payment_date', 'desc');
-                    }
+                    // if ($input['month'] && $input['month'] != 'all') {
+                    //     $open_todos->whereBetween($todo_table . '.payment_date', [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')])->orderBy($todo_table . '.payment_date', 'desc');
+                    // }
                     break;
                 case 'pending':
                     $open_todos->whereNull($todo_table . '.payment_date');
@@ -310,6 +310,7 @@ class ToDoRepository
                     }
                     break;
                 case 'chart':
+                case 'all':
                     // if ($input['month'] && $input['month'] != 'all') {
                         // $open_todos->whereBetween($todo_table . '.due_date', [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')]);
                         $open_todos->where(function ($q) use ($todo_table, $startOfMonth, $endOfMonth) {
@@ -344,6 +345,7 @@ class ToDoRepository
                         ->orWhere($todo_table . '.estimated_date',  '<', Carbon::now());
                     })->orderBy($todo_table . '.estimated_date', 'desc');
                     break;
+                
             }
         }
         $leader = DB::table('gv_projects')

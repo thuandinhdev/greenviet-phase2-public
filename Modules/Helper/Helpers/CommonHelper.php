@@ -35,9 +35,9 @@ class CommonHelper
         $currentDate = Carbon::now();
         $monthsPassed = $initPaidLeaveDate->diffInMonths($currentDate);
         $totalLeaveDays = $initPaidLeave + $monthsPassed;
-
-        $used_leave_days = DB::table('gv_leaves')->whereNull('deleted_at')->where('user_id', $user_id)->whereIn('status', [1,2,6])->whereIn('leave_type_id', [1])->where('duration', 'full')->count();
-        $used_leave_days_half = DB::table('gv_leaves')->whereNull('deleted_at')->where('user_id', $user_id)->whereIn('status', [1,2,6])->whereIn('leave_type_id', [1])->where('duration', 'half')->count();
+        
+        $used_leave_days = DB::table('gv_leaves')->whereNull('deleted_at')->where('user_id', $user_id)->whereIn('status', [1,2,6])->whereIn('leave_type_id', [1])->where('duration', 'full')->where('leave_date', '>=', date('Y-m-01', strtotime($user->init_paid_leave_date)))->count();
+        $used_leave_days_half = DB::table('gv_leaves')->whereNull('deleted_at')->where('user_id', $user_id)->whereIn('status', [1,2,6])->whereIn('leave_type_id', [1])->where('duration', 'half')->where('leave_date', '>=', date('Y-m-01', strtotime($user->init_paid_leave_date)))->count();
         $user->used_leave_days = $used_leave_days + $used_leave_days_half/2;
 
         $remainingLeaveDays = $totalLeaveDays - $user->used_leave_days;

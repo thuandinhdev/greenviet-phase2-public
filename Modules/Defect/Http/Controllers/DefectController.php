@@ -81,6 +81,11 @@ class DefectController extends Controller
         return $this->defectRepo->exportProjects($request);
     }
 
+    public function exportProjectsBill(Request $request)
+    {
+        return $this->defectRepo->exportProjectsBill($request);
+    }
+
     /**
      * Display a listing of the resource.
      *

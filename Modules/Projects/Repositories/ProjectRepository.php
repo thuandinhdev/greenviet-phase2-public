@@ -236,17 +236,20 @@ class ProjectRepository
      *
      * @return json
      */
-    private function _getAllProjectCount()
+    private function _getAllProjectCount($leaderids = [])
     {
         $user = Auth::user();
-        $result['all'] = Project::whereIn('status', [1, 2, 3, 4, 5])->count();
-        $result['open'] = $this->_getStatusWiseCount(1, $user);
-        $result['inProgress'] = $this->_getStatusWiseCount(2, $user);
-        $result['onHold'] = $this->_getStatusWiseCount(3, $user);
-        $result['cancel'] = $this->_getStatusWiseCount(4, $user);
-        $result['completed'] = $this->_getStatusWiseCount(5, $user);
+        $result['all'] = Project::whereIn('status', [1, 2, 3, 4, 5])->whereIn('assign_to', $leaderids)->count();
+        $result['open'] = $this->_getStatusWiseCount(1, $user, $leaderids);
+        $result['inProgress'] = $this->_getStatusWiseCount(2, $user, $leaderids);
+        $result['onHold'] = $this->_getStatusWiseCount(3, $user, $leaderids);
+        $result['cancel'] = $this->_getStatusWiseCount(4, $user, $leaderids);
+        $result['completed'] = $this->_getStatusWiseCount(5, $user, $leaderids);
         $result['overdue'] = Project::
             whereIn('status', [1, 2, 3])
+            ->when(!empty($leaderids), function ($q) use ($leaderids) {
+                $q->whereIn('assign_to', $leaderids);
+            })
             ->whereDate('end_date', '<', Carbon::now())
             ->count();
         return $result;
@@ -260,9 +263,11 @@ class ProjectRepository
      *
      * @return count
      */
-    private function _getStatusWiseCount($status, $user)
+    private function _getStatusWiseCount($status, $user, $leaderids)
     {
-        return Project::where('status', $status)->count();
+        return Project::where('status', $status)->when(!empty($leaderids), function ($q) use ($leaderids) {
+            $q->whereIn('assign_to', $leaderids);
+        })->count();
     }
 
     /**
@@ -1443,7 +1448,7 @@ class ProjectRepository
             $value->payment = DB::table('gv_todos')->where('module_id', 1)->where('module_related_id', $value->id)->where('cash_flow', 1)->where('status', 2)->sum('price');
             $value->paymentTotal = DB::table('gv_todos')->where('module_id', 1)->where('module_related_id', $value->id)->where('cash_flow', 1)->sum('price');
         }
-        $statusCount = $this->_getAllProjectCount();
+        $statusCount = $this->_getAllProjectCount($leaderids);
         $leader = DB::table('gv_projects')
         ->join('gv_users', 'gv_users.id', '=', 'gv_projects.assign_to')
         ->select(

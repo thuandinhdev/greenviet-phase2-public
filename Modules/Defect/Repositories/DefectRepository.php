@@ -14,6 +14,7 @@ use Modules\Projects\Entities\Project;
 use Modules\Setting\Entities\Setting;
 use Modules\Slack\Repositories\SlackRepository;
 use Modules\Team\Entities\Team;
+use Modules\Task\Entities\Task;
 use Modules\Timesheet\Entities\Timesheet;
 use Modules\UserActivity\Entities\UserActivity;
 use Modules\User\Entities\User\User;
@@ -23,6 +24,11 @@ use Illuminate\Http\Request;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+
+
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Cell\DataValidation;
 
 /**
  * Class DefectRepository
@@ -966,10 +972,10 @@ class DefectRepository
             $endOfMonth   = Carbon::createFromFormat('Y-m', $input['month'])->endOfMonth();
         }
 
-        $holidays = DB::table('gv_holidays')->whereBetween('date', [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')])->get();
+        $holidays = DB::table('gv_holidays')->whereBetween('date', [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')])->whereNull('deleted_at')->get();
         $leaves = DB::table('gv_leaves')->whereBetween('leave_date', [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')])
             // ->where('leave_type_id', '<', 3)
-            ->whereIn('status', [1, 2])->select('*', DB::raw('DATE_FORMAT(leave_date, "%Y-%m-%d") as formatted_date'))->get();
+            ->whereIn('status', [1, 2, 6])->select('*', DB::raw('DATE_FORMAT(leave_date, "%Y-%m-%d") as formatted_date'))->get();
 
 
         if(isset($input['action']) && $input['action'] == 'user'){
@@ -1177,8 +1183,297 @@ class DefectRepository
     }
 
 
+    public function exportProjectsTasksWithPayments()
+    {
+        // ======================
+        // LOAD DATA
+        // ======================
+        $projects = DB::table('gv_projects as p')
+            ->leftJoin('gv_users as u', 'u.id', '=', 'p.assign_to')
+            ->select(
+                'p.id',
+                'p.project_name',
+                'p.start_date',
+                'p.end_date',
+                'p.cost',
+                'p.status',
+                'p.assign_to',
+                DB::raw('CONCAT(u.firstname, " ", u.lastname) as assign_to_name')
+            )
+            ->whereNull('p.deleted_at')
+            ->orderBy('p.id')
+            ->get();
+
+        $tasks = DB::table('gv_tasks')
+            ->select(
+                'id',
+                'project_id',
+                'name',
+                'planned_start_date',
+                'planned_end_date',
+                'estimated_hours',
+                'cost',
+                'status'
+            )
+            ->whereNull('deleted_at')
+            ->orderBy('project_id')
+            ->orderBy('parent_task_id')
+            ->orderBy('order')
+            ->get()
+            ->groupBy('project_id');
+
+        $projectsByUser = $projects->groupBy('assign_to');
+
+        // ======================
+        // STATUS MAP
+        // ======================
+        $projectStatusMap = [
+            1 => 'Open',
+            2 => 'InProgress',
+            3 => 'OnHold',
+            4 => 'Cancel',
+            5 => 'Completed'
+        ];
+
+        $taskStatusMap = [
+            1 => 'Open',
+            2 => 'In Progress',
+            3 => 'On Hold',
+            4 => 'Waiting For Some one',
+            5 => 'Cancel',
+            6 => 'Completed'
+        ];
+
+        $projectStatusFormula = '"' . collect($projectStatusMap)
+            ->map(fn ($v, $k) => "{$k}={$v}")
+            ->implode(',') . '"';
+
+        $taskStatusFormula = '"' . collect($taskStatusMap)
+            ->map(fn ($v, $k) => "{$k}={$v}")
+            ->implode(',') . '"';
+
+        $cashFlowFormula = '"Company Revenue,Collection on Behalf"';
+
+        // ======================
+        // CREATE EXCEL
+        // ======================
+        $spreadsheet = new Spreadsheet();
+
+        // Sheet 1: All Projects
+        $this->renderProjectSheet(
+            $spreadsheet,
+            'All Projects',
+            $projects,
+            $tasks,
+            $projectStatusMap,
+            $taskStatusMap,
+            $projectStatusFormula,
+            $taskStatusFormula,
+            $cashFlowFormula,
+            true
+        );
+
+        // Sheet theo user
+        foreach ($projectsByUser as $userId => $userProjects) {
+            if ($userProjects->isEmpty()) continue;
+
+            $name = $userProjects->first()->assign_to_name ?: 'Unassigned';
+            $sheetName = mb_substr($name, 0, 30);
+
+            $this->renderProjectSheet(
+                $spreadsheet,
+                $sheetName,
+                $userProjects,
+                $tasks,
+                $projectStatusMap,
+                $taskStatusMap,
+                $projectStatusFormula,
+                $taskStatusFormula,
+                $cashFlowFormula,
+                false
+            );
+        }
+
+        // Xoá sheet rỗng mặc định
+        $spreadsheet->removeSheetByIndex(0);
+
+        // SAVE
+        $fileName = 'projects_tasks_payments_' . time() . '.xlsx';
+        $filePath = storage_path('app/' . $fileName);
+
+        (new Xlsx($spreadsheet))->save($filePath);
+
+        return response()->download($filePath)->deleteFileAfterSend(true);
+    }
+
+    // ======================================================
+    // RENDER 1 SHEET
+    // ======================================================
+    private function renderProjectSheet(
+        Spreadsheet $spreadsheet,
+        string $title,
+        $projects,
+        $tasks,
+        array $projectStatusMap,
+        array $taskStatusMap,
+        string $projectStatusFormula,
+        string $taskStatusFormula,
+        string $cashFlowFormula,
+        bool $showAssignTo
+    ) {
+        $sheet = $spreadsheet->createSheet();
+        $sheet->setTitle($title);
+
+        // ======================
+        // HEADER
+        // ======================
+        $headers = ['TYPE', 'LEVEL', 'ID', 'PROJECT_NAME', 'TASK_NAME'];
+        if ($showAssignTo) $headers[] = 'ASSIGN_TO';
+
+        $headers = array_merge($headers, [
+            'START_DATE', 'END_DATE',
+            'EST_HOURS', 'COST', 'STATUS',
+            'PAYMENT_AMOUNT', 'PAYMENT_NOTE', 'CASH_FLOW',
+            'EST_DATE', 'INVOICE_DATE', 'PAYMENT_DATE'
+        ]);
+
+        $lastCol = Coordinate::stringFromColumnIndex(count($headers));
+
+        $sheet->fromArray($headers, null, 'A1');
+        $sheet->getStyle("A1:{$lastCol}1")->applyFromArray([
+            'font' => ['bold' => true],
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID,
+                'startColor' => ['rgb' => 'D9D9D9']
+            ]
+        ]);
+
+        $row = 2;
+
+        foreach ($projects as $project) {
+
+            // ======================
+            // PROJECT ROW
+            // ======================
+            $projectRow = [
+                'PROJECT', 0, $project->id,
+                $project->project_name, ''
+            ];
+
+            if ($showAssignTo) {
+                $projectRow[] = $project->assign_to_name;
+            }
+
+            $projectRow = array_merge($projectRow, [
+                $project->start_date,
+                $project->end_date,
+                '',
+                $project->cost,
+                $project->status . '=' . $projectStatusMap[$project->status],
+                '', '', '', '', '', ''
+            ]);
+
+            $sheet->fromArray($projectRow, null, "A{$row}");
+
+            $sheet->getStyle("A{$row}:{$lastCol}{$row}")->applyFromArray([
+                'font' => ['bold' => true],
+                'fill' => [
+                    'fillType' => Fill::FILL_SOLID,
+                    'startColor' => ['rgb' => 'EEF3F7']
+                ]
+            ]);
+
+            $this->applyDropdown($sheet, $headers, 'STATUS', $row, $projectStatusFormula);
+
+            $row++;
+
+            // ======================
+            // TASK ROWS
+            // ======================
+            foreach ($tasks[$project->id] ?? [] as $task) {
+
+                $taskRow = [
+                    'TASK', 1, $task->id,
+                    '', '↳ ' . $task->name
+                ];
+
+                if ($showAssignTo) {
+                    $taskRow[] = '';
+                }
+
+                $taskRow = array_merge($taskRow, [
+                    $task->planned_start_date,
+                    $task->planned_end_date,
+                    $task->estimated_hours,
+                    $task->cost,
+                    $task->status . '=' . $taskStatusMap[$task->status],
+                    '', '', '', '', '', ''
+                ]);
+
+                $sheet->fromArray($taskRow, null, "A{$row}");
+                $this->applyDropdown($sheet, $headers, 'STATUS', $row, $taskStatusFormula);
+
+                $row++;
+            }
+
+            // ======================
+            // PAYMENT ROWS
+            // ======================
+            for ($i = 0; $i < 3; $i++) {
+
+                $paymentRow = [
+                    'PAYMENT', '', '',
+                    '', ''
+                ];
+
+                if ($showAssignTo) {
+                    $paymentRow[] = '';
+                }
+
+                $paymentRow = array_merge($paymentRow, [
+                    '', '', '', '',
+                    '', '', '', '', '', ''
+                ]);
+
+                $sheet->fromArray($paymentRow, null, "A{$row}");
+                $this->applyDropdown($sheet, $headers, 'CASH_FLOW', $row, $cashFlowFormula);
+
+                $row++;
+            }
+
+            $row++;
+        }
+
+        // AUTO WIDTH
+        foreach (range(1, count($headers)) as $i) {
+            $sheet->getColumnDimension(
+                Coordinate::stringFromColumnIndex($i)
+            )->setAutoSize(true);
+        }
+    }
+
+    // ======================================================
+    // APPLY DROPDOWN THEO HEADER
+    // ======================================================
+    private function applyDropdown($sheet, array $headers, string $header, int $row, string $formula)
+    {
+        $index = array_search($header, $headers);
+        if ($index === false) return;
+
+        $col = Coordinate::stringFromColumnIndex($index + 1);
+
+        $dv = new DataValidation();
+        $dv->setType(DataValidation::TYPE_LIST);
+        $dv->setAllowBlank(true);
+        $dv->setShowDropDown(true);
+        $dv->setFormula1($formula);
+
+        $sheet->setDataValidation("{$col}{$row}", $dv);
+    }
+
 
     public function exportPayment($request){
+        return $this->exportProjectsTasksWithPayments();
         $input = $request->all();
         $data = $input['data'];
         // 🔹 Đường dẫn file template
@@ -1314,7 +1609,7 @@ class DefectRepository
 
         $templateRow = 9; // Dòng mẫu (format gốc)
         $startRow = $templateRow;
-        $lastCol = 'K'; // Cột cuối cùng trong file
+        $lastCol = 'N'; // Cột cuối cùng trong file
         $project_table = config('core.acl.projects_table');
         $projects = Project::select(
                 $project_table.".*",
@@ -1388,6 +1683,427 @@ class DefectRepository
 
         return response()->download($filePath)->deleteFileAfterSend(true);
     }
+
+    public function exportProjectsBill($request)
+    {
+        $task_table = config('core.acl.task_table');
+        $user_table = config('core.acl.users_table');
+        $project_table = config('core.acl.projects_table');
+
+        $templatePath = storage_path('app/templates/projects-bill.xlsx');
+
+        if (!file_exists($templatePath)) {
+            abort(404, 'Không tìm thấy file mẫu projects-bill.xlsx');
+        }
+
+        // ======================
+        // LOAD TEMPLATE
+        // ======================
+        $spreadsheet = IOFactory::load($templatePath);
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // ======================
+        // GET PROJECT
+        // ======================
+        $project = DB::table('gv_projects')
+            ->where('id', $request->project_id)
+            ->first();
+
+        if (!$project) {
+            abort(404, 'Project không tồn tại');
+        }
+
+        $est_total = 0;
+        $actual_total = 0;
+        // ======================
+        // PAYMENT SECTION
+        // ======================
+        $paymentStartRow = 40;
+        $paymentTemplateRow = 40;
+        $paymentLastCol = 'N';
+
+        // nếu đang dùng currentRow thì dùng luôn
+        if (!isset($currentRow) || $currentRow < $paymentStartRow) {
+            $currentRow = $paymentStartRow;
+        }
+
+        // load payment theo task
+        $payment = DB::table('gv_todos')
+            ->where('module_id', 1)
+            ->where('module_related_id', $project->id)
+            ->get();
+
+        foreach ($payment ?? [] as $p) {
+            // insert row mới
+            $sheet->insertNewRowBefore($currentRow, 1);
+            $row = $currentRow;
+
+            // copy style từ dòng mẫu
+            $sheet->duplicateStyle(
+                $sheet->getStyle("B" . ($paymentTemplateRow + 1) . ":{$paymentLastCol}" . ($paymentTemplateRow + 1)),
+                "B{$row}:{$paymentLastCol}{$row}"
+            );
+
+            // ======================
+            // FILL PAYMENT
+            // ======================
+            $sheet->setCellValue("B{$row}", $p->description);
+            $sheet->setCellValue("C{$row}", $p->price);
+            $sheet->setCellValue("D{$row}", $p->cash_flow == 1 ? 'Company Revenue' : 'Collection on Behalf');
+            $sheet->setCellValue("E{$row}", $p->estimated_date ? date('d-m-Y', strtotime($p->estimated_date)) : '');
+            $sheet->setCellValue("F{$row}", $p->invoice_date ? date('d-m-Y', strtotime($p->invoice_date)) : '');
+            $sheet->setCellValue("G{$row}", $p->payment_date ? date('d-m-Y', strtotime($p->payment_date)) : '');
+            $sheet->setCellValue("H{$row}", 0.1);
+            $sheet->getStyle("H{$row}")->getNumberFormat()->setFormatCode('0.00%');
+            $sheet->setCellValue("I{$row}", "=(C{$row}*H{$row})");
+            $sheet->setCellValue("J{$row}", "=(C{$row}+I{$row})");
+            $sheet->getStyle("I{$row}")->getNumberFormat()->setFormatCode('#,##0');
+            $sheet->getStyle("J{$row}")->getNumberFormat()->setFormatCode('#,##0');
+
+            // ngày (nếu có)
+            if (!empty($p->created_at)) {
+                $sheet->setCellValue("D{$row}", date('d-m-Y', strtotime($p->created_at)));
+            }
+
+            $sheet->getStyle("C{$row}")->getNumberFormat()->setFormatCode('#,##0');
+
+            $currentRow++;
+        }
+        
+        $formula1 = "=SUMIFS(C{$paymentStartRow}:C{$row}, D{$paymentStartRow}:D{$row}, \"Company Revenue\")";
+        $sheet->setCellValue("B22", $formula1);
+        
+        $formula2 = "=SUMIFS(C{$paymentStartRow}:C{$row}, D{$paymentStartRow}:D{$row}, \"Company Revenue\", G{$paymentStartRow}:G{$row}, \">0\")";
+        $sheet->setCellValue("C22", $formula2);
+        
+        $formula3 = "=SUMIFS(C{$paymentStartRow}:C{$row}, D{$paymentStartRow}:D{$row}, \"Company Revenue\", F{$paymentStartRow}:F{$row}, \">0\")";
+        $sheet->setCellValue("C22", $formula3);
+
+        $formula3 = "=SUMIFS(C{$paymentStartRow}:C{$row}, D{$paymentStartRow}:D{$row}, \"Company Revenue\", F{$paymentStartRow}:F{$row}, \">0\")";
+        $paymentRowSum = $paymentStartRow-1;
+
+        $formula4 = "=SUMIFS(C{$paymentStartRow}:C{$row}, D{$paymentStartRow}:D{$row}, \"Collection on Behalf\", G{$paymentStartRow}:G{$row}, \"\")";
+        $sheet->setCellValue("D24", $formula4);
+
+        $sheet->setCellValue("C{$paymentRowSum}", "=SUM(C{$paymentStartRow}:C{$row})");
+        $sheet->setCellValue("I{$paymentRowSum}", "=SUM(I{$paymentStartRow}:I{$row})");
+        $sheet->setCellValue("J{$paymentRowSum}", "=SUM(J{$paymentStartRow}:J{$row})");
+        // ======================
+        // LOAD TASKS
+        // ======================
+        $tasks = Task::leftJoin($user_table, $user_table . '.id', '=', $task_table . '.assign_to')
+            ->leftJoin($project_table, $project_table . '.id', '=', $task_table . '.project_id')
+            ->where('project_id', $project->id)
+            ->select(
+                $task_table . '.*',
+                $user_table . '.firstname as assign_firstname',
+                $user_table . '.lastname as assign_lastname'
+            )
+            ->get();
+
+        // ======================
+        // PROJECT INFO
+        // ======================
+        $sheet->setCellValue("C7", $project->project_name);
+        $sheet->setCellValue("C9", $project->address ?? '');
+        $sheet->setCellValue("C10", now()->format('d-m-Y'));
+        $sheet->setCellValue("C15", $project->assign_to ?? '');
+        $sheet->setCellValue("C16", $project->start_date ? date('d-m-Y', strtotime($project->start_date)) : '');
+        $sheet->setCellValue("C17", $project->end_date ? date('d-m-Y', strtotime($project->end_date)) : '');
+
+        // ======================
+        // CONFIG
+        // ======================
+        $startRow = 35;
+        $templateRow = 35;
+        $lastCol = 'N';
+
+        $currentRow = $startRow;
+
+        foreach ($tasks as $task) {
+
+            // ======================
+            // LOAD TIMESHEET
+            // ======================
+            $timesheetQuery = DB::table('gv_timesheets')
+                ->leftJoin($user_table, $user_table . '.id', '=', 'gv_timesheets.created_user_id')
+                ->where('module_id', 2)
+                ->where('module_related_id', $task->id);
+
+            $timesheetQueryDetail = clone $timesheetQuery;
+
+            $task->timesheet = $timesheetQuery
+                ->selectRaw('SUM(decimal_time) as total_time, SUM(cost) as total_cost')
+                ->first();
+
+            $task->timesheet_detail = $timesheetQueryDetail
+            ->select(
+                'gv_timesheets.created_user_id',
+                DB::raw('SUM(decimal_time) as total_time'),
+                $user_table . '.firstname as assign_firstname',
+                $user_table . '.lastname as assign_lastname',
+                DB::raw('SUM(cost) as total_cost')
+            )->groupBy(
+                'gv_timesheets.created_user_id',
+                'gv_users.firstname',
+                'gv_users.lastname'
+            )->get();
+
+            // ======================
+            // INSERT TASK ROW
+            // ======================
+            $sheet->insertNewRowBefore($currentRow, 1);
+
+            $row = $currentRow;
+
+            $sheet->duplicateStyle(
+                $sheet->getStyle("B" . ($templateRow + 1) . ":{$lastCol}" . ($templateRow + 1)),
+                "B{$row}:{$lastCol}{$row}"
+            );
+
+            // fill TASK
+            $sheet->setCellValue("B{$row}", 'TASK');
+            $sheet->setCellValue("C{$row}", $task->name);
+            $sheet->setCellValue("D{$row}", $task->task_start_date ? date('d-m-Y', strtotime($task->task_start_date)) : '');
+            $sheet->setCellValue("E{$row}", $task->task_start_date ? date('d-m-Y', strtotime($task->task_end_date)) : '');
+            // $sheet->setCellValue("F{$row}", ($task->assign_lastname ?? '') . ' ' . ($task->assign_firstname ?? ''));
+            $sheet->setCellValue("G{$row}", $task->estimated_hours);
+
+            $sheet->setCellValue("H{$row}", $task->timesheet->total_time ?? 0);
+            $sheet->setCellValue("J{$row}", $task->price_rate ?? 0);
+            $sheet->setCellValue("K{$row}", $task->timesheet->total_cost ?? 0);
+
+            $sheet->setCellValue("N{$row}", $this->mapTaskStatus($task->status));
+
+            $sheet->getStyle("G{$row}")->getNumberFormat()->setFormatCode('0.0');
+            $sheet->getStyle("H{$row}")->getNumberFormat()->setFormatCode('0.0');
+            $sheet->getStyle("J{$row}")->getNumberFormat()->setFormatCode('#,##0');
+            $sheet->getStyle("K{$row}")->getNumberFormat()->setFormatCode('#,##0');
+            $sheet->setCellValue("I{$row}", "=(H{$row}-G{$row})/G{$row}");
+            $sheet->setCellValue("L{$row}", "=(K{$row}-J{$row})/J{$row}");
+            $sheet->getStyle("I{$row}")->getNumberFormat()->setFormatCode('0.00%');
+            $sheet->getStyle("L{$row}")->getNumberFormat()->setFormatCode('0.00%');
+
+            $est_total += $task->price_rate;
+            $actual_total += $task->timesheet->total_cost;
+            $currentRow++; // 👈 quan trọng
+
+            // ======================
+            // INSERT TIMESHEET ROWS
+            // ======================
+            foreach ($task->timesheet_detail as $ts) {
+
+                $sheet->insertNewRowBefore($currentRow, 1);
+                $tsRow = $currentRow;
+
+                $sheet->duplicateStyle(
+                    $sheet->getStyle("B" . ($templateRow + 1) . ":{$lastCol}" . ($templateRow + 1)),
+                    "B{$tsRow}:{$lastCol}{$tsRow}"
+                );
+
+                // $date = date('d-m-Y', strtotime($ts->date));
+
+                $sheet->setCellValue("B{$tsRow}", 'TIMESHEET');
+                // $sheet->setCellValue("C{$tsRow}", $date);
+                $sheet->setCellValue("F{$tsRow}", ($ts->assign_lastname ?? '') . ' ' . ($ts->assign_firstname ?? ''));
+                $sheet->setCellValue("H{$tsRow}", $ts->total_time);
+                $sheet->setCellValue("K{$tsRow}", $ts->total_cost);
+
+                $sheet->getStyle("H{$tsRow}")->getNumberFormat()->setFormatCode('0.0');
+                $sheet->getStyle("K{$tsRow}")->getNumberFormat()->setFormatCode('#,##0');
+                // $sheet->getStyle("K{$tsRow}")
+                //     ->getNumberFormat()
+                //     ->setFormatCode('#,##0');
+
+                $currentRow++;
+            }
+        }
+        $sheet->setCellValue("B24", $est_total);
+        $sheet->setCellValue("C24", $actual_total);
+        // ======================
+        // SAVE
+        // ======================
+        $fileName = 'project_bill_' . $project->id . '_' . time() . '.xlsx';
+        $filePath = storage_path('app/' . $fileName);
+
+        (new Xlsx($spreadsheet))->save($filePath);
+
+        return response()->download($filePath)->deleteFileAfterSend(true);
+    }
+    // public function exportProjectsBill($request)
+    // {
+    //     $task_table = config('core.acl.task_table');
+    //     $user_table = config('core.acl.users_table');
+    //     $project_table = config('core.acl.projects_table');
+    //     $templatePath = storage_path('app/templates/projects-bill.xlsx');
+
+    //     if (!file_exists($templatePath)) {
+    //         abort(404, 'Không tìm thấy file mẫu projects-bill.xlsx');
+    //     }
+
+    //     // ======================
+    //     // LOAD TEMPLATE
+    //     // ======================
+    //     $spreadsheet = IOFactory::load($templatePath);
+    //     $sheet = $spreadsheet->getActiveSheet();
+
+    //     // ======================
+    //     // GET PROJECT
+    //     // ======================
+    //     $project = DB::table('gv_projects')
+    //         ->where('id', $request->project_id)
+    //         ->first();
+
+    //     if (!$project) {
+    //         abort(404, 'Project không tồn tại');
+    //     }
+
+    //     // ======================
+    //     // LOAD TASKS
+    //     // ======================
+    //     $tasks = DB::table('gv_tasks')
+    //     ->where('project_id', $project->id)
+    //     ->whereNull('deleted_at')
+    //     ->get();
+
+    //     $tasks = Task::leftjoin($user_table, $user_table . '.id', '=', $task_table . '.assign_to')
+    //         ->leftjoin($project_table, $project_table.'.id', '=', $task_table . '.project_id')
+    //         ->where('project_id', $project->id)
+    //         ->select(
+    //             $task_table . '.*',
+    //             $project_table.'.project_name',
+    //             $user_table . '.firstname as assign_firstname',
+    //             $user_table . '.lastname as assign_lastname',
+    //             $user_table . '.avatar as assign_avatar'
+    //         )->get();
+
+    //     // ======================
+    //     // FILL PROJECT INFO
+    //     // ======================
+    //     $sheet->setCellValue("C7", $project->project_name);
+    //     $sheet->setCellValue("B8", '');
+    //     $sheet->setCellValue("C9", $project->address ?? '');
+    //     $sheet->setCellValue("C10", now()->format('d-m-Y'));
+
+    //     $sheet->setCellValue("C15", $project->assign_to ?? '');
+    //     $sheet->setCellValue("C16", date('d-m-Y', strtotime($project->start_date)));
+    //     $sheet->setCellValue("C17", date('d-m-Y', strtotime($project->end_date)));
+
+    //     // ======================
+    //     // TASK TABLE
+    //     // ======================
+    //     $startRow = 35;     // ⚠️ chỉnh theo file thật
+    //     $templateRow = 35;  // dòng có format mẫu
+    //     $lastCol = 'O';     // cột cuối
+
+    //     foreach ($tasks as $i => $task) {
+
+    //         $timesheetQuery =  DB::table('gv_timesheets')
+    //         ->where('created_user_id', $request->get('user_id'))
+    //         ->where('module_id', 2)
+    //         ->where('status', 2)
+    //         ->where('module_related_id', $task->id);
+    //         $timesheetQueryDetail = clone $timesheetQuery;
+
+    //         $task->timesheet = $timesheetQuery->selectRaw('SUM(decimal_time) as total_time, SUM(cost) as total_cost')
+    //         ->first();
+    //         $task->timesheet_detail = $timesheetQueryDetail->select('start_time as date', 'decimal_time as time', 'cost')->orderBy('start_time', 'desc')->get();
+
+    //         // luôn insert tại startRow
+    //         $sheet->insertNewRowBefore($startRow, 1);
+
+    //         $row = $startRow;
+
+    //         // copy style từ template xuống row mới
+    //         $sheet->duplicateStyle(
+    //             $sheet->getStyle("B" . ($templateRow + 1) . ":{$lastCol}" . ($templateRow + 1)),
+    //             "B{$row}:{$lastCol}{$row}"
+    //         );
+
+    //         // copy formula
+    //         $delta = 0; // vì luôn insert ngay dưới template
+
+    //         for ($col = 'B'; $col !== Coordinate::stringFromColumnIndex(
+    //             Coordinate::columnIndexFromString($lastCol) + 1
+    //         ); $col = Coordinate::stringFromColumnIndex(
+    //             Coordinate::columnIndexFromString($col) + 1
+    //         )) {
+    //             $cell = $sheet->getCell("{$col}" . ($templateRow + 1));
+    //             $value = $cell->getValue();
+
+    //             if ($cell->isFormula()) {
+    //                 $sheet->setCellValue("{$col}{$row}", $value);
+    //             }
+    //         }
+
+    //         // fill data
+    //         $sheet->setCellValue("B{$row}", 'TASK');
+    //         $sheet->setCellValue("C{$row}", $task->name);
+    //         $sheet->setCellValue("D{$row}", date('d-m-Y', strtotime($task->task_start_date)) ?? '');
+    //         $sheet->setCellValue("E{$row}", date('d-m-Y', strtotime($task->task_end_date)) ?? '');
+    //         $sheet->setCellValue("F{$row}", $task->assign_lastname . $task->assign_firstname ?? '');
+    //         $sheet->setCellValue("G{$row}", $task->estimated_hours);
+    //         $sheet->setCellValue("H{$row}", $task->total_time->total_time ?? 0);
+    //         $sheet->setCellValue("J{$row}", $task->cost ?? 0);
+    //         $sheet->setCellValue("K{$row}", $task->total_time->total_cost ?? 0);
+    //         $sheet->setCellValue("N{$row}", $this->mapTaskStatus($task->status));
+
+    //         // ======================
+    //         // TIMESHEET DETAIL
+    //         // ======================
+    //         foreach ($task->timesheet_detail as $ts) {
+
+    //             // insert row mới
+    //             $sheet->insertNewRowBefore($startRow, 1);
+    //             $tsRow = $startRow;
+
+    //             // copy style giống dòng template
+    //             $sheet->duplicateStyle(
+    //                 $sheet->getStyle("B" . ($templateRow + 1) . ":{$lastCol}" . ($templateRow + 1)),
+    //                 "B{$tsRow}:{$lastCol}{$tsRow}"
+    //             );
+
+    //             // format date
+    //             $date = date('d-m-Y', strtotime($ts->date));
+
+    //             // fill data (indent cho đẹp)
+    //             $sheet->setCellValue("B{$tsRow}", 'TS');
+    //             $sheet->setCellValue("C{$tsRow}", '  ↳ ' . $date);
+    //             $sheet->setCellValue("G{$tsRow}", $ts->time);
+    //             $sheet->setCellValue("K{$tsRow}", $ts->cost);
+
+    //             // format number
+    //             $sheet->getStyle("K{$tsRow}")
+    //                 ->getNumberFormat()
+    //                 ->setFormatCode('#,##0');
+    //         }
+    //     }
+
+    //     // ======================
+    //     // SAVE FILE
+    //     // ======================
+    //     $fileName = 'project_bill_' . $project->id . '_' . time() . '.xlsx';
+    //     $filePath = storage_path('app/' . $fileName);
+
+    //     (new Xlsx($spreadsheet))->save($filePath);
+
+    //     return response()->download($filePath)->deleteFileAfterSend(true);
+    // }
+
+    private function mapTaskStatus($status)
+    {
+        $map = [
+            1 => 'Open',
+            2 => 'In Progress',
+            3 => 'On Hold',
+            4 => 'Waiting',
+            5 => 'Cancel',
+            6 => 'Completed'
+        ];
+
+        return $map[$status] ?? '';
+    }
+
     public function exportTimesheet($request){
         $input = $request->all();
         $data = $input['data'];
@@ -1736,14 +2452,14 @@ class DefectRepository
                         $timesheets_draft = DB::table('gv_timesheets_draft')->where('start_time', '=', date('y-m-d H:i:s', strtotime($input['month']."-".$dayIndex+1)))->where('created_user_id', $item['id'])->sum('decimal_time');
                         if($timesheets_draft == 0){
                             $timesheets_draft = DB::table('gv_timesheets')->where('start_time', '=', date('y-m-d H:i:s', strtotime($input['month']."-".$dayIndex+1)))->where('created_user_id', $item['id'])->sum('decimal_time');
-                        } 
+                        }
                         if($timesheets_draft == 8.5){
                             $value = 'x';
                         }
                         if($timesheets_draft == 4.5 || $timesheets_draft == 4){
                             $value = '/';
                         }
-                        
+
                         if($value == '' &&  $dateWoking >= 1 && $dateWoking <= 5){
                             $value = 'x';
                         }

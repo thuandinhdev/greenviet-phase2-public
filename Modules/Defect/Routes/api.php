@@ -30,6 +30,7 @@ Route::group(
         Route::put('defect/notes/{id}', 'DefectController@defectNotesUpdate');
         Route::get('defect/{id}/permission/{type}', 'DefectController@getDefectPermission');
         Route::post('defect/export-projects', 'DefectController@exportProjects');
+        Route::post('defect/export-project-bill', 'DefectController@exportProjectsBill');
         Route::resource('defect', 'DefectController');
     }
 );
