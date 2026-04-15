@@ -160,20 +160,20 @@ class ProjectRepository
                 'project_created.avatar as created_avatar',
                 DB::raw('(SELECT SUM(actual_hours) FROM gv_tasks WHERE gv_tasks.project_id = gv_projects.id) as total_actual_hours'),
                 $team_table . '.team_name',
-            //     DB::raw('(SELECT JSON_ARRAYAGG(JSON_OBJECT(
-            //         "id", gv_todos.id,
-            //         "description", gv_todos.description,
-            //         "due_date", DATE_FORMAT(gv_todos.due_date, "%Y-%m-%d"),
-            //         "status", gv_todos.status,
-            //         "price", gv_todos.price,
-            //         "payment_date", DATE_FORMAT(gv_todos.payment_date, "%Y-%m-%d"),
-            //         "cash_flow", gv_todos.cash_flow,
-            //         "estimated_date", DATE_FORMAT(gv_todos.estimated_date, "%Y-%m-%d"),
-            //         "invoice_date", DATE_FORMAT(gv_todos.invoice_date, "%Y-%m-%d")
-            //     ))
-            //     FROM gv_todos
-            //     WHERE gv_todos.module_related_id = gv_projects.id
-            //    ) as payments')
+                DB::raw('(SELECT JSON_ARRAYAGG(JSON_OBJECT(
+                    "id", gv_todos.id,
+                    "description", gv_todos.description,
+                    "due_date", DATE_FORMAT(gv_todos.due_date, "%Y-%m-%d"),
+                    "status", gv_todos.status,
+                    "price", gv_todos.price,
+                    "payment_date", DATE_FORMAT(gv_todos.payment_date, "%Y-%m-%d"),
+                    "cash_flow", gv_todos.cash_flow,
+                    "estimated_date", DATE_FORMAT(gv_todos.estimated_date, "%Y-%m-%d"),
+                    "invoice_date", DATE_FORMAT(gv_todos.invoice_date, "%Y-%m-%d")
+                ))
+                FROM gv_todos
+                WHERE gv_todos.module_related_id = gv_projects.id
+               ) as payments')
             )
 
             ->leftjoin($user_table, $user_table . '.id', '=', $project_table . '.client_id')
