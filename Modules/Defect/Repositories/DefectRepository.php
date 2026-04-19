@@ -1706,7 +1706,13 @@ class DefectRepository
         // GET PROJECT
         // ======================
         $project = DB::table('gv_projects')
-            ->where('id', $request->project_id)
+            ->leftJoin($user_table, $user_table . '.id', '=', 'gv_projects.assign_to')
+            ->where('gv_projects.id', $request->project_id)
+            ->select(
+                'gv_projects.*',
+                $user_table . '.firstname as assign_firstname',
+                $user_table . '.lastname as assign_lastname'
+            )
             ->first();
 
         if (!$project) {
@@ -1722,6 +1728,8 @@ class DefectRepository
         $paymentTemplateRow = 40;
         $paymentLastCol = 'N';
 
+
+        $conditionalStylesTask = $sheet->getStyle("I35")->getConditionalStyles();
         // nếu đang dùng currentRow thì dùng luôn
         if (!isset($currentRow) || $currentRow < $paymentStartRow) {
             $currentRow = $paymentStartRow;
@@ -1770,24 +1778,23 @@ class DefectRepository
             $currentRow++;
         }
         
-        $formula1 = "=SUMIFS(C{$paymentStartRow}:C{$row}, D{$paymentStartRow}:D{$row}, \"Company Revenue\")";
+        $paymentEndRow = $currentRow - 1;
+        $formula1 = "=SUMIFS(C{$paymentStartRow}:C{$paymentEndRow}, D{$paymentStartRow}:D{$paymentEndRow}, \"Company Revenue\")";
         $sheet->setCellValue("B22", $formula1);
         
-        $formula2 = "=SUMIFS(C{$paymentStartRow}:C{$row}, D{$paymentStartRow}:D{$row}, \"Company Revenue\", G{$paymentStartRow}:G{$row}, \">0\")";
+        $formula2 = "=SUMIFS(C{$paymentStartRow}:C{$paymentEndRow}, D{$paymentStartRow}:D{$paymentEndRow}, \"Company Revenue\", G{$paymentStartRow}:G{$paymentEndRow}, \"<>\")";
         $sheet->setCellValue("C22", $formula2);
         
-        $formula3 = "=SUMIFS(C{$paymentStartRow}:C{$row}, D{$paymentStartRow}:D{$row}, \"Company Revenue\", F{$paymentStartRow}:F{$row}, \">0\")";
-        $sheet->setCellValue("C22", $formula3);
+        $formula3 = "=SUMIFS(C{$paymentStartRow}:C{$paymentEndRow}, D{$paymentStartRow}:D{$paymentEndRow}, \"Company Revenue\", F{$paymentStartRow}:F{$paymentEndRow}, \"<>\")";
+        $sheet->setCellValue("D22", $formula3);
 
-        $formula3 = "=SUMIFS(C{$paymentStartRow}:C{$row}, D{$paymentStartRow}:D{$row}, \"Company Revenue\", F{$paymentStartRow}:F{$row}, \">0\")";
-        $paymentRowSum = $paymentStartRow-1;
-
-        $formula4 = "=SUMIFS(C{$paymentStartRow}:C{$row}, D{$paymentStartRow}:D{$row}, \"Collection on Behalf\", G{$paymentStartRow}:G{$row}, \"\")";
+        $formula4 = "=SUMIFS(C{$paymentStartRow}:C{$paymentEndRow}, D{$paymentStartRow}:D{$paymentEndRow}, \"Collection on Behalf\", G{$paymentStartRow}:G{$paymentEndRow}, \"\")";
         $sheet->setCellValue("D24", $formula4);
 
-        $sheet->setCellValue("C{$paymentRowSum}", "=SUM(C{$paymentStartRow}:C{$row})");
-        $sheet->setCellValue("I{$paymentRowSum}", "=SUM(I{$paymentStartRow}:I{$row})");
-        $sheet->setCellValue("J{$paymentRowSum}", "=SUM(J{$paymentStartRow}:J{$row})");
+        $paymentRowSum = $paymentStartRow-1;
+        $sheet->setCellValue("C{$paymentRowSum}", "=SUM(C{$paymentStartRow}:C{$paymentEndRow})");
+        $sheet->setCellValue("I{$paymentRowSum}", "=SUM(I{$paymentStartRow}:I{$paymentEndRow})");
+        $sheet->setCellValue("J{$paymentRowSum}", "=SUM(J{$paymentStartRow}:J{$paymentEndRow})");
         // ======================
         // LOAD TASKS
         // ======================
@@ -1807,10 +1814,12 @@ class DefectRepository
         $sheet->setCellValue("C7", $project->project_name);
         $sheet->setCellValue("C9", $project->address ?? '');
         $sheet->setCellValue("C10", now()->format('d-m-Y'));
-        $sheet->setCellValue("C15", $project->assign_to ?? '');
+        $sheet->setCellValue("C15", ($project->assign_lastname ?? '') . ' ' . ($project->assign_firstname ?? ''));
         $sheet->setCellValue("C16", $project->start_date ? date('d-m-Y', strtotime($project->start_date)) : '');
         $sheet->setCellValue("C17", $project->end_date ? date('d-m-Y', strtotime($project->end_date)) : '');
+        $sheet->setCellValue("C18", $this->mapProjectStatus($project->status));
 
+        
         // ======================
         // CONFIG
         // ======================
@@ -1860,14 +1869,14 @@ class DefectRepository
                 $sheet->getStyle("B" . ($templateRow + 1) . ":{$lastCol}" . ($templateRow + 1)),
                 "B{$row}:{$lastCol}{$row}"
             );
-
+            
             // fill TASK
             $sheet->setCellValue("B{$row}", 'TASK');
-            $sheet->setCellValue("C{$row}", $task->name);
+            $sheet->setCellValue("C{$row}", "↳ ".$task->name);
             $sheet->setCellValue("D{$row}", $task->task_start_date ? date('d-m-Y', strtotime($task->task_start_date)) : '');
-            $sheet->setCellValue("E{$row}", $task->task_start_date ? date('d-m-Y', strtotime($task->task_end_date)) : '');
+            $sheet->setCellValue("E{$row}", $this->mapTaskEnDate($task));
             // $sheet->setCellValue("F{$row}", ($task->assign_lastname ?? '') . ' ' . ($task->assign_firstname ?? ''));
-            $sheet->setCellValue("G{$row}", $task->estimated_hours);
+            $sheet->setCellValue("G{$row}", $task->estimated_hours ?? 0);
 
             $sheet->setCellValue("H{$row}", $task->timesheet->total_time ?? 0);
             $sheet->setCellValue("J{$row}", $task->price_rate ?? 0);
@@ -1883,6 +1892,8 @@ class DefectRepository
             $sheet->setCellValue("L{$row}", "=(K{$row}-J{$row})/J{$row}");
             $sheet->getStyle("I{$row}")->getNumberFormat()->setFormatCode('0.00%');
             $sheet->getStyle("L{$row}")->getNumberFormat()->setFormatCode('0.00%');
+            
+            $sheet->getStyle("I{$row}")->setConditionalStyles($conditionalStylesTask);
 
             $est_total += $task->price_rate;
             $actual_total += $task->timesheet->total_cost;
@@ -1920,6 +1931,34 @@ class DefectRepository
         }
         $sheet->setCellValue("B24", $est_total);
         $sheet->setCellValue("C24", $actual_total);
+
+        $leaves = DB::table('gv_leaves_detail')
+            ->leftJoin($user_table, $user_table . '.id', '=', 'gv_leaves_detail.user_id')
+            ->where('project_id', $request->project_id)
+            ->select(
+                'gv_leaves_detail.*',
+                $user_table . '.firstname as assign_firstname',
+                $user_table . '.lastname as assign_lastname'
+            )->get();
+            
+        foreach ($leaves as $leave) {
+            $sheet->insertNewRowBefore($currentRow, 1);
+            $tsRow = $currentRow;
+
+            $sheet->duplicateStyle(
+                $sheet->getStyle("B" . ($templateRow + 1) . ":{$lastCol}" . ($templateRow + 1)),
+                "B{$tsRow}:{$lastCol}{$tsRow}"
+            );
+
+            $sheet->setCellValue("B{$tsRow}", 'Other');
+            $sheet->setCellValue("F{$tsRow}", ($leave->assign_lastname ?? '') . ' ' . ($leave->assign_firstname ?? ''));
+            $sheet->setCellValue("K{$tsRow}", $leave->value);
+
+            $sheet->getStyle("K{$tsRow}")->getNumberFormat()->setFormatCode('#,##0');
+            $currentRow++;
+            $actual_total += $leave->value;
+        }
+
         // ======================
         // SAVE
         // ======================
@@ -2102,6 +2141,35 @@ class DefectRepository
         ];
 
         return $map[$status] ?? '';
+    }
+    private function mapProjectStatus($status)
+    {
+        $map = [
+            1 => 'Open',
+            2 => 'In Progress',
+            3 => 'On Hold',
+            4 => 'Cancel',
+            5 => 'Completed'
+        ];
+
+        return $map[$status] ?? '';
+    }
+    private function mapTaskEnDate($task)
+    {
+        if($task->status > 2){
+            return date('d-m-Y', strtotime($task->task_end_date));
+        } else {
+            $timesheet = DB::table('gv_timesheets')
+            ->where('module_related_id', $task->id)
+            ->where('module_id', 2)
+            ->orderBy('start_time', 'desc')
+            ->first();
+            if($timesheet){
+                return date('d-m-Y', strtotime($timesheet->start_time));
+            } else {
+                return date('d-m-Y', strtotime($task->task_end_date));
+            }
+        }
     }
 
     public function exportTimesheet($request){
